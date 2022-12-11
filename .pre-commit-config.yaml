@@ -1,0 +1,37 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+    -   id: check-yaml
+    -   id: check-json
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+        exclude: \.svg$
+-   repo: local
+    # Using local repos because these won't work for me from remote repo -EJ
+    # They're also more convenient because we install them via requirements.dev.txt
+    # and they are then available on the command line as well as in pre-commit.
+    hooks:
+    -   id: isort
+        name: isort
+        entry: isort
+        language: system
+        types: [python]
+        stages: [commit]
+    -   id: black
+        name: black
+        entry: black
+        language: system
+        types: [python]
+        stages: [commit]
+    -   id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        stages: [commit]
+-   repo: https://github.com/pycqa/flake8
+    # do flake8 last to avoid duplicate reports
+    rev: 3.8.3
+    hooks:
+    -   id: flake8
