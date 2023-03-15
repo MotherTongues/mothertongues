@@ -1,0 +1,28 @@
+name: Run full matrix Tests before Releases
+on:
+  pull_request:
+    branches: [ release ]
+jobs:
+  pre-release-matrix-test:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, windows-latest, macos-latest]
+        python-version: ["3.9", "3.10"]
+        poetry-version: ["1.3.0"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install dependencies
+        run: |
+          poetry install
+          poetry run pip install g2p
+      - name: Run tests
+        run: poetry run python mothertongues/tests/run.py dev
