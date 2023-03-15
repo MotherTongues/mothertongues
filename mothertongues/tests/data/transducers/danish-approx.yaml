@@ -1,0 +1,6 @@
+mapping: danish-approx.csv
+norm_form: NFC
+escape_special: true
+case_sensitive: false
+authors:
+  - Aidan Pine

@@ -80,8 +80,8 @@ def load_mtd_configuration(path: Path, base_path: Union[None, Path] = None):
         config["data"][i]["resource"] = resolve_possible_path(
             config["data"][i]["resource"], list, base_path
         )
-        config["data"][i]["manifest"] = resolve_possible_path(
-            config["data"][i]["manifest"], dict, base_path
+        config["data"][i]["manifest"] = load_manifest_configuration(
+            resolve_possible_path(config["data"][i]["manifest"], dict, base_path)
         )
     return config
 
@@ -119,14 +119,42 @@ def load_json_from_path(path: Path):
         return json.load(f)
 
 
-def string_to_callable(string: str) -> Callable:
-    """Convert a string to a callable"""
-    path = Path(string)
+def extract_parser_targets(targets: dict):
+    """Given some nested Parser Targets, create a flat dictionary of their contents
+
+    Args:
+        targets (ParserTargets): all the parser targets
+
+    Returns:
+        dict: a flat dictionary with the parser targets, enumerated for lists
+    """
+    target_dict = {}
+    for k, v in targets.items():
+        if isinstance(v, list):
+            for i, item in enumerate(v):
+                for v_k, v_j in item.items():
+                    target_dict[f"{k}_{v_k}_{i}"] = v_j
+        else:
+            target_dict[k] = v
+    return target_dict
+
+
+def string_to_callable(string: Union[Callable, str]) -> Callable:
+    """Convert a string to a callable.
+
+    Callable strings can either be :
+
+    - Callable, in which case they are returned
+    - start with "lambda" in which case they are eval'ed
+    - if they are a path to a yaml file, create a g2p mapping from them
+    - dot notation import, like "mothertongues.utils.get_current_time"
+
+    """
     if callable(string):
         return string
-    elif not isinstance(string, str):
-        raise ValueError(f"Expected a string or callable, got {type(string)}")
-    elif string.startswith("lambda"):
+    path = Path(string)
+    string = str(string)
+    if string.startswith("lambda"):
         try:
             return eval(string)
         except SyntaxError as e:
@@ -135,7 +163,11 @@ def string_to_callable(string: str) -> Callable:
             ) from e
     elif path.is_file():
         try:
-            return Transducer(Mapping(load_mapping_from_path(path)))
+            # TODO: This should actually be updated in g2p
+            mapping_data = load_mapping_from_path(path)
+            mapping_data["mapping_path"] = mapping_data["mapping"]
+            mapping_data["mapping"] = mapping_data["mapping_data"]
+            return Transducer(Mapping(**mapping_data))
         except:  # noqa: E722 TODO: find exception
             raise ValueError("Expected file at to be loadable to g2p")
     elif string.endswith(".yaml") or string.endswith(".yml"):

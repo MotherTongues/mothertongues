@@ -6,6 +6,7 @@ from loguru import logger
 
 from mothertongues.tests.test_configuration import ConfigurationTest
 from mothertongues.tests.test_dictionary_data import DictionaryDataTest
+from mothertongues.tests.test_sorter import SorterTest
 
 LOADER = TestLoader()
 
@@ -23,6 +24,8 @@ DATA_TESTS = [
     ]
 ]
 
+PROCESSOR_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [SorterTest]]
+
 
 def run_tests(suite: str, describe: bool = False) -> bool:
     """Run the test suite specified in suite.
@@ -34,7 +37,7 @@ def run_tests(suite: str, describe: bool = False) -> bool:
     if suite == "all":
         test_suite = LOADER.discover(os.path.dirname(__file__))
     elif suite == "dev":
-        test_suite = TestSuite(CONFIG_TESTS + DATA_TESTS)
+        test_suite = TestSuite(CONFIG_TESTS + DATA_TESTS + PROCESSOR_TESTS)
     elif suite == "config":
         test_suite = TestSuite(CONFIG_TESTS)
     elif suite == "data":

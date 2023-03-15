@@ -1,10 +1,12 @@
 from enum import Enum
+from pathlib import Path
 from string import ascii_letters
-from typing import Callable, List, Union
+from typing import Callable, Dict, List, Union
 
 from loguru import logger
-from pandas import DataFrame
 from pydantic import BaseModel, Extra, FilePath, HttpUrl, root_validator, validator
+
+from mothertongues.utils import convert_callables, convert_callables_list
 
 
 class BaseConfig(BaseModel):
@@ -13,8 +15,8 @@ class BaseConfig(BaseModel):
 
 
 class Audio(BaseConfig):
-    speaker: Union[None, str] = None
-    """The location of the speaker of the audio"""
+    description: Union[None, str] = None
+    """The location of the description of the audio (including speaker)"""
 
     filename: str
     """The location of the audio filename. Path is prepended with ResourceManifest.audio_path"""
@@ -29,6 +31,14 @@ class Transducer(BaseConfig):
 
     functions: List[Callable]
 
+    @convert_callables_list(kwargs_to_convert=["functions"])
+    def __init__(
+        self,
+        **data,
+    ) -> None:
+        """Custom init to process transducer functions"""
+        super().__init__(**data)
+
 
 class ParserEnum(Enum):
     json = "json"
@@ -36,6 +46,8 @@ class ParserEnum(Enum):
     psv = "psv"
     tsv = "tsv"
     xlsx = "xlsx"
+    custom = "custom"
+    none = "none"  # for when object is passed directly with no parser needed
 
 
 class Contributor(BaseConfig):
@@ -65,16 +77,16 @@ class ParserTargets(BaseConfig):
     img: Union[str, None] = None
     """The location of the image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
 
-    audio: Union[Audio, None] = None
+    audio: Union[List[Audio], None] = None
     """The location of the audio associated with the entry."""
 
-    definition_audio: Union[Audio, None] = None
+    definition_audio: Union[List[Audio], None] = None
     """The location of the audio associated with the definition of the entry."""
 
-    example_sentence: Union[List[str], None]
+    example_sentence: Union[List[str], None] = None
     """The location(s) of any example sentences associated with the entry"""
 
-    example_sentence_definition: Union[List[str], None]
+    example_sentence_definition: Union[List[str], None] = None
     """The location(s) of any example sentences associated with the entry"""
 
     example_sentence_audio: Union[List[Union[Audio, None]], None] = None
@@ -83,11 +95,14 @@ class ParserTargets(BaseConfig):
     example_sentence_definition_audio: Union[List[Union[Audio, None]], None] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
+    optional: Union[List[Dict[str, str]], None] = None
+    """A list of information to optionally display"""
+
     @root_validator
     def check_example_sentence_fields_are_same_length(cls, values):
         return values
 
-    @validator()
+    @root_validator
     def warn_that_functionality_is_limited_if_none(cls, v):
         if v is None:
             logger.warning(
@@ -97,20 +112,11 @@ class ParserTargets(BaseConfig):
 
 
 class ResourceManifest(BaseConfig):
-    file_type: Union[None, ParserEnum] = None
-    """The type of file to parse. None if data is passed as object"""
+    file_type: ParserEnum = ParserEnum.none
+    """The type of parser to use to parse the resource"""
 
     name: str = "YourData"
     """The name/source of your dataset"""
-
-    display_field: str = "word"
-    """The fieldname to display"""
-
-    compare_field: str = "compare_form"
-    """The fieldname to pass to the approximate search algorithm"""
-
-    sorting_field: str = "sort_form"
-    """The fieldname to pass to the sorting algorithm"""
 
     skip_header: bool = False
     """TODO: change this to just allow any kwargs to pass to pandas.read_*. Whether to skip the header when parsing. Applies to spreadsheet formats"""
@@ -130,7 +136,7 @@ class ResourceManifest(BaseConfig):
     def check_paths_are_pingable(cls, v):
         return v
 
-    @validator()
+    @root_validator
     def warn_that_functionality_is_limited_if_none(cls, v):
         if v is None:
             logger.warning(
@@ -146,14 +152,20 @@ class LanguageConfiguration(BaseConfig):
     L2: str = "English"
     """The Other Language of Your Dictionary"""
 
-    alphabet: Union[List[str], str] = list(ascii_letters)
+    alphabet: Union[List[str], FilePath] = list(ascii_letters)
     """The Symbols/Letters present in Your Dictionary"""
 
-    L1_compare_transducer_name: str
-    """TODO: what is this"""
+    display_field: str = "word"
+    """The fieldname to display"""
+
+    compare_field: str = "compare_form"
+    """The fieldname to pass to the approximate search algorithm"""
+
+    sorting_field: str = "sort_form"
+    """The fieldname to pass to the sorting algorithm"""
 
     optional_field_name: str
-    """TODO: what is this"""
+    """The display name for the optional field"""
 
     credits: Union[List[Contributor], None] = None
     """Add a list of contributors to this project"""
@@ -161,7 +173,7 @@ class LanguageConfiguration(BaseConfig):
     build: str
     """The build identifier for your dictionary build"""
 
-    @validator()
+    @root_validator
     def warn_that_functionality_is_limited_if_none(cls, v):
         if v is None:
             logger.warning(
@@ -169,15 +181,25 @@ class LanguageConfiguration(BaseConfig):
             )
         return v
 
+    @convert_callables(kwargs_to_convert=["build"])
+    def __init__(
+        self,
+        **data,
+    ) -> None:
+        """Custom init to process possible build function"""
+        if callable(data["build"]):
+            data["build"] = data["build"]()
+        super().__init__(**data)
+
 
 class DataSource(BaseConfig):
     manifest: ResourceManifest
     """The manifest describing how to parse your data"""
 
-    data: Union[FilePath, List[dict]]
+    resource: Union[FilePath, List[dict]]
     """The data or a path to the data"""
 
-    @validator("data")
+    @validator("resource")
     def check_data_is_parsable(cls, v):
         return v
 
@@ -187,6 +209,9 @@ class DataSource(BaseConfig):
         - Data is parsable
         - ParserTargets are of the valid type given file_type
         - ParserTargets exist in data"""
+        if isinstance(values["resource"], Path) and not values["resource"].exists():
+            raise
+
         return values
 
 
@@ -194,38 +219,5 @@ class MTDConfiguration(BaseConfig):
     config: LanguageConfiguration
     """The Configuration for your Language"""
 
-    data: List[Union[FilePath, DataSource]]
+    data: List[DataSource]
     """The list of data sources for your dictionary"""
-
-
-class MTDictionary(BaseConfig):
-    config: MTDConfiguration
-    """The Configuration for your Dictionary"""
-
-    data: DataFrame
-    """Your Dictionary Data as a Pandas Dataframe"""
-
-    def __init__(self, **data):
-        """Create Data Frame from Config"""
-        # TODO: parse data
-        # TODO: transduce
-        # TODO: sort
-        super().__init__(**data)
-
-    def __len__(self):
-        return len(self.data.index)
-
-    def __getitem__(self, position):
-        return self.data.iloc[[position]]
-
-    @validator("data")
-    def check_duplicates(cls, v):
-        return v
-
-    @validator("data")
-    def check_missing_chars(cls, v):
-        return v
-
-    @validator("data")
-    def check_missing_data(cls, v):
-        return v

@@ -1,0 +1,32 @@
+{
+    "file_type": "csv",
+    "name": "words",
+    "transducers": [{
+            "input_field": "word",
+            "output_field": "compare_form",
+            "functions": [
+                "./transducers/danish-approx.yaml"
+            ]
+        },
+        {
+            "input_field": "word",
+            "output_field": "sort_form",
+            "functions": [
+                "lambda x: x.lower()"
+            ]
+        }
+    ],
+    "targets": {
+        "entryID": "0",
+        "definition": "1",
+        "word": "2",
+        "audio": [{
+            "description": "3",
+            "filename": "4"
+        }],
+        "theme": "5",
+        "optional": [{
+            "Pronunciation": "6"
+        }]
+    }
+}
