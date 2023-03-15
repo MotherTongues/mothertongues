@@ -6,3 +6,4 @@ __pycache__
 .python-version
 docs/build
 .DS_Store
+coverage.xml
