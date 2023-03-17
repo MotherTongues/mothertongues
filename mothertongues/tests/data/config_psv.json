@@ -7,7 +7,7 @@
         "alphabet": "./alphabet.json"
     },
     "data": [{
-        "manifest": "./manifest.json",
-        "resource": "./data.csv"
+        "manifest": "./manifest_psv.json",
+        "resource": "./data.psv"
     }]
 }

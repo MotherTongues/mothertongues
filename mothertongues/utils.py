@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from importlib import import_module
 from pathlib import Path
+from string import ascii_letters
 from typing import Callable, List, Union
 
 from g2p import Mapping, Transducer
@@ -222,3 +223,19 @@ def convert_callables_list(*args, kwargs_to_convert: List[str] = []):
         return wrapper
 
     return decorator
+
+
+def col2int(col: Union[str, int]):
+    if isinstance(col, int):
+        # return if it's already an int
+        return col
+    try:
+        # otherwise try a basic type cast
+        return int(col)
+    except ValueError:
+        # otherwise convert letter to number (can also have columns AA for example)
+        num = 0
+        for c in col:
+            if c in ascii_letters:
+                num = num * 26 + (ord(c.upper()) - ord("A"))
+        return num

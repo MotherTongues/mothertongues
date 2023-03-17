@@ -1,0 +1,32 @@
+{
+    "file_type": "xlsx",
+    "name": "words",
+    "transducers": [{
+            "input_field": "word",
+            "output_field": "compare_form",
+            "functions": [
+                "./transducers/danish-approx.yaml"
+            ]
+        },
+        {
+            "input_field": "word",
+            "output_field": "sort_form",
+            "functions": [
+                "lambda x: x.lower()"
+            ]
+        }
+    ],
+    "targets": {
+        "entryID": "A",
+        "definition": "B",
+        "word": "C",
+        "audio": [{
+            "description": "D",
+            "filename": "E"
+        }],
+        "theme": "F",
+        "optional": [{
+            "Pronunciation": "G"
+        }]
+    }
+}

@@ -6,6 +6,7 @@ from loguru import logger
 
 from mothertongues.tests.test_configuration import ConfigurationTest
 from mothertongues.tests.test_dictionary_data import DictionaryDataTest
+from mothertongues.tests.test_parsers import DictionaryParserTest
 from mothertongues.tests.test_sorter import SorterTest
 
 LOADER = TestLoader()
@@ -24,7 +25,9 @@ DATA_TESTS = [
     ]
 ]
 
-PROCESSOR_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [SorterTest]]
+PROCESSOR_TESTS = [
+    LOADER.loadTestsFromTestCase(test) for test in [SorterTest, DictionaryParserTest]
+]
 
 
 def run_tests(suite: str, describe: bool = False) -> bool:
@@ -42,6 +45,8 @@ def run_tests(suite: str, describe: bool = False) -> bool:
         test_suite = TestSuite(CONFIG_TESTS)
     elif suite == "data":
         test_suite = TestSuite(DATA_TESTS)
+    elif suite == "processors":
+        test_suite = TestSuite(PROCESSOR_TESTS)
     else:
         logger.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
         return False

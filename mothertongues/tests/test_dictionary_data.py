@@ -11,7 +11,7 @@ class DictionaryDataTest(BasicTestCase):
 
     def setUp(self):
         super().setUp()
-        language_config_path = self.data_dir / "config.json"
+        language_config_path = self.data_dir / "config_csv.json"
         config = load_mtd_configuration(language_config_path)
         self.mtd_config = MTDConfiguration(**config)
         self.dictionary = MTDictionary(self.mtd_config)
