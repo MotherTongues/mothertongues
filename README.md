@@ -1,6 +1,6 @@
 # Mother Tongues Dictionaries (MTD)
 
-[![Coverage Status](https://coveralls.io/repos/github/MotherTongues/mothertongues/badge.svg?branch=master)](https://coveralls.io/github/MotherTongues/mothertongues?branch=master)
+[![codecov](https://codecov.io/gh/MotherTongues/mothertongues/branch/main/graph/badge.svg?token=7JUKAAHZDV)](https://codecov.io/gh/MotherTongues/mothertongues)
 [![Documentation Status](https://img.shields.io/badge/-docs-blue)](https://docs.mothertongues.org)
 [![Build Status](https://github.com/MotherTongues/mothertongues/actions/workflows/tests.yml/badge.svg)](https://github.com/MotherTongues/mothertongues/actions)
 [![PyPI package](https://img.shields.io/pypi/v/mothertongues.svg)](https://pypi.org/project/mothertongues/)
@@ -82,6 +82,6 @@ This project exists thanks to all the people who contribute.
 
 TODO:
 
-- Run `python3 -m unittest mothertongues/tests/test_dictionary_data.py` and then fix the issue with relative paths for g2p callables.
+- Run `python3 -m unittest mothertongues/tests/test_dictionary_data.py`.
 
 - Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.
