@@ -1,0 +1,13 @@
+{
+    "config": {
+        "L1": "Danish",
+        "L2": "English",
+        "build": "mothertongues.utils.get_current_time",
+        "optional_field_name": "Optional Info",
+        "alphabet": "./alphabet.json"
+    },
+    "data": [{
+        "manifest": "./manifest_custom.json",
+        "resource": "./data_custom_format.data"
+    }]
+}

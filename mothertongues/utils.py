@@ -3,10 +3,11 @@ from datetime import datetime
 from importlib import import_module
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, List, Union
+from typing import Callable, Union
 
 from g2p import Mapping, Transducer
 from g2p.mappings.utils import load_mapping_from_path
+from loguru import logger
 from pandas import DataFrame
 
 from mothertongues.processors.sorter import ArbSorter
@@ -140,7 +141,7 @@ def extract_parser_targets(targets: dict):
     return target_dict
 
 
-def string_to_callable(string: Union[Callable, str]) -> Callable:
+def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
     """Convert a string to a callable.
 
     Callable strings can either be :
@@ -168,7 +169,8 @@ def string_to_callable(string: Union[Callable, str]) -> Callable:
             mapping_data = load_mapping_from_path(path)
             mapping_data["mapping_path"] = mapping_data["mapping"]
             mapping_data["mapping"] = mapping_data["mapping_data"]
-            return Transducer(Mapping(**mapping_data))
+            transducer = Transducer(Mapping(**mapping_data))
+            return lambda x: transducer(x).output_string
         except:  # noqa: E722 TODO: find exception
             raise ValueError("Expected file at to be loadable to g2p")
     elif string.endswith(".yaml") or string.endswith(".yml"):
@@ -176,7 +178,10 @@ def string_to_callable(string: Union[Callable, str]) -> Callable:
             f"File '{string}' looks like yaml but does not seem to exist. Please provide an absolute path or a path relative to your configuration file"
         )
     if "." not in string:
-        raise ValueError("String must be in the format <module>.<function>")
+        logger.debug(
+            f"String must be in the format <module>.<function>. If {string} is actually a string, you can ignore this."
+        )
+        return string
     module_name, function_name = string.rsplit(".", 1)
     try:
         module = import_module(module_name)
@@ -191,38 +196,6 @@ def string_to_callable(string: Union[Callable, str]) -> Callable:
             f"Cannot find method {function} in module {module}"
         ) from exc
     return function
-
-
-def convert_callables(*args, kwargs_to_convert: List[str] = []):
-    def decorator(fn):
-        def wrapper(*args, **kwargs):
-            converted_kwargs = {
-                k: string_to_callable(v)
-                for k, v in kwargs.items()
-                if k in kwargs_to_convert
-            }
-            kwargs = kwargs | converted_kwargs
-            return fn(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-def convert_callables_list(*args, kwargs_to_convert: List[str] = []):
-    def decorator(fn):
-        def wrapper(*args, **kwargs):
-            converted_kwargs = {
-                k: [string_to_callable(x) for x in v]
-                for k, v in kwargs.items()
-                if k in kwargs_to_convert
-            }
-            kwargs = kwargs | converted_kwargs
-            return fn(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 def col2int(col: Union[str, int]):

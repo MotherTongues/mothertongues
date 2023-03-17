@@ -1,5 +1,5 @@
 {
-    "file_type": "psv",
+    "file_type": "custom",
     "name": "words",
     "transducers": [{
             "input_field": "word",
@@ -15,18 +15,5 @@
                 "lambda x: x.lower()"
             ]
         }
-    ],
-    "targets": {
-        "entryID": "0",
-        "definition": "1",
-        "word": "2",
-        "audio": [{
-            "description": "3",
-            "filename": "4"
-        }],
-        "theme": "5",
-        "optional": [{
-            "Part of Speech": "6"
-        }]
-    }
+    ]
 }

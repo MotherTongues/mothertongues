@@ -6,7 +6,7 @@ from typing import Callable, Dict, List, Union
 from loguru import logger
 from pydantic import BaseModel, Extra, FilePath, HttpUrl, root_validator, validator
 
-from mothertongues.utils import convert_callables, convert_callables_list
+from mothertongues.utils import string_to_callable
 
 
 class BaseConfig(BaseModel):
@@ -31,13 +31,14 @@ class Transducer(BaseConfig):
 
     functions: List[Callable]
 
-    @convert_callables_list(kwargs_to_convert=["functions"])
-    def __init__(
-        self,
-        **data,
-    ) -> None:
-        """Custom init to process transducer functions"""
-        super().__init__(**data)
+    @validator("functions", always=True, pre=True)
+    def convert_callables(cls, v, values):
+        funcs = []
+        for func in v:
+            func = string_to_callable(func)
+            funcs.append(func)
+        values["functions"] = funcs
+        return funcs
 
 
 class ParserEnum(Enum):
@@ -121,7 +122,7 @@ class ResourceManifest(BaseConfig):
     skip_header: bool = False
     """TODO: change this to just allow any kwargs to pass to pandas.read_*. Whether to skip the header when parsing. Applies to spreadsheet formats"""
 
-    transducers: List[Transducer]
+    transducers: List[Transducer] = []
     """A list of Transducers to apply to your data"""
 
     audio_path: Union[HttpUrl, None] = None
@@ -130,10 +131,18 @@ class ResourceManifest(BaseConfig):
     img_path: Union[HttpUrl, None] = None
     """This is a path to your image files that will be pre-pended to each image path"""
 
-    targets: ParserTargets
+    targets: Union[ParserTargets, None] = None
 
     @validator("audio_path", "img_path")
     def check_paths_are_pingable(cls, v):
+        return v
+
+    @root_validator
+    def targets_none_only_if_custom_parser(cls, v):
+        if v["targets"] is None and not v["file_type"].custom:
+            raise ValueError(
+                "Targets cannot be None if the parser is not using a custom parser."
+            )
         return v
 
     @root_validator
@@ -164,13 +173,13 @@ class LanguageConfiguration(BaseConfig):
     sorting_field: str = "sort_form"
     """The fieldname to pass to the sorting algorithm"""
 
-    optional_field_name: str
+    optional_field_name: str = "Optional Field"
     """The display name for the optional field"""
 
     credits: Union[List[Contributor], None] = None
     """Add a list of contributors to this project"""
 
-    build: str
+    build: str = "mothertongues.utils.get_current_time"
     """The build identifier for your dictionary build"""
 
     @root_validator
@@ -181,15 +190,23 @@ class LanguageConfiguration(BaseConfig):
             )
         return v
 
-    @convert_callables(kwargs_to_convert=["build"])
-    def __init__(
-        self,
-        **data,
-    ) -> None:
-        """Custom init to process possible build function"""
-        if callable(data["build"]):
-            data["build"] = data["build"]()
-        super().__init__(**data)
+    @validator("build", always=True, pre=True)
+    def convert_callable_build(cls, v, values):
+        """Take the build argument (string) and if it's in dot notation,
+           convert it to a callable and call it.
+
+        Args:
+            v (_type_): the build value
+            values (_type_): all values
+
+        Returns:
+            string: the called value of the build function (if it's not a function, just return the string)
+        """
+        v = string_to_callable(v)
+        if callable(v):
+            v = v()
+            values["build"] = v
+        return v
 
 
 class DataSource(BaseConfig):
@@ -209,8 +226,12 @@ class DataSource(BaseConfig):
         - Data is parsable
         - ParserTargets are of the valid type given file_type
         - ParserTargets exist in data"""
-        if isinstance(values["resource"], Path) and not values["resource"].exists():
-            raise
+        if (
+            values
+            and isinstance(values["resource"], Path)
+            and not values["resource"].exists()
+        ):
+            raise  # TODO: what should this raise?
 
         return values
 
@@ -219,5 +240,5 @@ class MTDConfiguration(BaseConfig):
     config: LanguageConfiguration
     """The Configuration for your Language"""
 
-    data: List[DataSource]
-    """The list of data sources for your dictionary"""
+    data: Union[DataSource, List[DataSource]]
+    """The data sources for your dictionary"""
