@@ -27,7 +27,7 @@ class ArbSorter(object):
         # Next, collect weights for the ordering.
         self.char_to_ord_lookup = {order[i]: i for i in range(len(order))}
         self.ord_to_char_lookup = {v: k for k, v in self.char_to_ord_lookup.items()}
-        self.oov_count = 10000
+        self.oov_start = 10000
 
     # Turns a word into a list of ints representing the new
     # lexicographic ordering.  Python, helpfully, allows one to
@@ -47,10 +47,10 @@ class ArbSorter(object):
                 for oov in char:
                     if oov in self.ignorable:
                         continue
-                    self.char_to_ord_lookup[oov] = self.oov_count
-                    self.ord_to_char_lookup[self.oov_count] = oov
-                    values.append(self.oov_count)
-                    self.oov_count += 1
+                    oov_index = self.oov_start + ord(oov)
+                    self.char_to_ord_lookup[oov] = oov_index
+                    self.ord_to_char_lookup[oov_index] = oov
+                    values.append(oov_index)
         return values
 
     def values_as_word(self, values):

@@ -22,10 +22,10 @@ class SorterTest(TestCase):
         lexicon = self.list_to_sorting_form(["råd", "ūįrød"])
         lexicon_sorted = [
             {"word": "råd", "sorting_form": [17, 28, 3]},
-            {"word": "ūįrød", "sorting_form": [10000, 17, 27, 3]},
+            {"word": "ūįrød", "sorting_form": [10303, 17, 27, 3]},
         ]
         self.assertEqual(sorter(lexicon, "word"), lexicon_sorted)
-        self.assertEqual(sorter.values_as_word([10000, 17, 27, 3]), "įrød")
+        self.assertEqual(sorter.values_as_word([10303, 17, 27, 3]), "įrød")
 
     def test_sort_oov_characters(self):
         """Sort oov characters at the end"""
@@ -33,10 +33,13 @@ class SorterTest(TestCase):
         lexicon = self.list_to_sorting_form(["råd", "ūįrød"])
         lexicon_sorted = [
             {"word": "råd", "sorting_form": [17, 28, 3]},
-            {"word": "ūįrød", "sorting_form": [10000, 10001, 17, 27, 3]},
+            {"word": "ūįrød", "sorting_form": [10363, 10303, 17, 27, 3]},
         ]
         self.assertEqual(sorter(lexicon, "word"), lexicon_sorted)
-        self.assertEqual(sorter.values_as_word([10000, 10001, 17, 27, 3]), "ūįrød")
+        self.assertEqual(sorter.values_as_word([10363, 10303, 17, 27, 3]), "ūįrød")
+        self.assertEqual(
+            sorter.values_as_word([10363, 10303, 10303, 17, 27, 3]), "ūįįrød"
+        )
 
     def test_sort_unicode(self):
         """Sort non-ascii characters."""
