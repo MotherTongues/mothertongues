@@ -4,7 +4,7 @@
 [![Documentation Status](https://img.shields.io/badge/-docs-blue)](https://docs.mothertongues.org)
 [![Build Status](https://github.com/MotherTongues/mothertongues/actions/workflows/tests.yml/badge.svg)](https://github.com/MotherTongues/mothertongues/actions)
 [![PyPI package](https://img.shields.io/pypi/v/mothertongues.svg)](https://pypi.org/project/mothertongues/)
-[![license](https://img.shields.io/github/license/MotherTongues/mothertongues.svg)](LICENSE)
+[![license](https://img.shields.io/badge/Licence-MIT-green)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
 MTD is the first of two open-source tools that allow language communities and developers to quickly and inexpensively make their dictionary data digitally accessible. MTD is a tool that parses and prepares your data for being used with an MTD User Interface. Currently [mobile](https://github.com/roedoejet/mothertongues-ui) and [web](https://github.com/MotherTongues/mothertongues-UI-Web) are supported.
