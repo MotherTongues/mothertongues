@@ -1,4 +1,5 @@
 from pathlib import Path
+from types import MethodType
 
 import pandas as pd
 
@@ -11,6 +12,13 @@ from mothertongues.config.models import (
 from mothertongues.dictionary import MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
+
+
+def _custom_parser_method(self: MTDictionary, data_source: DataSource) -> pd.DataFrame:
+    print(
+        f"Testing accessing the dictionary config. Here is the build number: {self.config.config.build}"
+    )
+    return _custom_parser(data_source)
 
 
 def _custom_parser(data_source: DataSource) -> pd.DataFrame:
@@ -112,6 +120,16 @@ class DictionaryParserTest(BasicTestCase):
         data = dictionary.data.to_dict(orient="records")
         self.assertEqual(data[0]["word"], "farvel")
         self.assertEqual(data[3]["word"], "træ")
+        dictionary_no_init = MTDictionary(
+            mtd_config, parse_data_on_initialization=False
+        )
+        dictionary_no_init.custom_parse_method = MethodType(
+            _custom_parser_method, dictionary_no_init
+        )
+        dictionary_no_init.initialize()
+        data_from_no_init = dictionary_no_init.data.to_dict(orient="records")
+        self.assertEqual(data_from_no_init[0]["word"], "farvel")
+        self.assertEqual(data_from_no_init[3]["word"], "træ")
         # self.assertEqual(data, self.reference_data)
 
     def test_no_parser(self):

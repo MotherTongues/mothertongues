@@ -20,6 +20,7 @@ class MTDictionary(BaseConfig):
         self,
         config: MTDConfiguration,
         custom_parse_method: Union[Callable, None] = None,
+        parse_data_on_initialization: bool = True,
         **kwargs
     ):
         """Create Data Frame from Config"""
@@ -27,6 +28,17 @@ class MTDictionary(BaseConfig):
             setattr(self, "custom_parse_method", custom_parse_method)
         self.config = config
         self.data = None
+        if parse_data_on_initialization:
+            self.initialize()
+        super().__init__()
+
+    def __len__(self):
+        return len(self.data.index)
+
+    def __getitem__(self, position):
+        return self.data.iloc[[position]]
+
+    def initialize(self):
         # convert single DataSource to list
         if isinstance(self.config.data, DataSource):
             self.config.data = [self.config.data]
@@ -46,13 +58,6 @@ class MTDictionary(BaseConfig):
         if self.data is not None:
             self.data.sort_values(by=self.config.config.sorting_field, inplace=True)
         self.check_data()
-        super().__init__()
-
-    def __len__(self):
-        return len(self.data.index)
-
-    def __getitem__(self, position):
-        return self.data.iloc[[position]]
 
     def custom_parse_method(self, data_source: DataSource) -> pd.DataFrame:
         """Custom Parser for your data. This method is meant to be overridden by subclasses.
@@ -125,5 +130,16 @@ class MTDictionary(BaseConfig):
         # duplicates
         # missing chars
         # missing data
+        # typechecking
         # TODO: Implement this
         return True
+
+
+# TODO: turn this into docs
+# from types import MethodType
+
+# def custom_parser(self: MTDictionary, data_source: DataSource):
+#     return self.config
+
+# dictionary = MTDictionary()
+# dictionary.custom_parse_method = MethodType(custom_parser, dictionary)
