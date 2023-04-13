@@ -140,3 +140,19 @@ class DictionaryParserTest(BasicTestCase):
 
     def test_misconfigured_parser_targets(self):
         pass
+
+    def test_prepending_paths(self):
+        language_configuration = LanguageConfiguration()
+        data_plus_img = self.reference_data
+        data_plus_img[0]["img"] = "test.jpg"
+        data = DataSource(
+            manifest=ResourceManifest(
+                img_path="http://bar.foo//", audio_path="https://foo.bar"
+            ),
+            resource=data_plus_img,
+        )
+        mtd_config = MTDConfiguration(config=language_configuration, data=[data])
+        dictionary = MTDictionary(mtd_config)
+        data = dictionary.data.to_dict(orient="records")
+        self.assertEqual(data[1]["audio_filename_0"], "https://foo.bar/hej.mp3")
+        self.assertEqual(data[0]["img"], "http://bar.foo/test.jpg")

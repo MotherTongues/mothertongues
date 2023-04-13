@@ -1,4 +1,6 @@
+from functools import partial
 from typing import Callable, List, Union
+from urllib.parse import urljoin
 
 import pandas as pd
 from pydantic import BaseConfig
@@ -48,6 +50,17 @@ class MTDictionary(BaseConfig):
                 df = pd.DataFrame(data_source.resource)
             else:
                 df = self.parse(data_source)
+            # Prepend image and audio paths
+            if data_source.manifest.audio_path is not None:
+                audio_join_partial = partial(urljoin, data_source.manifest.audio_path)
+                df.loc[:, df.columns.str.startswith("audio_filename")] = (
+                    df.loc[:, df.columns.str.startswith("audio_filename")]
+                    .dropna()
+                    .applymap(audio_join_partial)
+                )
+            if data_source.manifest.img_path is not None:
+                img_join_partial = partial(urljoin, data_source.manifest.img_path)
+                df["img"] = df["img"].dropna().apply(img_join_partial)
             # Transduce Data
             df = self.transduce(df, data_source.manifest.transducers)
             if self.data is None:
@@ -170,3 +183,6 @@ class MTDictionary(BaseConfig):
         # typechecking
         # TODO: Implement this
         return True
+
+    def export(self):
+        breakpoint()
