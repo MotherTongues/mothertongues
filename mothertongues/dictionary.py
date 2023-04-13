@@ -63,7 +63,41 @@ class MTDictionary(BaseConfig):
         """Custom Parser for your data. This method is meant to be overridden by subclasses.
         To implement, you must parse the targets in self.parser_targets and return a pandas dataframe.
 
-        TODO: this should be configurable in the config"""
+        You can either implement by initializing the MTDictionary object with a custom parse function like so:
+
+        >>> dictionary = MTDictionary(mtd_config: MTDConfiguration, custom_parse_method=custom_parser_function)
+
+        Here, custom_parser_function has to be a function that takes a data_source as its only argument and return a Pandas DataFrame of the parsed data:
+
+        >>> def custom_parser_function(data_source: DataSource) -> pd.DataFrame:
+                ...parse the data...
+                return pd.DataFrame
+
+        Alternatively, if you need access to the configuration or other parts of the MTDictionary object in order to parse properly,
+        you can define a method using MethodType.
+
+        MTDictionary objects automatically parse on initialization by default though, so first create the MTDictionary and supress parsing on initialization:
+
+        >>> dictionary_no_init = MTDictionary(
+            mtd_config, parse_data_on_initialization=False
+        )
+        >>> dictionary_no_init.custom_parse_method = MethodType(
+            custom_parser_method, dictionary_no_init
+        )
+
+        Where custom_parser_method is a function that takes two arguments and returns a Pandas DataFrame:
+
+        >>>  def custom_parser_method(self: MTDictionary, data_source: DataSource) -> pd.DataFrame:
+                ...do stuff with self...
+                ...parse the data...
+                return pd.DataFrame
+
+        Then, don't forget to initialize the data:
+
+        >>> dictionary_no_init.initialize()
+
+
+        """
         raise NotImplementedError(
             "Your data was specified as 'custom' but the MTDictionary.custom_parse_method was not implemented. You must implement a custom parser for your data."
         )
@@ -91,10 +125,10 @@ class MTDictionary(BaseConfig):
             # assume parser targets are accurate if passing in raw data. # TODO: validate
         elif data_source.manifest.file_type == ParserEnum.json:
             df = pd.read_json(data_source.resource)
-            # TODO: decide if we're keeping this... maybe not...
+            # TODO: implement this
         elif data_source.manifest.file_type == ParserEnum.xml:
-            df = pd.read_json(data_source.resource)
-            # TODO: decide if we're keeping this... maybe not...
+            df = pd.read_xml(data_source.resource)
+            # TODO: implement this
         elif data_source.manifest.file_type == ParserEnum.xlsx:
             # For some reason pandas doesn't seem to read data in as utf8 for excel
             with open(data_source.resource, "rb") as f:
