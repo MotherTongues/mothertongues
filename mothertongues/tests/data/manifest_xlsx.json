@@ -25,8 +25,8 @@
             "filename": "E"
         }],
         "theme": "F",
-        "optional": [{
+        "optional": {
             "Part of Speech": "G"
-        }]
+        }
     }
 }

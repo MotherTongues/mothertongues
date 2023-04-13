@@ -25,8 +25,8 @@
             "filename": "4"
         }],
         "theme": "5",
-        "optional": [{
+        "optional": {
             "Part of Speech": "6"
-        }]
+        }
     }
 }

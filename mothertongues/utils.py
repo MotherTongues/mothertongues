@@ -136,6 +136,9 @@ def extract_parser_targets(targets: dict):
             for i, item in enumerate(v):
                 for v_k, v_j in item.items():
                     target_dict[f"{k}_{v_k}_{i}"] = v_j
+        elif isinstance(v, dict):
+            for v_key, v_val in v.items():
+                target_dict[f"{k}_{v_key}"] = v_val
         else:
             target_dict[k] = v
     return target_dict

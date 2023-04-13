@@ -92,6 +92,9 @@ class MTDictionary(BaseConfig):
         elif data_source.manifest.file_type == ParserEnum.json:
             df = pd.read_json(data_source.resource)
             # TODO: decide if we're keeping this... maybe not...
+        elif data_source.manifest.file_type == ParserEnum.xml:
+            df = pd.read_json(data_source.resource)
+            # TODO: decide if we're keeping this... maybe not...
         elif data_source.manifest.file_type == ParserEnum.xlsx:
             # For some reason pandas doesn't seem to read data in as utf8 for excel
             with open(data_source.resource, "rb") as f:
@@ -133,13 +136,3 @@ class MTDictionary(BaseConfig):
         # typechecking
         # TODO: Implement this
         return True
-
-
-# TODO: turn this into docs
-# from types import MethodType
-
-# def custom_parser(self: MTDictionary, data_source: DataSource):
-#     return self.config
-
-# dictionary = MTDictionary()
-# dictionary.custom_parse_method = MethodType(custom_parser, dictionary)

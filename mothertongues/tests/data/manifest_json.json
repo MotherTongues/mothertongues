@@ -1,5 +1,5 @@
 {
-    "file_type": "csv",
+    "file_type": "json",
     "name": "words",
     "transducers": [{
             "input_field": "word",
@@ -17,16 +17,16 @@
         }
     ],
     "targets": {
-        "entryID": "0",
-        "definition": "1",
-        "word": "2",
+        "entryID": "entryID",
+        "definition": "definition",
+        "word": "word",
         "audio": [{
-            "description": "3",
-            "filename": "4"
+            "description": "speaker",
+            "filename": "filename"
         }],
-        "theme": "5",
-        "optional": {
-            "Part of Speech": "6"
-        }
+        "theme": "theme",
+        "optional": [{
+            "Part of Speech": "optional.\"Part of Speech\""
+        }]
     }
 }

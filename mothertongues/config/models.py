@@ -48,6 +48,7 @@ class ParserEnum(Enum):
     tsv = "tsv"
     xlsx = "xlsx"
     custom = "custom"
+    xml = "xml"
     none = "none"  # for when object is passed directly with no parser needed
 
 
@@ -96,7 +97,7 @@ class ParserTargets(BaseConfig):
     example_sentence_definition_audio: Union[List[Union[Audio, None]], None] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
-    optional: Union[List[Dict[str, str]], None] = None
+    optional: Union[Dict[str, str], None] = None
     """A list of information to optionally display"""
 
     @root_validator
