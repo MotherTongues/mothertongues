@@ -1,4 +1,7 @@
+import json
 import re
+from pathlib import Path
+from typing import List, Union
 
 
 class ArbSorter(object):
@@ -20,12 +23,21 @@ class ArbSorter(object):
         order (list[str]): The order to sort by.
     """
 
-    def __init__(self, order, ignorable=None):
+    def __init__(self, order: Union[List[str], Path], ignorable=None):
+        self.order = order
+        if isinstance(order, Path):
+            if self.order.suffix.endswith("json"):
+                with open(self.order, encoding="utf8") as f:
+                    self.order = json.load(f)
+            else:
+                with open(self.order, encoding="utf8") as f:
+                    self.order = [x.strip() for x in f]
         self.ignorable = [] if ignorable is None else ignorable
-        split_order = [re.escape(x) for x in sorted(order, key=len, reverse=True)]
+        split_order = [re.escape(x) for x in sorted(self.order, key=len, reverse=True)]
         self.splitter = re.compile(f'({"|".join(split_order)})', re.UNICODE)
+        self.oovs = []
         # Next, collect weights for the ordering.
-        self.char_to_ord_lookup = {order[i]: i for i in range(len(order))}
+        self.char_to_ord_lookup = {self.order[i]: i for i in range(len(self.order))}
         self.ord_to_char_lookup = {v: k for k, v in self.char_to_ord_lookup.items()}
         self.oov_start = 10000
 
@@ -50,6 +62,7 @@ class ArbSorter(object):
                     oov_index = self.oov_start + ord(oov)
                     self.char_to_ord_lookup[oov] = oov_index
                     self.ord_to_char_lookup[oov_index] = oov
+                    self.oovs.append(oov)
                     values.append(oov_index)
         return values
 
@@ -58,6 +71,7 @@ class ArbSorter(object):
         return "".join([self.ord_to_char_lookup[v] for v in values])
 
     def __call__(self, item_list, target, sort_key="sorting_form"):
+        # TODO: this is a bit weird. make it more general.
         """Return sorted list based on item's (word's) sorting_form"""
         sorted_list = []
         for item in item_list:

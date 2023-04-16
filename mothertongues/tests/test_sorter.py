@@ -1,20 +1,37 @@
 from string import ascii_lowercase
-from unittest import TestCase, main
+from unittest import main
 
 from pandas import DataFrame
 
 from mothertongues.processors.sorter import ArbSorter
+from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import add_sorting_form_to_df
 
 
-class SorterTest(TestCase):
+class SorterTest(BasicTestCase):
     def setUp(self):
+        super().setUp()
         self.english_alphabet = list(ascii_lowercase)
         self.danish_alphabet = self.english_alphabet + ["æ", "ø", "å"]
+        self.alphabet_json_path = self.data_dir / "alphabet.json"
+        self.alphabet_text_path = self.data_dir / "alphabet.txt"
 
     def list_to_sorting_form(self, lex_list, key="word"):
         """turn list of strings into list of dicts with sorting forms"""
         return [{key: v} for v in lex_list]
+
+    def test_sort_formats(self):
+        """Sort from json, text and list formats"""
+        sorter = ArbSorter(self.danish_alphabet)
+        json_sorter = ArbSorter(self.alphabet_json_path)
+        txt_sorter = ArbSorter(self.alphabet_text_path)
+        lexicon = [{"word": "råd"}, {"word": "ūįrød"}]
+        sorter(lexicon, "word")
+        json_sorter(lexicon, "word")
+        txt_sorter(lexicon, "word")
+        self.assertEqual(sorter.values_as_word([10363, 10303, 17, 27, 3]), "ūįrød")
+        self.assertEqual(json_sorter.values_as_word([10363, 10303, 17, 27, 3]), "ūįrød")
+        self.assertEqual(txt_sorter.values_as_word([10363, 10303, 17, 27, 3]), "ūįrød")
 
     def test_sort_ignorables(self):
         """Sort ignorable characters"""
