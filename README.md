@@ -82,6 +82,8 @@ This project exists thanks to all the people who contribute.
 
 TODO:
 
-- Run `python3 -m unittest mothertongues/tests/test_dictionary_data.py`.
+- Note, this is the same as main, just with no pandas in the wip
+
+- export
 
 - Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.

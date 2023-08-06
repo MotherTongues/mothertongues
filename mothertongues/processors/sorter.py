@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, no_type_check
 
 
 class ArbSorter(object):
@@ -23,6 +23,7 @@ class ArbSorter(object):
         order (list[str]): The order to sort by.
     """
 
+    @no_type_check
     def __init__(self, order: Union[List[str], Path], ignorable=None):
         self.order = order
         if isinstance(order, Path):
@@ -35,7 +36,7 @@ class ArbSorter(object):
         self.ignorable = [] if ignorable is None else ignorable
         split_order = [re.escape(x) for x in sorted(self.order, key=len, reverse=True)]
         self.splitter = re.compile(f'({"|".join(split_order)})', re.UNICODE)
-        self.oovs = []
+        self.oovs: List[str] = []
         # Next, collect weights for the ordering.
         self.char_to_ord_lookup = {self.order[i]: i for i in range(len(self.order))}
         self.ord_to_char_lookup = {v: k for k, v in self.char_to_ord_lookup.items()}
@@ -70,11 +71,14 @@ class ArbSorter(object):
         """Turn values into word"""
         return "".join([self.ord_to_char_lookup[v] for v in values])
 
-    def __call__(self, item_list, target, sort_key="sorting_form"):
-        # TODO: this is a bit weird. make it more general.
+    def return_sorted_data(self, item_list, target, sort_key="sorting_form"):
         """Return sorted list based on item's (word's) sorting_form"""
         sorted_list = []
         for item in item_list:
             item[sort_key] = self.word_as_values(item[target])
             sorted_list.append(item)
         return sorted(sorted_list, key=lambda x: x[sort_key])
+
+    def __call__(self, item_list, target, sort_key="sorting_form"):
+        """Return sorted list based on item's (word's) sorting_form"""
+        return self.return_sorted_data(item_list, target, sort_key)

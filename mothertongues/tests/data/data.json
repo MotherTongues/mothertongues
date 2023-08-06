@@ -3,6 +3,30 @@
         "definition": "tree",
         "word": "træ",
         "theme": "plants",
+        "example_sentence_1": "Har du røde øjne?",
+        "example_sentence_2": "Døde røde rødøjede rådne røgede ørreder.",
+        "example_sentence_audio": [
+            [{
+                    "speaker": "AP",
+                    "filename": "ap_sent1.mp3"
+                },
+                {
+                    "speaker": "AR",
+                    "filename": "ar_sent1.mp3"
+                }
+            ],
+            [{
+                    "speaker": "AP",
+                    "filename": "ap_sent2.mp3"
+                },
+                {
+                    "speaker": "AR",
+                    "filename": "ar_sent2.mp3"
+                }
+            ]
+        ],
+        "example_sentence_definition_1": "Do you have red eyes?",
+        "example_sentence_definition_2": "Dead, red, red-eyed, rotten, smoked trout.",
         "optional": {
             "Part of Speech": "noun"
         },

@@ -1,11 +1,8 @@
 from string import ascii_lowercase
 from unittest import main
 
-from pandas import DataFrame
-
 from mothertongues.processors.sorter import ArbSorter
 from mothertongues.tests.base_test_case import BasicTestCase
-from mothertongues.utils import add_sorting_form_to_df
 
 
 class SorterTest(BasicTestCase):
@@ -76,10 +73,8 @@ class SorterTest(BasicTestCase):
     def test_sort_unicode_df(self):
         """Sort non-ascii characters in DataFrame."""
         sorter = ArbSorter(self.danish_alphabet)
-        lexicon = DataFrame(
-            self.list_to_sorting_form(["æbleskiver", "hund", "råd", "rød"])
-        )
-        lexicon_sorted = DataFrame(
+        lexicon = self.list_to_sorting_form(["æbleskiver", "hund", "råd", "rød"])
+        lexicon_sorted = sorted(
             [
                 {
                     "word": "æbleskiver",
@@ -88,13 +83,10 @@ class SorterTest(BasicTestCase):
                 {"word": "hund", "sorting_form": [7, 20, 13, 3]},
                 {"word": "råd", "sorting_form": [17, 28, 3]},
                 {"word": "rød", "sorting_form": [17, 27, 3]},
-            ]
-        ).sort_values(by=["sorting_form"])["sorting_form"]
-        self.assertTrue(
-            lexicon_sorted.equals(
-                add_sorting_form_to_df(lexicon, sorter, "word")["sorting_form"]
-            )
+            ],
+            key=lambda x: x["sorting_form"],
         )
+        self.assertEquals(lexicon_sorted, sorter(lexicon, "word"))
 
     def test_digraph_sorting(self):
         """Sort digraphs"""
