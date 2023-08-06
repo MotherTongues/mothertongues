@@ -62,6 +62,7 @@ ParserTargets
 ~~~~~~~~~~~~~
 
 The ParserTargets class defines which fields are present in your data and how they can be parsed.
+Note, the DictionaryEntry class is an alias for ParserTargets contains hydrated (parsed) values from the ParserTargets.
 
 .. autopydantic_settings:: mothertongues.config.models.ParserTargets
     :settings-show-json: True

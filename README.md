@@ -82,6 +82,8 @@ This project exists thanks to all the people who contribute.
 
 TODO:
 
-- Run `python3 -m unittest mothertongues/tests/test_dictionary_data.py`.
+- export
 
 - Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.
+
+- inverted index and scoring

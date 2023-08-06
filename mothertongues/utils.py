@@ -2,31 +2,11 @@ import json
 from datetime import datetime
 from importlib import import_module
 from pathlib import Path
-from string import ascii_letters
 from typing import Callable, Union
 
 from g2p import Mapping, Transducer
 from g2p.mappings.utils import load_mapping_from_path
 from loguru import logger
-from pandas import DataFrame
-
-from mothertongues.processors.sorter import ArbSorter
-
-
-def add_sorting_form_to_df(
-    df: DataFrame,
-    sorter: ArbSorter,
-    df_sorter_input_key: str,
-    sort_key: str = "sorting_form",
-):
-    """Add "sorting_form" to DataFrame.
-
-    Args:
-        :param DataFrame df: Pandas DataFrame to add sorting form to
-        :param str sort_key: DataFrame key to sort based on
-    """
-    df[sort_key] = df[df_sorter_input_key].apply(sorter.word_as_values)
-    return df.sort_values(by=[sort_key])
 
 
 def get_current_time():
@@ -121,29 +101,6 @@ def load_json_from_path(path: Path):
         return json.load(f)
 
 
-def extract_parser_targets(targets: dict):
-    """Given some nested Parser Targets, create a flat dictionary of their contents
-
-    Args:
-        targets (ParserTargets): all the parser targets
-
-    Returns:
-        dict: a flat dictionary with the parser targets, enumerated for lists
-    """
-    target_dict = {}
-    for k, v in targets.items():
-        if isinstance(v, list):
-            for i, item in enumerate(v):
-                for v_k, v_j in item.items():
-                    target_dict[f"{k}_{v_k}_{i}"] = v_j
-        elif isinstance(v, dict):
-            for v_key, v_val in v.items():
-                target_dict[f"{k}_{v_key}"] = v_val
-        else:
-            target_dict[k] = v
-    return target_dict
-
-
 def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
     """Convert a string to a callable.
 
@@ -199,19 +156,3 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
             f"Cannot find method {function} in module {module}"
         ) from exc
     return function
-
-
-def col2int(col: Union[str, int]):
-    if isinstance(col, int):
-        # return if it's already an int
-        return col
-    try:
-        # otherwise try a basic type cast
-        return int(col)
-    except ValueError:
-        # otherwise convert letter to number (can also have columns AA for example)
-        num = 0
-        for c in col:
-            if c in ascii_letters:
-                num = num * 26 + (ord(c.upper()) - ord("A"))
-        return num
