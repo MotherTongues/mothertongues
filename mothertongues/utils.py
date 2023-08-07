@@ -1,12 +1,41 @@
 import json
+from contextlib import contextmanager
 from datetime import datetime
 from importlib import import_module
 from pathlib import Path
 from typing import Callable, Union
 
+import joblib
 from g2p import Mapping, Transducer
 from g2p.mappings.utils import load_mapping_from_path
 from loguru import logger
+
+
+@contextmanager
+def tqdm_joblib_context(tqdm_instance):
+    """Context manager to make tqdm compatible with joblib.Parallel
+
+    Runs the parallel jobs using joblib, but displays the nicer tqdm progress bar
+    Only tested with tqdm.tqdm, but should also work with tqdm.notepad.tqdm and
+    other variants
+
+    Usage:
+        with tqdm_joblib_context(tqdm(desc="my description", total=len(job_list))):
+            joblib.Parallel(n_jobs=cpus)(delayed(fn)(item) for item in job_list)
+    """
+
+    class ParallelCallback(joblib.parallel.BatchCompletionCallBack):
+        def __call__(self, out):
+            tqdm_instance.update(n=self.batch_size)
+            super().__call__(out)
+
+    old_callback = joblib.parallel.BatchCompletionCallBack
+    joblib.parallel.BatchCompletionCallBack = ParallelCallback
+    try:
+        yield
+    finally:
+        tqdm_instance.close()
+        joblib.parallel.BatchCompletionCallBack = old_callback
 
 
 def get_current_time():

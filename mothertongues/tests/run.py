@@ -6,6 +6,8 @@ from loguru import logger
 
 from mothertongues.tests.test_configuration import ConfigurationTest
 from mothertongues.tests.test_dictionary_data import DictionaryDataTest
+from mothertongues.tests.test_exporter import DictionaryExporterTest
+from mothertongues.tests.test_index import DictionaryIndexBuilderTest
 from mothertongues.tests.test_parsers import DictionaryParserTest
 from mothertongues.tests.test_sorter import SorterTest
 
@@ -26,7 +28,13 @@ DATA_TESTS = [
 ]
 
 PROCESSOR_TESTS = [
-    LOADER.loadTestsFromTestCase(test) for test in [SorterTest, DictionaryParserTest]
+    LOADER.loadTestsFromTestCase(test)
+    for test in [
+        SorterTest,
+        DictionaryParserTest,
+        DictionaryExporterTest,
+        DictionaryIndexBuilderTest,
+    ]
 ]
 
 
