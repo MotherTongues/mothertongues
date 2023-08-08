@@ -7,3 +7,8 @@ __pycache__
 docs/build
 .DS_Store
 coverage.xml
+config.json
+data_hash.json
+dictionary_data.json
+l1_index.json
+l2_index.json
