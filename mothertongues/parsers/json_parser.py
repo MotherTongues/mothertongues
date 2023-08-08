@@ -48,7 +48,7 @@ class Parser(BaseTabularParser):
 
     def resolve_targets(self) -> List[dict]:
         resolved_targets = []
-        for entry in tqdm(self.resource):
+        for entry in tqdm(self.resource, desc="Parsing data"):
             # ignoring type because targets is only None when parser is CustomParser
             targets = self.manifest.targets.dict()  # type: ignore
             filled_entry = self.fill_entry_template(

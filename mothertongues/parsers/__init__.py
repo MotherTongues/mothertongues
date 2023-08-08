@@ -101,7 +101,7 @@ class BaseTabularParser:
         targets = self.manifest.targets.dict()
         return [
             self.fill_entry_template(targets, entry, self.parse_fn)
-            for entry in tqdm(self.resource)
+            for entry in tqdm(self.resource, desc="Parsing data")
         ]
 
     def parse(self) -> List[dict]:
