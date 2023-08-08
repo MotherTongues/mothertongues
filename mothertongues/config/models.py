@@ -300,7 +300,8 @@ class LanguageConfiguration(BaseConfig):
     """The Symbols/Letters present in Your Dictionary"""
 
     duplicate_fields_subset: List[CheckableParserTargetFieldNames] = [
-        CheckableParserTargetFieldNames.word
+        CheckableParserTargetFieldNames.word,
+        CheckableParserTargetFieldNames.entryID,
     ]
     """The subset of fields to consider when removing duplicates"""
 

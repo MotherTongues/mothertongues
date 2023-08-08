@@ -1,5 +1,8 @@
+from collections import Counter
 from typing import Callable, List, Union
 from urllib.parse import urljoin
+
+from tqdm import tqdm
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
@@ -30,6 +33,8 @@ class MTDictionary:
         if custom_parse_method is not None:
             setattr(self, "custom_parse_method", custom_parse_method)
         self.config = config
+        self.missing_data: List[str] = []
+        self.duplicates: List[str] = []
         self.data = None
         self.index = None
         if parse_data_on_initialization:
@@ -157,7 +162,34 @@ class MTDictionary:
         Returns:
             _type_: _description_
         """
-        # duplicates
+        # find missing data and duplicates
+        required_fields = [x.value for x in self.config.config.required_fields]
+        duplicate_fields = {
+            x.value: Counter() for x in self.config.config.duplicate_fields_subset
+        }
+        for i, entry in tqdm(
+            enumerate(self.data),
+            desc=f"Finding duplicates and entries that are missing fields for {', '.join(required_fields)}",
+        ):
+            truthy_fields = [bool(entry[field]) for field in required_fields]
+            duplicate = False
+            missing_fields = False
+            for key, counter in duplicate_fields.items():
+                counter.update([entry[key]])
+                if counter[entry[key]] > 1:
+                    self.duplicates.append(
+                        entry[CheckableParserTargetFieldNames.entryID.value]
+                    )
+                    duplicate = True
+            if not all(truthy_fields):
+                self.missing_data.append(
+                    entry[CheckableParserTargetFieldNames.entryID.value]
+                )
+                missing_fields = True
+            if duplicate or missing_fields:
+                del self.data[i]
+        self.duplicates = list(set(self.duplicates))
+        self.missing_data = list(set(self.missing_data))
         # missing chars
         self.missing_chars = self.sorter.oovs
         return True

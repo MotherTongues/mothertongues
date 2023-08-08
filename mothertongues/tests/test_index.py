@@ -11,9 +11,7 @@ from mothertongues.utils import load_mtd_configuration
 
 
 class DictionaryIndexBuilderTest(BasicTestCase):
-    """Test Building Dictionary Index
-    TODO: Create data that exhibits the following and assert that errors/warnings are raised
-    """
+    """Test Building Dictionary Index"""
 
     def setUp(self):
         super().setUp()

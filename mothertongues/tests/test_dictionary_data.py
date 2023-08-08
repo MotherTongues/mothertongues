@@ -10,9 +10,7 @@ from mothertongues.utils import load_mtd_configuration
 
 
 class DictionaryDataTest(BasicTestCase):
-    """Test Dictionary Data Checks
-    TODO: Create data that exhibits the following and assert that errors/warnings are raised
-    """
+    """Test Dictionary Data Checks"""
 
     def setUp(self):
         super().setUp()
@@ -24,15 +22,12 @@ class DictionaryDataTest(BasicTestCase):
     def test_missing_chars(self):
         self.assertIn("😀", self.dictionary.sorter.oovs)
 
-    def _test_duplicates(self):
-        # TODO: duplicates not currently implementd since refactor away from pandas
-        self.assertEqual(self.dictionary.duplicates, ["", "farvel", "træ"])
+    def test_duplicates(self):
+        self.assertCountEqual(self.dictionary.duplicates, ["4", "6"])
 
-    def _test_missing_required_fields(self):
-        # TODO: these are automatically dropped in the parser with a warning. maybe that's enough
-        # 9 & 6 dropped from duplicates
-        self.assertEqual([7], self.dictionary.missing_data["entryID"].tolist())
+    def test_missing_required_fields(self):
+        self.assertCountEqual(["7", "6"], self.dictionary.missing_data)
         looser_config = deepcopy(self.mtd_config)
         looser_config.config.required_fields = [CheckableParserTargetFieldNames.theme]
         dictionary = MTDictionary(looser_config)
-        self.assertEqual([7, 5], dictionary.missing_data["entryID"].tolist())
+        self.assertCountEqual(["7", "5"], dictionary.missing_data)
