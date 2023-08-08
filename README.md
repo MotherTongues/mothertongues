@@ -85,5 +85,3 @@ TODO:
 - export
 
 - Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.
-
-- inverted index and scoring

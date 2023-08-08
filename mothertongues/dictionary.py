@@ -2,6 +2,7 @@ from typing import Callable, List, Union
 from urllib.parse import urljoin
 
 from mothertongues.config.models import (
+    CheckableParserTargetFieldNames,
     DataSource,
     DictionaryEntry,
     MTDConfiguration,
@@ -10,6 +11,7 @@ from mothertongues.config.models import (
 )
 from mothertongues.exceptions import ConfigurationError, ParserError
 from mothertongues.parsers import parse
+from mothertongues.processors.index_builder import create_inverted_index
 from mothertongues.processors.sorter import ArbSorter
 
 
@@ -29,6 +31,7 @@ class MTDictionary:
             setattr(self, "custom_parse_method", custom_parse_method)
         self.config = config
         self.data = None
+        self.index = None
         if parse_data_on_initialization:
             self.initialize()
         super().__init__()
@@ -159,10 +162,39 @@ class MTDictionary:
         self.missing_chars = self.sorter.oovs
         return True
 
-    def export(self):
+    def export(self, combine=True, hash_data=True):
         config_export = self.config.config.dict(
-            include={"L1": True, "L2": True, "alphabet": True, "build": True}
+            include={
+                "L1": True,
+                "L2": True,
+                "alphabet": True,
+                "build": True,
+                "l1_stemmer": True,
+                "l2_stemmer": True,
+                "l1_normalization_transducer": True,
+                "l2_normalization_transducer": True,
+            }
         )
+        if self.index is None:
+            self.l1_index = create_inverted_index(self.data, self.config, "l1")
+            self.l1_index.calculate_scores()
+            self.l2_index = create_inverted_index(self.data, self.config, "l2")
+            self.l2_index.calculate_scores()
         # TODO: transducers for the config should be built here
         # config_export['transducers'] =
-        return config_export, self.data
+        if hash_data:
+            data = {
+                entry[CheckableParserTargetFieldNames.entryID.value]: entry
+                for entry in self.data
+            }
+        else:
+            data = self.data
+        if combine:
+            return {
+                "config": config_export,
+                "data": data,
+                "l1_index": self.l1_index.data,
+                "l2_index": self.l2_index.data,
+            }
+        else:
+            return config_export, data, self.l1_index.data, self.l2_index.data

@@ -30,17 +30,10 @@ def export(
 ):
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
-    config, data = dictionary.export()
+    output = dictionary.export()
     if output_format == OutputFormat.json:
-        with open("config.json", "w", encoding="utf8") as f:
-            json.dump(config, f)
-        with open("data.json", "w", encoding="utf8") as f:
-            json.dump(data, f)
-    if output_format == OutputFormat.js:
-        with open("config.js", "w", encoding="utf8") as f:
-            f.write(f"var config = {config}")
-        with open("dict_cached.js", "w", encoding="utf8") as f:
-            f.write(f"var dataDict = {data}")
+        with open("dictionary_data.json", "w", encoding="utf8") as f:
+            json.dump(output, f)
 
 
 if __name__ == "__main__":

@@ -1,13 +1,17 @@
 import json
+import re
 from enum import Enum
+from functools import partial
 from pathlib import Path
 from string import ascii_letters
 from typing import Callable, Dict, List, Union
+from unicodedata import normalize
 
 from loguru import logger
 from pydantic import (
     BaseModel,
     Extra,
+    Field,
     FilePath,
     HttpUrl,
     ValidationError,
@@ -30,6 +34,62 @@ class Audio(BaseConfig):
 
     filename: str
     """The location of the audio filename. Path is prepended with ResourceManifest.audio_path"""
+
+
+class NormalizationEnum(str, Enum):
+    nfc = "NFC"
+    nfd = "NFD"
+    nkfc = "NFKC"
+    nkfd = "NKFD"
+    none = "none"
+
+
+class StemmerEnum(str, Enum):
+    snowball_english = "snowball_english"
+    none = "none"
+
+
+class RestrictedTransducer(BaseConfig):
+    lower: bool = True
+    unicode_normalization: NormalizationEnum = NormalizationEnum.nfc
+    remove_punctuation: str = "[.,/#!$%^&?*';:{}=\\-_`~()]"
+    replace_rules: Union[List[Dict[str, str]], None] = None
+
+
+def create_restricted_transducer(config: RestrictedTransducer) -> Callable:
+    """Create a callable function from the Restricted Transducer configuration.
+       It's restricted because the same functionality needs to be available on the client.
+
+    Args:
+        config (RestrictedTransducer): pre-defined acceptable transductions
+
+    Returns:
+        Callable: a callable that takes one argument (string) and returns the transduced string
+    """
+    callables = []
+    if config.lower:
+        callables.append(lambda x: x.lower())
+    if config.unicode_normalization != NormalizationEnum.none:
+        callables.append(partial(normalize, config.unicode_normalization.value))
+    if config.remove_punctuation:
+        callables.append(partial(re.sub, re.compile(config.remove_punctuation), ""))
+    if config.replace_rules:
+
+        def replace(term):
+            for inp, outp in config.replace_rules.items():
+                term = re.sub(inp, outp, term)
+            return term
+
+        callables.append(replace)
+    if not callables:
+        callables.append(lambda x: x)
+
+    def new_callable(text):
+        for callable in callables:
+            text = callable(text)
+        return text
+
+    return new_callable
 
 
 class Transducer(BaseConfig):
@@ -58,7 +118,6 @@ class ParserEnum(Enum):
     tsv = "tsv"
     xlsx = "xlsx"
     custom = "custom"
-    xml = "xml"
     none = "none"  # for when object is passed directly with no parser needed
 
 
@@ -218,6 +277,24 @@ class LanguageConfiguration(BaseConfig):
 
     L2: str = "English"
     """The Other Language of Your Dictionary"""
+
+    l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
+
+    l2_keys_to_index: List[str] = [CheckableParserTargetFieldNames.definition.value]
+
+    l1_stemmer: StemmerEnum = StemmerEnum.none
+
+    l2_stemmer: StemmerEnum = StemmerEnum.snowball_english
+
+    l1_normalization_transducer: RestrictedTransducer = Field(
+        default_factory=RestrictedTransducer
+    )
+    """The transducer for creating the 'normalized' form for l1"""
+
+    l2_normalization_transducer: RestrictedTransducer = Field(
+        default_factory=RestrictedTransducer
+    )
+    """The transducer for creating the 'normalized' form for l2"""
 
     alphabet: Union[List[str], FilePath] = list(ascii_letters)
     """The Symbols/Letters present in Your Dictionary"""

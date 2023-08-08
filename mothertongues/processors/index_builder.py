@@ -1,7 +1,5 @@
-import re
 from collections import defaultdict
 from typing import Callable, Dict, List, Union
-from unicodedata import normalize
 
 from jsonpath_ng import jsonpath
 from jsonpath_ng import parse as json_parse
@@ -10,12 +8,12 @@ from nltk.stem.snowball import SnowballStemmer
 from rank_bm25 import BM25Okapi
 from tqdm import tqdm
 
-from mothertongues.config.models import CheckableParserTargetFieldNames
-
-
-def default_normalization(term: str):
-    return normalize("NFC", re.sub(r"[.,/#!$%^&?*\';:{}=\-_`~()]", "", term.lower()))
-
+from mothertongues.config.models import (
+    CheckableParserTargetFieldNames,
+    MTDConfiguration,
+    StemmerEnum,
+    create_restricted_transducer,
+)
 
 SNOWBALL_STEMMER = SnowballStemmer("english")
 
@@ -30,14 +28,13 @@ class InvertedIndex:
     def __init__(
         self,
         raw_data: List[dict],
-        norm_fn: Callable = default_normalization,
-        stemmer_function: Callable = DEFAULT_STEMMER,
+        normalization_function: Union[Callable, None] = None,
+        stemmer_function: Union[Callable, None] = None,
         keys_to_index: List[str] = [
             CheckableParserTargetFieldNames.word.value,
-            CheckableParserTargetFieldNames.definition.value,
         ],
     ):
-        self.normalization_function = norm_fn
+        self.normalization_function = normalization_function
         self.stemmer_function = stemmer_function
         self.data: Dict[
             str, Dict[str, Dict[str, Union[int, List[Union[str, int]]]]]
@@ -136,11 +133,13 @@ class InvertedIndex:
 
     def _process_terms(self, entry_data: str):
         # normalize value
-        value = self.normalization_function(entry_data)
+        if self.normalization_function is not None:
+            entry_data = self.normalization_function(entry_data)
         # split on whitespace
-        terms = value.split()
+        terms = entry_data.split()
         # apply stemmer
-        terms = [self.stemmer_function(term) for term in terms]
+        if self.stemmer_function is not None:
+            terms = [self.stemmer_function(term) for term in terms]
         return terms
 
     def build(self):
@@ -173,3 +172,31 @@ class InvertedIndex:
                         for j, term in enumerate(terms):
                             self._add_index(term, doc_id, value_item_key, j)
         return self.data
+
+
+def create_inverted_index(data: List[dict], config: MTDConfiguration, l1_or_l2: str):
+    if l1_or_l2.lower() == "l1":
+        stemmer_fn = (
+            DEFAULT_STEMMER
+            if config.config.l1_stemmer == StemmerEnum.snowball_english
+            else None
+        )
+        return InvertedIndex(
+            data,
+            create_restricted_transducer(config.config.l1_normalization_transducer),
+            stemmer_function=stemmer_fn,
+            keys_to_index=config.config.l1_keys_to_index,
+        )
+    elif l1_or_l2.lower() == "l2":
+        stemmer_fn = (
+            DEFAULT_STEMMER
+            if config.config.l2_stemmer == StemmerEnum.snowball_english
+            else None
+        )
+        return InvertedIndex(
+            data,
+            create_restricted_transducer(config.config.l2_normalization_transducer),
+            stemmer_function=stemmer_fn,
+            keys_to_index=config.config.l2_keys_to_index,
+        )
+    raise ValueError(f"Expected 'l1' or 'l2', but got {l1_or_l2}")

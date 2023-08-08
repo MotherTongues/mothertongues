@@ -5,7 +5,7 @@ from mothertongues.config.models import (
     MTDConfiguration,
 )
 from mothertongues.dictionary import MTDictionary
-from mothertongues.processors.index_builder import InvertedIndex
+from mothertongues.processors.index_builder import InvertedIndex, create_inverted_index
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
 
@@ -23,7 +23,13 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         self.dictionary = MTDictionary(self.mtd_config)
 
     def test_build_index(self):
-        index = InvertedIndex(self.dictionary.data)
+        index = create_inverted_index(
+            self.dictionary.data, self.dictionary.config, "l1"
+        )
+        index.keys_to_index = [
+            CheckableParserTargetFieldNames.definition.value,
+            CheckableParserTargetFieldNames.word.value,
+        ]
         index.build()
         # assert that it finds a single word and definition for each entry
         self.assertEqual(len(index.data), len(self.dictionary.data) * 2)
@@ -58,7 +64,8 @@ class DictionaryIndexBuilderTest(BasicTestCase):
             {"entryID": i, "test": " ".join(sent)}
             for i, sent in enumerate(nltk.corpus.brown.sents()[:1000])
         ]
-        index = InvertedIndex(corpus, keys_to_index=["test"])
+        index = create_inverted_index(corpus, self.dictionary.config, "l2")
+        index.keys_to_index = ["test"]
         index.calculate_scores()
         get_top_1 = index._scorers["test"].get_top_n(["zurich"], corpus, n=1)
         self.assertEqual(get_top_1[0]["entryID"], 684)
