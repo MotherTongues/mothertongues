@@ -19,10 +19,10 @@ def hello(name: str):
 @app.command()
 def export(
     language_config_path: Path = typer.Argument(
-        default=None, exists=True, file_okay=True, dir_okay=False, readable=True
+        exists=True, file_okay=True, dir_okay=False, readable=True
     ),
     output_directory: Path = typer.Argument(
-        default=None, exists=True, file_okay=False, dir_okay=True
+        exists=True, file_okay=False, dir_okay=True
     ),
     single_file: bool = typer.Option(default=True),
 ):
