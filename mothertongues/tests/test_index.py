@@ -54,7 +54,6 @@ class DictionaryIndexBuilderTest(BasicTestCase):
             ],
         )
         index.build()
-        # index.calculate_scores()
         for term in index.data:
             for posting in index.data[term]:
                 self.assertGreaterEqual(
@@ -73,7 +72,7 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         second_index.keys_to_index = ["test"]
         second_index.build()
         index.build(calculate_score=False)
-        index.calculate_scores()
+        index._legacy_calculate_scores()
         self.assertEqual(second_index.k1, index._scorers["test"].k1)
         self.assertEqual(second_index.b, index._scorers["test"].b)
         self.assertEqual(
@@ -87,10 +86,13 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         self.assertEqual(get_top_1[0]["entryID"], 684)
 
     def test_speed(self):
+        """Should be able to index and score a ten-thousand entry dictionary in < 15 seconds
+        Even on a slower ci/cd test machine.
+        """
         nltk.download("brown")
         corpus = [
             {"entryID": i, "test": " ".join(sent)}
-            for i, sent in enumerate(nltk.corpus.brown.sents())
+            for i, sent in enumerate(nltk.corpus.brown.sents()[:10000])
         ]
         index = create_inverted_index(corpus, self.dictionary.config, "l2")
         index.keys_to_index = ["test"]
