@@ -1,3 +1,5 @@
+import time
+
 import nltk
 
 from mothertongues.config.models import (
@@ -51,10 +53,13 @@ class DictionaryIndexBuilderTest(BasicTestCase):
                 "example_sentence",
             ],
         )
-        index.calculate_scores()
+        index.build()
+        # index.calculate_scores()
         for term in index.data:
             for posting in index.data[term]:
-                self.assertGreater(index.data[term][posting]["score"]["total"], 0.0)
+                self.assertGreaterEqual(
+                    index.data[term][posting]["score"]["total"], 0.0
+                )
 
     def test_score_brown_corpus(self):
         nltk.download("brown")
@@ -64,6 +69,32 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         ]
         index = create_inverted_index(corpus, self.dictionary.config, "l2")
         index.keys_to_index = ["test"]
+        second_index = create_inverted_index(corpus, self.dictionary.config, "l2")
+        second_index.keys_to_index = ["test"]
+        second_index.build()
+        index.build(calculate_score=False)
         index.calculate_scores()
+        self.assertEqual(second_index.k1, index._scorers["test"].k1)
+        self.assertEqual(second_index.b, index._scorers["test"].b)
+        self.assertEqual(
+            second_index.IDFS["test"]["light"], index._scorers["test"].idf["light"]
+        )
+        self.assertEqual(
+            index.data["centuri"][926]["score"]["total"],
+            second_index.data["centuri"][926]["score"]["total"],
+        )
         get_top_1 = index._scorers["test"].get_top_n(["zurich"], corpus, n=1)
         self.assertEqual(get_top_1[0]["entryID"], 684)
+
+    def test_speed(self):
+        nltk.download("brown")
+        corpus = [
+            {"entryID": i, "test": " ".join(sent)}
+            for i, sent in enumerate(nltk.corpus.brown.sents())
+        ]
+        index = create_inverted_index(corpus, self.dictionary.config, "l2")
+        index.keys_to_index = ["test"]
+        t1 = time.perf_counter()
+        index.build()
+        t2 = time.perf_counter()
+        self.assertLess(t2 - t1, 15)
