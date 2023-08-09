@@ -61,6 +61,7 @@ class InvertedIndex:
         self.raw_data = []
 
     def _legacy_calculate_score(self, scorer, doc_ids, key, term):
+        """LEGACY USE OF RANK_BM25 - Much slower than the other implementation so this is not used"""
         scores = scorer.get_scores([term])
         for posting, score in zip(doc_ids, scores):
             if not score:
@@ -73,6 +74,7 @@ class InvertedIndex:
             self.data[term][posting]["score"][key] += score
 
     def _legacy_calculate_scores(self):
+        """LEGACY USE OF RANK_BM25 - Much slower than the other implementation so this is not used"""
         if not self.data:
             logger.info("Building index before calculating scores")
             self.build()
@@ -215,15 +217,18 @@ class InvertedIndex:
                     else:
                         self.data[term][posting]["score"]["total"] += score
 
-    def build(self, b=0.75, k1=1.5, epsilon=0.25, calculate_score=True):
-        if calculate_score:
-            # keeps track of the number of documents a term exists in
-            self.doc_frequency_counter: Dict[str, Counter] = {}
-            # keeps track of the number of words in each doc (where a 'doc' is an entry's key, e.g. 'word', 'definition', 'example_sentence')
-            self.document_lengths: Dict[str, Dict[str, int]] = {}
-            self.k1 = k1
-            self.b = b
-            self.epsilon = epsilon
+    def calculate_scores(self, b=0.75, k1=1.5, epsilon=0.25):
+        self.k1 = k1
+        self.b = b
+        self.epsilon = epsilon
+        self._calculate_idf()
+        self._calculate_score()
+
+    def build(self):
+        # keeps track of the number of documents a term exists in
+        self.doc_frequency_counter: Dict[str, Counter] = {}
+        # keeps track of the number of words in each doc (where a 'doc' is an entry's key, e.g. 'word', 'definition', 'example_sentence')
+        self.document_lengths: Dict[str, Dict[str, int]] = {}
         for entry in tqdm(self.raw_data, desc="Building index"):
             doc_id = (
                 self._path_cache[CheckableParserTargetFieldNames.entryID.value]
@@ -251,21 +256,16 @@ class InvertedIndex:
                         value_item_key = key + key_indices[i]
                         # create normalized, stemmed, split terms
                         terms = self._process_terms(value_item)
-                        if calculate_score:
-                            # add to document frequency and document length counters
-                            if key not in self.doc_frequency_counter:
-                                self.doc_frequency_counter[key] = Counter()
-                            if key not in self.document_lengths:
-                                self.document_lengths[key] = {}
-                            self.doc_frequency_counter[key].update(set(terms))
-                            self.document_lengths[key][doc_id] = len(terms)
+                        # add to document frequency and document length counters
+                        if key not in self.doc_frequency_counter:
+                            self.doc_frequency_counter[key] = Counter()
+                        if key not in self.document_lengths:
+                            self.document_lengths[key] = {}
+                        self.doc_frequency_counter[key].update(set(terms))
+                        self.document_lengths[key][doc_id] = len(terms)
                         # for term in normalize/stemmed/split value, add it to the index
                         for j, term in enumerate(terms):
                             self._add_index(term, doc_id, value_item_key, j)
-        if calculate_score:
-            self._calculate_idf()
-            self._calculate_score()
-
         return self.data
 
 

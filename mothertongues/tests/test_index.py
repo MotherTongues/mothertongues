@@ -54,6 +54,7 @@ class DictionaryIndexBuilderTest(BasicTestCase):
             ],
         )
         index.build()
+        index.calculate_scores()
         for term in index.data:
             for posting in index.data[term]:
                 self.assertGreaterEqual(
@@ -71,7 +72,8 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         second_index = create_inverted_index(corpus, self.dictionary.config, "l2")
         second_index.keys_to_index = ["test"]
         second_index.build()
-        index.build(calculate_score=False)
+        second_index.calculate_scores()
+        index.build()
         index._legacy_calculate_scores()
         self.assertEqual(second_index.k1, index._scorers["test"].k1)
         self.assertEqual(second_index.b, index._scorers["test"].b)
@@ -98,5 +100,6 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         index.keys_to_index = ["test"]
         t1 = time.perf_counter()
         index.build()
+        index.calculate_scores()
         t2 = time.perf_counter()
         self.assertLess(t2 - t1, 15)

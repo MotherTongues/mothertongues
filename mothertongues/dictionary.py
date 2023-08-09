@@ -210,8 +210,10 @@ class MTDictionary:
         if self.index is None:
             self.l1_index = create_inverted_index(self.data, self.config, "l1")
             self.l1_index.build()
+            self.l1_index.calculate_scores()
             self.l2_index = create_inverted_index(self.data, self.config, "l2")
             self.l2_index.build()
+            self.l2_index.calculate_scores()
         # TODO: transducers for the config should be built here
         # config_export['transducers'] =
         if hash_data:
