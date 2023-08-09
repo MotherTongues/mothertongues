@@ -60,7 +60,7 @@ class InvertedIndex:
         self.data = {}
         self.raw_data = []
 
-    def _calculate_score(self, scorer, doc_ids, key, term):
+    def _legacy_calculate_score(self, scorer, doc_ids, key, term):
         scores = scorer.get_scores([term])
         for posting, score in zip(doc_ids, scores):
             if not score:
@@ -72,7 +72,7 @@ class InvertedIndex:
                 self.data[term][posting]["score"] = defaultdict(float)
             self.data[term][posting]["score"][key] += score
 
-    def calculate_scores(self):
+    def _legacy_calculate_scores(self):
         if not self.data:
             logger.info("Building index before calculating scores")
             self.build()
@@ -108,7 +108,7 @@ class InvertedIndex:
             # for each term in the index, calculate the score of the term with respect to the posting
             # and add it.
             for term in tqdm(self.data, desc="Calculating scores"):
-                self._calculate_score(
+                self._legacy_calculate_score(
                     scorer,
                     doc_ids,
                     key,
@@ -144,13 +144,86 @@ class InvertedIndex:
             terms = [self.stemmer_function(term) for term in terms]
         return terms
 
-    def build(self, calculate_score=True):
+    def _calculate_idf(self):
+        self.IDFS = {}
+        for key in self.keys_to_index:
+            # to determine the number of documents for a particular
+            # field, sum all truthy values or take lengths of lists
+            n_documents = sum(
+                len(doc[key]) if isinstance(doc[key], list) else 1
+                for doc in self.raw_data
+                if doc[key]
+            )
+            self.IDFS[key] = {}
+            for term in tqdm(self.data, desc="Calculating IDFs"):
+                # IDF = 1 + n_documents / 1 + document_frequency
+                if term not in self.IDFS[key]:
+                    # Frequency of term across all documents
+                    document_frequency = self.doc_frequency_counter[key][term]
+                    IDF = math.log(n_documents - document_frequency + 0.5) - math.log(
+                        document_frequency + 0.5
+                    )
+                    self.IDFS[key][term] = IDF
+
+    def _calculate_score(self):
+        for key in self.keys_to_index:
+            avg_idf = sum(v for v in self.IDFS[key].values() if v > 0) / len(
+                self.IDFS[key]
+            )
+            self.n_all_words = sum(self.document_lengths[key].values())
+            self.avg_document_length = self.n_all_words / len(
+                self.document_lengths[key]
+            )
+            for term in tqdm(self.data, desc="Calculating scores"):
+                for posting in self.data[term].keys():
+                    # Frequency of term in current document
+                    term_frequency = len(
+                        [
+                            x
+                            for x in self.data[term][posting]["location"]
+                            if re.sub(r"\[\d+\]", "", x[0]) == key
+                        ]
+                    )
+                    # correct negative IDF by adding lower bound
+                    # See [Trotman, A., X. Jia, M. Crane, Towards an Efficient and Effective Search Engine] for more info
+                    if self.IDFS[key][term] < 0:
+                        self.IDFS[key][term] = self.epsilon * avg_idf
+                    IDF = self.IDFS[key][term]
+                    # calculate score
+                    score = IDF * (
+                        term_frequency
+                        * (self.k1 + 1)
+                        / (
+                            (
+                                term_frequency
+                                + self.k1
+                                * (
+                                    1
+                                    - self.b
+                                    + self.b
+                                    * self.document_lengths[key].get(posting, 0)
+                                    / self.avg_document_length
+                                )
+                            )
+                        )
+                    )
+                    if "score" not in self.data[term][posting]:
+                        self.data[term][posting]["score"] = {}
+                    self.data[term][posting]["score"][key] = score
+                    if "total" not in self.data[term][posting]["score"]:
+                        self.data[term][posting]["score"]["total"] = score
+                    else:
+                        self.data[term][posting]["score"]["total"] += score
+
+    def build(self, b=0.75, k1=1.5, epsilon=0.25, calculate_score=True):
         if calculate_score:
+            # keeps track of the number of documents a term exists in
             self.doc_frequency_counter: Dict[str, Counter] = {}
-            self.document_lengths: Dict[str, List[int]] = {}
-            self.k1 = 1.5
-            self.b = 0.75
-            self.epsilon = 0.25
+            # keeps track of the number of words in each doc (where a 'doc' is an entry's key, e.g. 'word', 'definition', 'example_sentence')
+            self.document_lengths: Dict[str, Dict[str, int]] = {}
+            self.k1 = k1
+            self.b = b
+            self.epsilon = epsilon
         for entry in tqdm(self.raw_data, desc="Building index"):
             doc_id = (
                 self._path_cache[CheckableParserTargetFieldNames.entryID.value]
@@ -176,8 +249,10 @@ class InvertedIndex:
                         key_indices = [f"[{x}]" for x in range(len(value))]
                     for i, value_item in enumerate(value):
                         value_item_key = key + key_indices[i]
+                        # create normalized, stemmed, split terms
                         terms = self._process_terms(value_item)
                         if calculate_score:
+                            # add to document frequency and document length counters
                             if key not in self.doc_frequency_counter:
                                 self.doc_frequency_counter[key] = Counter()
                             if key not in self.document_lengths:
@@ -188,73 +263,9 @@ class InvertedIndex:
                         for j, term in enumerate(terms):
                             self._add_index(term, doc_id, value_item_key, j)
         if calculate_score:
-            self.IDFS = {}
-            for key in self.keys_to_index:
-                # to determine the number of documents for a particular
-                # field, sum all truthy values or take lengths of lists
-                n_documents = sum(
-                    len(doc[key]) if isinstance(doc[key], list) else 1
-                    for doc in self.raw_data
-                    if doc[key]
-                )
-                self.IDFS[key] = {}
-                for term in tqdm(self.data, desc="Calculating IDFs"):
-                    # IDF = 1 + n_documents / 1 + document_frequency
-                    if term not in self.IDFS[key]:
-                        # Frequency of term across all documents
-                        document_frequency = self.doc_frequency_counter[key][term]
-                        IDF = math.log(
-                            n_documents - document_frequency + 0.5
-                        ) - math.log(document_frequency + 0.5)
-                        self.IDFS[key][term] = IDF
-            for key in self.keys_to_index:
-                avg_idf = sum(v for v in self.IDFS[key].values() if v > 0) / len(
-                    self.IDFS[key]
-                )
-                self.n_all_words = sum(self.document_lengths[key].values())
-                self.avg_document_length = self.n_all_words / len(
-                    self.document_lengths[key]
-                )
-                for term in tqdm(self.data, desc="Calculating scores"):
-                    for posting in self.data[term].keys():
-                        # Frequency of term in current document
-                        term_frequency = len(
-                            [
-                                x
-                                for x in self.data[term][posting]["location"]
-                                if re.sub(r"\[\d+\]", "", x[0]) == key
-                            ]
-                        )
-                        # correct negative IDF by adding lower bound
-                        # See [Trotman, A., X. Jia, M. Crane, Towards an Efficient and Effective Search Engine] for more info
-                        if self.IDFS[key][term] < 0:
-                            self.IDFS[key][term] = self.epsilon * avg_idf
-                        IDF = self.IDFS[key][term]
-                        # calculate score
-                        score = IDF * (
-                            term_frequency
-                            * (self.k1 + 1)
-                            / (
-                                (
-                                    term_frequency
-                                    + self.k1
-                                    * (
-                                        1
-                                        - self.b
-                                        + self.b
-                                        * self.document_lengths[key].get(posting, 0)
-                                        / self.avg_document_length
-                                    )
-                                )
-                            )
-                        )
-                        if "score" not in self.data[term][posting]:
-                            self.data[term][posting]["score"] = {}
-                        self.data[term][posting]["score"][key] = score
-                        if "total" not in self.data[term][posting]["score"]:
-                            self.data[term][posting]["score"]["total"] = score
-                        else:
-                            self.data[term][posting]["score"]["total"] += score
+            self._calculate_idf()
+            self._calculate_score()
+
         return self.data
 
 
