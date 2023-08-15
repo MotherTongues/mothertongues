@@ -1,0 +1,72 @@
+[{
+        "entryID": "1",
+        "definition": "tree",
+        "word": "træ",
+        "theme": "plants",
+        "example_sentences": ["Har du røde øjne?", "Døde røde rødøjede rådne røgede ørreder."],
+        "example_sentence_audio": [
+            [{
+                    "speaker": "AP",
+                    "filename": "ap_sent1.mp3"
+                },
+                {
+                    "speaker": "AR",
+                    "filename": "ar_sent1.mp3"
+                }
+            ],
+            [{
+                    "speaker": "AP",
+                    "filename": "ap_sent2.mp3"
+                },
+                {
+                    "speaker": "AR",
+                    "filename": "ar_sent2.mp3"
+                }
+            ]
+        ],
+        "example_sentence_definitions": ["Do you have red eyes?", "Dead, red, red-eyed, rotten, smoked trout."],
+        "optional": {
+            "Part of Speech": "noun"
+        },
+        "audio": [{
+            "speaker": "Aidan Pine",
+            "filename": "tree.mp3"
+        }]
+    },
+    {
+        "entryID": "2",
+        "definition": "word",
+        "word": "ord",
+        "theme": "abstract",
+        "optional": {
+            "Part of Speech": "noun"
+        },
+        "audio": [{
+            "speaker": "Aidan Pine",
+            "filename": "ord.mp3"
+        }]
+    },
+    {
+        "entryID": "3",
+        "definition": "hello",
+        "word": "hej",
+        "theme": "greetings",
+        "optional": {
+            "Part of Speech": "interjection"
+        },
+        "audio": [{
+            "speaker": "Aidan Pine",
+            "filename": "hej.mp3"
+        }]
+    },
+    {
+        "entryID": "4",
+        "definition": "goodbye",
+        "word": "farvel",
+        "theme": "greetings",
+        "optional": {
+            "Part of Speech": "interjection"
+        },
+        "audio": []
+    }
+]

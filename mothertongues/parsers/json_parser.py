@@ -50,7 +50,7 @@ class Parser(BaseTabularParser):
         resolved_targets = []
         for entry in tqdm(self.resource, desc="Parsing data"):
             # ignoring type because targets is only None when parser is CustomParser
-            targets = self.manifest.targets.dict()  # type: ignore
+            targets = self.manifest.targets.dict(exclude_none=True)  # type: ignore
             filled_entry = self.fill_entry_template(
                 targets, entry, self.getValueFromJsonPath
             )

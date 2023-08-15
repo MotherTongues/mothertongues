@@ -47,7 +47,10 @@ class BaseTabularParser:
         if (
             isinstance(v, list)
             and len(v) == 1
-            and self.return_manifest_key_type(k, self.manifest.targets.dict()) != list
+            and self.return_manifest_key_type(
+                k, self.manifest.targets.dict(exclude_none=True)
+            )
+            != list
         ):
             return v[0]
         else:
@@ -98,7 +101,7 @@ class BaseTabularParser:
     def resolve_targets(self) -> List[dict]:
         # not type checking because targets.dict() complains, but targets is only none with custom parser
         # also, self.resource is created by the classes that inherit the base parser.
-        targets = self.manifest.targets.dict()
+        targets = self.manifest.targets.dict(exclude_none=True)
         return [
             self.fill_entry_template(targets, entry, self.parse_fn)
             for entry in tqdm(self.resource, desc="Parsing data")

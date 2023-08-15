@@ -4,7 +4,7 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List, Optional, Union
 from unicodedata import normalize
 
 from loguru import logger
@@ -29,7 +29,7 @@ class BaseConfig(BaseModel):
 
 
 class Audio(BaseConfig):
-    description: Union[None, str] = None
+    description: Optional[str]
     """The location of the description of the audio (including speaker)"""
 
     filename: str
@@ -53,7 +53,7 @@ class RestrictedTransducer(BaseConfig):
     lower: bool = True
     unicode_normalization: NormalizationEnum = NormalizationEnum.nfc
     remove_punctuation: str = "[.,/#!$%^&?*';:{}=\\-_`~()]"
-    replace_rules: Union[List[Dict[str, str]], None] = None
+    replace_rules: Optional[List[Dict[str, str]]] = None
 
 
 def create_restricted_transducer(config: RestrictedTransducer) -> Callable:
@@ -136,80 +136,117 @@ class CheckableParserTargetFieldNames(Enum):
     theme = "theme"
     secondary_theme = "secondary_theme"
     img = "img"
-    # Currently, checking only occurs for string-type targets. TODO: implement for the following
-    # audio = "audio"
-    # definition_audio = "definition_audio"
-    # example_sentence = "example_sentence"
-    # example_sentence_definition = "example_sentence_definition"
-    # example_sentence_audio = "example_sentence_audio"
-    # example_sentence_definition_audio = "example_sentence_definition_audio"
-    # option = "optional"
+    audio = "audio"
+    definition_audio = "definition_audio"
+    example_sentence = "example_sentence"
+    example_sentence_definition = "example_sentence_definition"
+    example_sentence_audio = "example_sentence_audio"
+    example_sentence_definition_audio = "example_sentence_definition_audio"
+    optional = "optional"
 
 
-class _SharedDictionaryDictionaryEntryClass(BaseModel):
+class ParserTargets(BaseConfig):
+    """Your ParserTargets define how to parse your data into a list of DictionaryEntry objects"""
+
     word: str
     """The location of the words in your dictionary"""
 
     definition: str
     """The location of the definitions in your dictionary"""
 
-    entryID: Union[str, None] = ""
+    entryID: Optional[str]
     """The location of the unique IDs in your dictionary. If None, ID's will be automatically assigned."""
 
-    theme: Union[str, None] = ""
+    theme: Optional[str]
     """The location of the main theme to group the entry under."""
 
-    secondary_theme: Union[str, None] = ""
+    secondary_theme: Optional[str]
     """The location of the secondary theme to group the entry under."""
 
-    img: Union[str, None] = ""
+    img: Optional[str]
     """The location of the image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
 
-    audio: Union[List[Audio], Dict, None] = []
+    # Dict is used in case of json listof parser syntax
+    audio: Optional[Union[List[Audio], Dict]]
     """The location of the audio associated with the entry."""
 
-    definition_audio: Union[List[Audio], Dict, None] = []
+    definition_audio: Optional[Union[List[Audio], Dict]]
     """The location of the audio associated with the definition of the entry."""
 
-    example_sentence: Union[List[str], Dict, None] = []
+    example_sentence: Optional[Union[List[str], Dict]]
     """The location(s) of any example sentences associated with the entry"""
 
-    example_sentence_definition: Union[List[str], Dict, None] = []
-    """The location(s) of any example sentences associated with the entry"""
+    example_sentence_definition: Optional[Union[List[str], Dict]]
+    """The location(s) of any example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Union[List[Union[Audio, None]], Dict, None] = []
+    example_sentence_audio: Optional[Union[List[Audio], Dict]]
     """The location of the audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Union[List[Union[Audio, None]], Dict, None] = []
+    example_sentence_definition_audio: Optional[Union[List[Audio], Dict]]
     """The location of the audio associated with the example sentence definitions of the entry."""
 
-    optional: Union[Dict[str, str], None] = {}
+    optional: Optional[Dict[str, str]]
     """A list of information to optionally display"""
 
+    # @root_validator
+    # def check_example_sentence_fields_are_same_length(cls, values):
+    #     # TODO: implement
+    #     return values
 
-class ParserTargets(BaseConfig, _SharedDictionaryDictionaryEntryClass):
-    """Your ParserTargets define how to parse your data into a list of DictionaryEntry objects"""
-
-    @root_validator
-    def check_example_sentence_fields_are_same_length(cls, values):
-        # TODO: implement
-        return values
-
-    @root_validator
-    def warn_that_functionality_is_limited_if_none(cls, v):
-        # TODO: test
-        if v is None:
-            logger.warning(
-                f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
-            )
-        return v
+    # @root_validator
+    # def warn_that_functionality_is_limited_if_none(cls, v):
+    #     # TODO: test
+    #     if v is None:
+    #         logger.warning(
+    #             f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
+    #         )
+    #     return v
 
 
-class DictionaryEntry(_SharedDictionaryDictionaryEntryClass):
+class DictionaryEntry(BaseModel):
     """There is a DictionaryEntry created for each entry in your dictionary.
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields.
     """
+
+    word: str
+    """The words in your dictionary"""
+
+    definition: str
+    """The definitions in your dictionary"""
+
+    entryID: Optional[str]
+    """The unique IDs for entries in your dictionary. If None, ID's will be automatically assigned."""
+
+    theme: Optional[str] = ""
+    """The main theme to group the entry under."""
+
+    secondary_theme: Optional[str] = ""
+    """The secondary theme to group the entry under."""
+
+    img: Optional[str] = ""
+    """The image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
+
+    audio: Optional[List[Audio]] = []
+    """The audio associated with the entry."""
+
+    definition_audio: Optional[List[Audio]] = []
+    """The audio associated with the definition of the entry."""
+
+    example_sentence: Optional[List[str]] = []
+    """The example sentences associated with the entry"""
+
+    example_sentence_definition: Optional[List[str]] = []
+    """The example sentence definitions associated with the entry"""
+
+    example_sentence_audio: Optional[List[Audio]] = []
+    """The audio associated with the example sentences of the entry."""
+
+    example_sentence_definition_audio: Optional[List[Audio]] = []
+    """The audio associated with the example sentence definitions of the entry."""
+
+    optional: Optional[Dict[str, str]] = {}
+    """A list of information to optionally display"""
 
     class Config:
         extra = Extra.allow
@@ -228,38 +265,39 @@ class ResourceManifest(BaseConfig):
     transducers: List[Transducer] = []
     """A list of Transducers to apply to your data"""
 
-    audio_path: Union[HttpUrl, None] = None
+    audio_path: Optional[HttpUrl]
     """This is a path to your audio files that will be pre-pended to each audio path"""
 
-    img_path: Union[HttpUrl, None] = None
+    img_path: Optional[HttpUrl]
     """This is a path to your image files that will be pre-pended to each image path"""
 
-    targets: Union[ParserTargets, None] = None
-    """The ParserTargets for parsing the resource"""
+    targets: Optional[ParserTargets]
+    """The ParserTargets for parsing the resource. They are optional if providing a custom parser method"""
 
-    sheet_name: Union[str, None] = None
+    sheet_name: Optional[str]
     """The sheet name; only used for xlsx parsers since workbooks can have multiple sheets"""
 
-    json_parser_entrypoint: Union[str, None] = None
+    json_parser_entrypoint: Optional[str]
     """The entrypoint for parsing json; only used with json parsers when the json is nested and you only want to parse something further down in the tree"""
 
-    @validator("audio_path", "img_path")
-    def check_paths_are_pingable(cls, v):
-        return v
+    @root_validator(pre=True)
+    def targets_none_only_if_custom_parser(cls, values):
+        targets, file_type = values.get("targets"), values.get("file_type")
 
-    @root_validator
-    def targets_none_only_if_custom_parser(cls, v):
-        if "targets" not in v or (
-            v["targets"] is None
-            and v["file_type"]
-            not in [
-                ParserEnum.none,
-                ParserEnum.custom,
-            ]
-        ):
+        if targets is None and file_type not in [
+            ParserEnum.none,
+            ParserEnum.custom,
+            ParserEnum.none.value,
+            ParserEnum.custom.value,
+            None,
+        ]:
             raise ConfigurationError(
                 "Targets cannot be None if the parser is not using a custom parser."
             )
+        return values
+
+    @validator("audio_path", "img_path")
+    def check_paths_are_pingable(cls, v):
         return v
 
     @root_validator
@@ -323,7 +361,7 @@ class LanguageConfiguration(BaseConfig):
     optional_field_name: str = "Optional Field"
     """The display name for the optional field"""
 
-    credits: Union[List[Contributor], None] = None
+    credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
     build: str = "mothertongues.utils.get_current_time"
