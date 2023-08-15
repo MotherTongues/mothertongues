@@ -1,0 +1,17 @@
+{
+    "config": {
+        "L1": "Danish",
+        "L2": "English",
+        "l1_search_config": {
+            "insertionAtBeginningCost": 1.0,
+            "substitutionCostsPath": "./weights.psv"
+        },
+        "build": "mothertongues.utils.get_current_time",
+        "optional_field_name": "Optional Info",
+        "alphabet": "./alphabet.json"
+    },
+    "data": [{
+        "manifest": "./manifest_data_check.json",
+        "resource": "./data_check.csv"
+    }]
+}

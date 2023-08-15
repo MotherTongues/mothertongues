@@ -1,10 +1,20 @@
+from mothertongues.config.models import MTDConfiguration
+from mothertongues.dictionary import MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
+from mothertongues.utils import load_mtd_configuration
 
 
 class ConfigurationTest(BasicTestCase):
     """Test appropriate Configuration
     TODO: Create configs that exhibits the following and assert that errors/warnings are raised
     """
+
+    def setUp(self):
+        super().setUp()
+        language_config_path = self.data_dir / "config_data_search_algs.json"
+        config = load_mtd_configuration(language_config_path)
+        self.mtd_config = MTDConfiguration(**config)
+        self.dictionary = MTDictionary(self.mtd_config)
 
     def test_data_source_is_parsable(self):
         pass
@@ -17,6 +27,20 @@ class ConfigurationTest(BasicTestCase):
     def test_transducers(self):
         # check that input fields exist
         pass
+
+    def test_lev_weights(self):
+        self.assertEqual(
+            self.mtd_config.config.l1_search_config.insertionAtBeginningCost, 1.0
+        )
+        self.assertEqual(
+            self.mtd_config.config.l1_search_config.substitutionCosts["a"]["b"], 0.01
+        )
+        self.assertEqual(
+            self.mtd_config.config.l1_search_config.substitutionCosts["a"]["e"], 0.02
+        )
+        self.assertEqual(
+            self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
+        )
 
     def test_paths(self):
         # img and audio

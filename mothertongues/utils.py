@@ -87,6 +87,28 @@ def load_mtd_configuration(path: Path, base_path: Union[None, Path] = None):
     config["config"]["alphabet"] = resolve_possible_path(
         config["config"]["alphabet"], list, base_path
     )
+    if "l1_search_config" in config["config"] and (
+        "substitutionCostsPath" in config["config"]["l1_search_config"]
+        and config["config"]["l1_search_config"]["substitutionCostsPath"] is not None
+    ):
+        config["config"]["l1_search_config"][
+            "substitutionCostsPath"
+        ] = resolve_relative_path(
+            Path(config["config"]["l1_search_config"]["substitutionCostsPath"]),
+            base_path,
+        )
+
+    if "l2_search_config" in config["config"] and (
+        "substitutionCostsPath" in config["config"]["l2_search_config"]
+        and config["config"]["l2_search_config"]["substitutionCostsPath"] is not None
+    ):
+        config["config"]["l2_search_config"][
+            "substitutionCostsPath"
+        ] = resolve_relative_path(
+            Path(config["config"]["l2_search_config"]["substitutionCostsPath"]),
+            base_path,
+        )
+
     for i in range(len(config["data"])):
         config["data"][i]["resource"] = resolve_possible_path(
             config["data"][i]["resource"], list, base_path

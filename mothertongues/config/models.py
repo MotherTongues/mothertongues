@@ -1,10 +1,12 @@
+import csv
 import json
 import re
+from collections import defaultdict
 from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 from unicodedata import normalize
 
 from loguru import logger
@@ -42,6 +44,62 @@ class NormalizationEnum(str, Enum):
     nkfc = "NFKC"
     nkfd = "NKFD"
     none = "none"
+
+
+class SearchAlgorithms(str, Enum):
+    weighted_levenstein = "weighted_levenstein"
+    liblevenstein_automata = "liblevenstein_automata"
+
+
+class WeightedLevensteinConfig(BaseConfig):
+    insertionCost: float = 1.0
+    deletionCost: float = 1.0
+    insertionAtBeginningCost: float = 0.5
+    deletionAtEndCost: float = 0.5
+    substitutionCosts: Dict[str, Dict[str, float]] = {}
+    substitutionCostsPath: Optional[FilePath] = None
+    defaultSubstitutionCost: float = 1.0
+
+    def _convert_list_to_sub_costs(self, data: List[Tuple[str, str, float]]):
+        sub_costs: Dict[str, Dict[str, float]] = defaultdict(dict)
+        for item in data:
+            sub_costs[str(item[0])][str(item[1])] = float(item[2])
+        return sub_costs
+
+    @root_validator(pre=True)
+    def convert_sub_costs(cls, values):
+        if (
+            "substitutionCostsPath" in values
+            and values["substitutionCostsPath"] is not None
+        ):
+            v_path = Path(values["substitutionCostsPath"])
+            assert v_path.exists(), f"{v_path} does not exist"
+            if v_path.suffix == ".json":
+                with open(v_path, encoding="utf8") as f:
+                    data = json.load(f)
+                values["substitutionCosts"] = cls._convert_list_to_sub_costs(cls, data)
+            if v_path.suffix == ".xlsx":
+                with open(v_path, encoding="utf8") as f:
+                    data = json.load(f)
+                values["substitutionCosts"] = cls._convert_list_to_sub_costs(cls, data)
+            if v_path.suffix.endswith("sv"):
+                delimiter = None
+                if v_path.suffix == ".csv":
+                    delimiter = ","
+                elif v_path.suffix == ".psv":
+                    delimiter = "|"
+                elif v_path.suffix == ".tsv":
+                    delimiter = "\t"
+                assert (
+                    delimiter is not None
+                ), "Sorry, can only handle comma, tab or pipe separated values"
+                with open(v_path, encoding="utf8") as f:
+                    reader = csv.reader(f, delimiter=delimiter)
+                    data = list(reader)
+                    values["substitutionCosts"] = cls._convert_list_to_sub_costs(
+                        cls, data
+                    )
+        return values
 
 
 class StemmerEnum(str, Enum):
@@ -315,6 +373,16 @@ class LanguageConfiguration(BaseConfig):
 
     L2: str = "English"
     """The Other Language of Your Dictionary"""
+
+    l1_search_strategy: SearchAlgorithms = SearchAlgorithms.weighted_levenstein
+
+    l2_search_strategy: SearchAlgorithms = SearchAlgorithms.liblevenstein_automata
+
+    l1_search_config: Optional[WeightedLevensteinConfig] = Field(
+        default_factory=WeightedLevensteinConfig
+    )
+
+    l2_search_config: Optional[WeightedLevensteinConfig]
 
     l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
 
