@@ -6,7 +6,7 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, NamedTuple, Optional, Tuple, TypedDict, Union
 from unicodedata import normalize
 
 from loguru import logger
@@ -367,7 +367,7 @@ class ResourceManifest(BaseConfig):
         return v
 
 
-class LanguageConfiguration(BaseConfig):
+class ExportLanguageConfiguration(BaseModel):
     L1: str = "YourLanguage"
     """The Language of Your Dictionary"""
 
@@ -383,10 +383,6 @@ class LanguageConfiguration(BaseConfig):
     )
 
     l2_search_config: Optional[WeightedLevensteinConfig]
-
-    l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
-
-    l2_keys_to_index: List[str] = [CheckableParserTargetFieldNames.definition.value]
 
     l1_stemmer: StemmerEnum = StemmerEnum.none
 
@@ -405,18 +401,6 @@ class LanguageConfiguration(BaseConfig):
     alphabet: Union[List[str], FilePath] = list(ascii_letters)
     """The Symbols/Letters present in Your Dictionary"""
 
-    duplicate_fields_subset: List[CheckableParserTargetFieldNames] = [
-        CheckableParserTargetFieldNames.word,
-        CheckableParserTargetFieldNames.entryID,
-    ]
-    """The subset of fields to consider when removing duplicates"""
-
-    required_fields: List[CheckableParserTargetFieldNames] = [
-        CheckableParserTargetFieldNames.word,
-        CheckableParserTargetFieldNames.definition,
-    ]
-    """The name of required truthy fields"""
-
     display_field: str = "word"
     """The fieldname to display"""
 
@@ -434,14 +418,6 @@ class LanguageConfiguration(BaseConfig):
 
     build: str = "mothertongues.utils.get_current_time"
     """The build identifier for your dictionary build"""
-
-    @root_validator
-    def warn_that_functionality_is_limited_if_none(cls, v):
-        if v is None:
-            logger.warning(
-                f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
-            )
-        return v
 
     @validator("build", always=True, pre=True)
     def convert_callable_build(cls, v, values):
@@ -484,6 +460,39 @@ class LanguageConfiguration(BaseConfig):
             )
         return v
 
+    class Config:
+        extra = Extra.ignore
+
+
+class LanguageConfiguration(ExportLanguageConfiguration):
+
+    l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
+
+    l2_keys_to_index: List[str] = [CheckableParserTargetFieldNames.definition.value]
+
+    duplicate_fields_subset: List[CheckableParserTargetFieldNames] = [
+        CheckableParserTargetFieldNames.word,
+        CheckableParserTargetFieldNames.entryID,
+    ]
+    """The subset of fields to consider when removing duplicates"""
+
+    required_fields: List[CheckableParserTargetFieldNames] = [
+        CheckableParserTargetFieldNames.word,
+        CheckableParserTargetFieldNames.definition,
+    ]
+    """The name of required truthy fields"""
+
+    @root_validator
+    def warn_that_functionality_is_limited_if_none(cls, v):
+        if v is None:
+            logger.warning(
+                f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
+            )
+        return v
+
+    class Config:
+        extra = Extra.forbid
+
 
 class DataSource(BaseConfig):
     manifest: ResourceManifest
@@ -513,9 +522,27 @@ class DataSource(BaseConfig):
         return values
 
 
+class Location(NamedTuple):
+    entryIndex: str
+    positionIndex: int
+
+
 class MTDConfiguration(BaseConfig):
     config: LanguageConfiguration
     """The Configuration for your Language"""
 
     data: Union[DataSource, List[DataSource]]
     """The data sources for your dictionary"""
+
+
+PostingData = TypedDict(
+    "PostingData", {"location": List[Location], "score": Dict[str, float]}
+)
+IndexType = Dict[str, Dict[str, PostingData]]
+
+
+class MTDExportFormat(BaseConfig):
+    config: ExportLanguageConfiguration
+    data: Dict[str, DictionaryEntry]
+    l1_index: IndexType
+    l2_index: IndexType

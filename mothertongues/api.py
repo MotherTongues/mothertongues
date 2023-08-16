@@ -15,7 +15,12 @@ Once spun up, the documentation and API playground will be visible at
 http://localhost:8000/api/v1/docs
 """
 
+from typing import List
+
 from fastapi import FastAPI
+
+from mothertongues.config import SchemaTypes, get_schemas
+from mothertongues.config.models import DictionaryEntry, MTDExportFormat
 
 app = FastAPI()
 
@@ -23,4 +28,17 @@ v1 = FastAPI()
 
 app.mount("/api/v1", v1)
 
-# TODO: Scope out what API should do...
+
+@v1.get("/schema")
+async def return_schema(type: SchemaTypes = SchemaTypes.main_format):
+    return get_schemas(type)
+
+
+@v1.post("/validate-entries")
+async def validate_entries(data: List[DictionaryEntry]):
+    return True
+
+
+@v1.post("/validate-exported-data")
+async def validate_exported_data(data: MTDExportFormat):
+    return True

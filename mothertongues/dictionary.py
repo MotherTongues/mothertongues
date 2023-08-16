@@ -9,6 +9,7 @@ from mothertongues.config.models import (
     DataSource,
     DictionaryEntry,
     MTDConfiguration,
+    MTDExportFormat,
     ParserEnum,
     Transducer,
 )
@@ -194,7 +195,7 @@ class MTDictionary:
         self.missing_chars = self.sorter.oovs
         return True
 
-    def export(self, combine=True, hash_data=True):
+    def export(self, combine=True):
         config_export = self.config.config.dict(
             include={
                 "L1": True,
@@ -218,21 +219,17 @@ class MTDictionary:
             self.l2_index = create_inverted_index(self.data, self.config, "l2")
             self.l2_index.build()
             self.l2_index.calculate_scores()
-        # TODO: transducers for the config should be built here
-        # config_export['transducers'] =
-        if hash_data:
-            data = {
-                entry[CheckableParserTargetFieldNames.entryID.value]: entry
-                for entry in self.data
-            }
-        else:
-            data = self.data
+
+        data = {
+            entry[CheckableParserTargetFieldNames.entryID.value]: entry
+            for entry in self.data
+        }
         if combine:
-            return {
-                "config": config_export,
-                "data": data,
-                "l1_index": self.l1_index.data,
-                "l2_index": self.l2_index.data,
-            }
+            return MTDExportFormat(
+                config=config_export,
+                data=data,
+                l1_index=self.l1_index.data,
+                l2_index=self.l2_index.data,
+            ).dict()
         else:
             return config_export, data, self.l1_index.data, self.l2_index.data

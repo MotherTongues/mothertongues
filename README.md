@@ -82,7 +82,6 @@ This project exists thanks to all the people who contribute.
 
 TODO:
 
-- investigate speed for calculating bm25
 - export to format used by demo - `poetry run python3 mothertongues/cli.py export ~/Desktop/test_mtd/config.json --no-single-file` - might require change to namedtuple format.
 
 - Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.

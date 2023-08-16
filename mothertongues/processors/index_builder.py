@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
+    IndexType,
     MTDConfiguration,
     StemmerEnum,
     create_restricted_transducer,
@@ -38,9 +39,7 @@ class InvertedIndex:
     ):
         self.normalization_function = normalization_function
         self.stemmer_function = stemmer_function
-        self.data: Dict[
-            str, Dict[str, Dict[str, Union[int, List[Union[str, int]]]]]
-        ] = {}
+        self.data: IndexType = {}
         self._scorers: Dict[str, BM25Okapi] = {}
         self._path_cache: Dict[str, jsonpath.Fields] = {
             CheckableParserTargetFieldNames.entryID.value: json_parse(
