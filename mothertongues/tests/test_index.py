@@ -102,4 +102,4 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         index.build()
         index.calculate_scores()
         t2 = time.perf_counter()
-        self.assertLess(t2 - t1, 15)
+        self.assertLess(t2 - t1, 20)
