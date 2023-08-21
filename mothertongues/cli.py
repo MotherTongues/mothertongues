@@ -4,28 +4,63 @@ from pathlib import Path
 import typer
 from loguru import logger
 
+from mothertongues.config import SchemaTypes, get_schemas
 from mothertongues.config.models import MTDConfiguration
 from mothertongues.dictionary import MTDictionary
 from mothertongues.utils import load_mtd_configuration
 
-app = typer.Typer()
+app = typer.Typer(rich_markup_mode="markdown")
 
 
 @app.command()
-def hello(name: str):
-    print(f"Hello {name}")
+def schema(
+    type: SchemaTypes = typer.Argument(
+        default=SchemaTypes.main_format,
+        help="The SchemaType to return, choose from the main format, or just the dictionary configuration, or the schema for each entry in the dictionary.",
+    ),
+    output: Path = typer.Argument(
+        exists=False,
+        file_okay=True,
+        dir_okay=False,
+        help="The file path to write the JSON schema",
+    ),
+):
+    """
+    ## Export the JSON Schema for various MotherTongues Dictionary data definitions\
+
+    This is helpful when creating your own UI for use with MTD-generated data. Read more about it here: [https://docs.mothertongues.org/](https://docs.mothertongues.org/)
+
+    """
+    schema = get_schemas(type)
+    with open(output, "w", encoding="utf8") as f:
+        json.dump(schema, f)
+    return schema
 
 
 @app.command()
 def export(
     language_config_path: Path = typer.Argument(
-        exists=True, file_okay=True, dir_okay=False, readable=True
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="The path to your dictionary's language configuration file.",
     ),
     output_directory: Path = typer.Argument(
-        exists=True, file_okay=False, dir_okay=True
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        help="The output directory to write to.",
     ),
-    single_file: bool = typer.Option(default=True),
+    single_file: bool = typer.Option(
+        default=True, help="Whether to export to a single file or separate files."
+    ),
 ):
+    """
+    ## Export your dictionary for use in a MTD UI\
+
+    You need to export your data to create the file necessary for the UI. Read more about it here: [https://docs.mothertongues.org/](https://docs.mothertongues.org/)
+    """
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
 
