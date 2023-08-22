@@ -310,6 +310,60 @@ class DictionaryEntry(BaseModel):
         extra = Extra.allow
 
 
+class DictionaryEntryExportFormat(BaseModel):
+    """There is a DictionaryEntry created for each entry in your dictionary.
+    It intentionally shares the same data structure as the ParserTargets,
+    but allows for extra fields. This is the same as DictionaryEntry except with
+    some specifications for the output format (for example every exported entry will have)
+    a value for entryID, and a sorting_form).
+    """
+
+    word: str
+    """The words in your dictionary"""
+
+    definition: str
+    """The definitions in your dictionary"""
+
+    entryID: str
+    """The unique IDs for entries in your dictionary. If None, ID's will be automatically assigned."""
+
+    sorting_form: List[int]
+    """The form used to sort entries"""
+
+    theme: Optional[str] = ""
+    """The main theme to group the entry under."""
+
+    secondary_theme: Optional[str] = ""
+    """The secondary theme to group the entry under."""
+
+    img: Optional[str] = ""
+    """The image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
+
+    audio: Optional[List[Audio]] = []
+    """The audio associated with the entry."""
+
+    definition_audio: Optional[List[Audio]] = []
+    """The audio associated with the definition of the entry."""
+
+    example_sentence: Optional[List[str]] = []
+    """The example sentences associated with the entry"""
+
+    example_sentence_definition: Optional[List[str]] = []
+    """The example sentence definitions associated with the entry"""
+
+    example_sentence_audio: Optional[List[Audio]] = []
+    """The audio associated with the example sentences of the entry."""
+
+    example_sentence_definition_audio: Optional[List[Audio]] = []
+    """The audio associated with the example sentence definitions of the entry."""
+
+    optional: Optional[Dict[str, str]] = {}
+    """A list of information to optionally display"""
+
+    class Config:
+        extra = Extra.allow
+
+
 class ResourceManifest(BaseConfig):
     file_type: ParserEnum = ParserEnum.none
     """The type of parser to use to parse the resource"""
@@ -367,56 +421,41 @@ class ResourceManifest(BaseConfig):
         return v
 
 
-class ExportLanguageConfiguration(BaseModel):
-    L1: str = "YourLanguage"
+class LanguageConfigurationExportFormat(BaseModel):
+    L1: str
     """The Language of Your Dictionary"""
 
-    L2: str = "English"
+    L2: str
     """The Other Language of Your Dictionary"""
 
-    l1_search_strategy: SearchAlgorithms = SearchAlgorithms.weighted_levenstein
+    l1_search_strategy: SearchAlgorithms
 
-    l2_search_strategy: SearchAlgorithms = SearchAlgorithms.liblevenstein_automata
+    l2_search_strategy: SearchAlgorithms
 
-    l1_search_config: Optional[WeightedLevensteinConfig] = Field(
-        default_factory=WeightedLevensteinConfig
-    )
+    l1_search_config: Optional[WeightedLevensteinConfig]
 
     l2_search_config: Optional[WeightedLevensteinConfig]
 
-    l1_stemmer: StemmerEnum = StemmerEnum.none
+    l1_stemmer: StemmerEnum
 
-    l2_stemmer: StemmerEnum = StemmerEnum.snowball_english
+    l2_stemmer: StemmerEnum
 
-    l1_normalization_transducer: RestrictedTransducer = Field(
-        default_factory=RestrictedTransducer
-    )
+    l1_normalization_transducer: RestrictedTransducer
     """The transducer for creating the 'normalized' form for l1"""
 
-    l2_normalization_transducer: RestrictedTransducer = Field(
-        default_factory=RestrictedTransducer
-    )
+    l2_normalization_transducer: RestrictedTransducer
     """The transducer for creating the 'normalized' form for l2"""
 
-    alphabet: Union[List[str], FilePath] = list(ascii_letters)
+    alphabet: List[str]
     """The Symbols/Letters present in Your Dictionary"""
 
-    display_field: str = "word"
-    """The fieldname to display"""
-
-    compare_field: str = "compare_form"
-    """The fieldname to pass to the approximate search algorithm"""
-
-    sorting_field: str = "sort_form"
-    """The fieldname to pass to the sorting algorithm"""
-
-    optional_field_name: str = "Optional Field"
+    optional_field_name: str
     """The display name for the optional field"""
 
-    credits: Optional[List[Contributor]] = None
+    credits: Optional[List[Contributor]]
     """Add a list of contributors to this project"""
 
-    build: str = "mothertongues.utils.get_current_time"
+    build: str
     """The build identifier for your dictionary build"""
 
     @validator("build", always=True, pre=True)
@@ -464,7 +503,50 @@ class ExportLanguageConfiguration(BaseModel):
         extra = Extra.ignore
 
 
-class LanguageConfiguration(ExportLanguageConfiguration):
+class LanguageConfiguration(LanguageConfigurationExportFormat):
+
+    L1: str = "YourLanguage"
+    """The Language of Your Dictionary"""
+
+    L2: str = "English"
+    """The Other Language of Your Dictionary"""
+
+    l1_search_strategy: SearchAlgorithms = SearchAlgorithms.weighted_levenstein
+
+    l2_search_strategy: SearchAlgorithms = SearchAlgorithms.liblevenstein_automata
+
+    l1_search_config: Optional[WeightedLevensteinConfig] = Field(
+        default_factory=WeightedLevensteinConfig
+    )
+
+    l1_stemmer: StemmerEnum = StemmerEnum.none
+
+    l2_stemmer: StemmerEnum = StemmerEnum.snowball_english
+
+    l1_normalization_transducer: RestrictedTransducer = Field(
+        default_factory=RestrictedTransducer
+    )
+    """The transducer for creating the 'normalized' form for l1"""
+
+    l2_normalization_transducer: RestrictedTransducer = Field(
+        default_factory=RestrictedTransducer
+    )
+    """The transducer for creating the 'normalized' form for l2"""
+
+    alphabet: Union[List[str], FilePath] = list(ascii_letters)  # type: ignore
+    """The Symbols/Letters present in Your Dictionary"""
+
+    sorting_field: str = "sort_form"
+    """The fieldname to pass to the sorting algorithm"""
+
+    optional_field_name: str = "Optional Field"
+    """The display name for the optional field"""
+
+    credits: Optional[List[Contributor]] = None
+    """Add a list of contributors to this project"""
+
+    build: str = "mothertongues.utils.get_current_time"
+    """The build identifier for your dictionary build"""
 
     l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
 
@@ -542,7 +624,7 @@ IndexType = Dict[str, Dict[str, PostingData]]
 
 
 class MTDExportFormat(BaseConfig):
-    config: ExportLanguageConfiguration
-    data: Dict[str, DictionaryEntry]
+    config: LanguageConfigurationExportFormat
+    data: Dict[str, DictionaryEntryExportFormat]
     l1_index: IndexType
     l2_index: IndexType

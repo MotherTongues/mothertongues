@@ -1,8 +1,8 @@
 from enum import Enum
 
 from mothertongues.config.models import (
-    DictionaryEntry,
-    ExportLanguageConfiguration,
+    DictionaryEntryExportFormat,
+    LanguageConfigurationExportFormat,
     MTDExportFormat,
 )
 
@@ -17,6 +17,6 @@ def get_schemas(type: SchemaTypes):
     if type == SchemaTypes.main_format:
         return MTDExportFormat.schema()
     if type == SchemaTypes.config:
-        return ExportLanguageConfiguration.schema()
+        return LanguageConfigurationExportFormat.schema()
     if type == SchemaTypes.entry:
-        return DictionaryEntry.schema()
+        return DictionaryEntryExportFormat.schema()

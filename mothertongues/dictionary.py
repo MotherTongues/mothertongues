@@ -210,6 +210,7 @@ class MTDictionary:
                 "l2_stemmer": True,
                 "l1_normalization_transducer": True,
                 "l2_normalization_transducer": True,
+                "optional_field_name": True,
             }
         )
         if self.index is None:
