@@ -625,6 +625,6 @@ IndexType = Dict[str, Dict[str, PostingData]]
 
 class MTDExportFormat(BaseConfig):
     config: LanguageConfigurationExportFormat
-    data: Dict[str, DictionaryEntryExportFormat]
+    sorted_data: List[DictionaryEntryExportFormat]
     l1_index: IndexType
     l2_index: IndexType

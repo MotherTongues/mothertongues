@@ -221,16 +221,12 @@ class MTDictionary:
             self.l2_index.build()
             self.l2_index.calculate_scores()
 
-        data = {
-            entry[CheckableParserTargetFieldNames.entryID.value]: entry
-            for entry in self.data
-        }
         if combine:
             return MTDExportFormat(
                 config=config_export,
-                data=data,
+                sorted_data=self.data,
                 l1_index=self.l1_index.data,
                 l2_index=self.l2_index.data,
             ).dict()
         else:
-            return config_export, data, self.l1_index.data, self.l2_index.data
+            return config_export, self.data, self.l1_index.data, self.l2_index.data

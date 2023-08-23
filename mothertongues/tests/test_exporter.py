@@ -19,5 +19,5 @@ class DictionaryExporterTest(BasicTestCase):
         self.assertIn("config", output)
         self.assertIn("l1_index", output)
         self.assertIn("l2_index", output)
-        self.assertIn("data", output)
-        self.assertEqual(output["data"]["1"]["word"], "træ")
+        self.assertIn("sorted_data", output)
+        self.assertEqual(output["sorted_data"][3]["word"], "træ")
