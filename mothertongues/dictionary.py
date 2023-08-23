@@ -2,6 +2,12 @@ from collections import Counter
 from typing import Callable, List, Union
 from urllib.parse import urljoin
 
+from rich import print
+from rich.align import Align
+from rich.console import Group
+from rich.padding import Padding
+from rich.panel import Panel
+from rich.table import Table
 from tqdm import tqdm
 
 from mothertongues.config.models import (
@@ -201,8 +207,110 @@ class MTDictionary:
         self.duplicates = list(set(self.duplicates))
         self.missing_data = list(set(self.missing_data))
         # missing chars
-        self.missing_chars = self.sorter.oovs
+        self.missing_chars = set(self.sorter.oovs)
         return True
+
+    def print_info(self):
+        if not self.data:
+            print(
+                Padding(
+                    Panel(
+                        "",
+                        title="Nothing here, your dictionary is empty!",
+                        subtitle="Please check your data and configurations.",
+                    ),
+                    (2, 4),
+                )
+            )
+        n_entries = len(self.data)
+        n_dupes = len(self.duplicates)
+        n_missing = len(self.missing_data)
+        n_oov_chars = len(self.missing_chars)
+        dupe_ratio = n_dupes / n_entries
+        colors = {"duplicates": "", "missing": "", "oov_chars": ""}
+        warning = False
+        severe_warning = False
+        # provide warnings if too many duplicates
+        if dupe_ratio > 0.05 or n_dupes > 100:
+            warning = True
+            colors["duplicates"] = "[yellow]"
+            if dupe_ratio > 0.25 or n_dupes > 1000:
+                severe_warning = True
+                colors["duplicates"] = "[red]"
+        # provide severe warnings if too many duplicates
+        if n_missing > 0.05 or n_missing > 100:
+            warning = True
+            colors["missing"] = "[yellow]"
+            if n_missing > 0.25 or n_missing > 1000:
+                severe_warning = True
+                colors["missing"] = "[red]"
+        if n_oov_chars > 5:
+            warning = True
+            colors["oov_chars"] = "[yellow]"
+            if n_oov_chars > 25:
+                severe_warning = True
+                colors["oov_chars"] = "[red]"
+        title = "[green]Congratulations"
+        subtitle = "Documentation:  [link=https://docs.mothertongues.org]https://docs.mothertongues.org[/link]"
+        if warning:
+            title = "[yellow]Congratulations - but your dictionary needs checking"
+        if severe_warning:
+            title = (
+                "[red]Watch out! There are lots of possible errors in your dictionary"
+            )
+        basic = Padding(
+            f"\nYour dictionary for {self.config.config.L1} and {self.config.config.L2} has {n_entries} entries.",
+            (2, 2),
+        )
+        dupe_fields = ", ".join(
+            [x.value for x in self.config.config.duplicate_fields_subset]
+        )
+        required_fields = ", ".join(
+            [x.value for x in self.config.config.required_fields]
+        )
+        body = Align(basic, align="center")
+
+        table = Table(title="Dictionary Information", show_lines=True)
+
+        table.add_column("Description")
+        table.add_column("Total")
+        table.add_column("Examples")
+
+        # Duplicates
+        n_dupes_specs = (
+            ", ".join(self.duplicates)[:300] + "..." if self.duplicates else "---"
+        )
+        table.add_row(
+            f"Duplicate Entries\n\nThese entries had duplicate data in the following fields: {dupe_fields}",
+            f"{colors['duplicates']}{n_dupes}",
+            n_dupes_specs,
+        )
+        # Missing Data
+        n_missing_specs = (
+            ", ".join(self.missing_data)[:300] + "..." if self.missing_data else "---"
+        )
+        table.add_row(
+            f"Missing Data\n\nThese entries had data missing in one of the following fields: {required_fields}",
+            f"{colors['missing']}{n_missing}",
+            n_missing_specs,
+        )
+        # Missing Characters
+        n_oov_specs = ", ".join(self.missing_chars) if self.missing_chars else "---"
+        table.add_row(
+            "Unexpected Characters\n\nThese characters were not defined in your alphabet",
+            f"{colors['oov_chars']}{n_oov_chars}",
+            n_oov_specs,
+        )
+        print(
+            Padding(
+                Panel(
+                    Group(body, Align(table, align="center")),
+                    title=title,
+                    subtitle=subtitle,
+                ),
+                (2, 4),
+            )
+        )
 
     def export(self, combine=True):
         config_export = self.config.config.dict(
@@ -229,7 +337,6 @@ class MTDictionary:
             self.l2_index = create_inverted_index(self.data, self.config, "l2")
             self.l2_index.build()
             self.l2_index.calculate_scores()
-
         if combine:
             return MTDExportFormat(
                 config=config_export,

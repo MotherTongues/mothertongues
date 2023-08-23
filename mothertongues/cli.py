@@ -63,9 +63,9 @@ def export(
     """
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
-
     if single_file:
         output = dictionary.export()
+        dictionary.print_info()
         logger.info(
             f"Writing dictionary data file to {(output_directory / 'dictionary_data.json')}"
         )
@@ -73,6 +73,7 @@ def export(
             json.dump(output, f)
     else:
         config, data, l1_index, l2_index = dictionary.export(combine=False)
+        dictionary.print_info()
         logger.info(f"Writing config, data, and index files to {(output_directory)}")
         with open(output_directory / "config.json", "w", encoding="utf8") as f:
             json.dump(config, f)
