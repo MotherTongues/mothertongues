@@ -49,7 +49,7 @@ class InvertedIndex:
         self.keys_to_index = keys_to_index
         self.raw_data = sorted(
             raw_data,
-            key=lambda x: int(x[CheckableParserTargetFieldNames.entryID.value]),
+            key=lambda x: x[CheckableParserTargetFieldNames.entryID.value],
         )
 
     def load(self, data):

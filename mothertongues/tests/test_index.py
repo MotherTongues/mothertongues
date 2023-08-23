@@ -42,7 +42,9 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         self.assertEqual(
             self.dictionary.data[-1]["example_sentence"][0].split()[2], "røde"
         )
-        self.assertIn(["example_sentence[0]", 2], index.data["røde"]["1"]["location"])
+        self.assertIn(
+            ["example_sentence[0]", 2], index.data["røde"]["words1"]["location"]
+        )
 
     def test_score(self):
         index = InvertedIndex(

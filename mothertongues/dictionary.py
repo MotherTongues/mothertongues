@@ -156,7 +156,16 @@ class MTDictionary:
             data = self.custom_parse_method(data_source)
         else:
             data = parse(data_source)
-        return [x.dict() for x in data]
+        sourced_data = []
+        # Add entryID if it was not provided.
+        # Add the source
+        for i, entry in enumerate(data):
+            if entry.entryID is None:
+                entry.entryID = str(i)
+            entry.source = data_source.manifest.name
+            entry.entryID = entry.source + entry.entryID
+            sourced_data.append(entry.dict())
+        return sourced_data
 
     def check_data(self):
         """

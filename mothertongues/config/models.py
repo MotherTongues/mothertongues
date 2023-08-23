@@ -224,6 +224,9 @@ class ParserTargets(BaseConfig):
     img: Optional[str]
     """The location of the image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
 
+    source: Optional[str] = ""
+    """The location of the source of the entry. Note that this can be applied on each DataSource in manifest instead"""
+
     # Dict is used in case of json listof parser syntax
     audio: Optional[Union[List[Audio], Dict]]
     """The location of the audio associated with the entry."""
@@ -306,6 +309,9 @@ class DictionaryEntry(BaseModel):
     optional: Optional[Dict[str, str]] = {}
     """A list of information to optionally display"""
 
+    source: Optional[str] = ""
+    """The source of the entry"""
+
     class Config:
         extra = Extra.allow
 
@@ -359,6 +365,9 @@ class DictionaryEntryExportFormat(BaseModel):
 
     optional: Optional[Dict[str, str]] = {}
     """A list of information to optionally display"""
+
+    source: Optional[str] = ""
+    """The source of the entry"""
 
     class Config:
         extra = Extra.allow

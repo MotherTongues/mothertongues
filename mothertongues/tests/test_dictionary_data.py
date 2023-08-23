@@ -23,11 +23,18 @@ class DictionaryDataTest(BasicTestCase):
         self.assertIn("😀", self.dictionary.sorter.oovs)
 
     def test_duplicates(self):
-        self.assertCountEqual(self.dictionary.duplicates, ["4", "6"])
+        self.assertCountEqual(self.dictionary.duplicates, ["words4", "words6"])
+
+    def test_minimal(self):
+        config_path = self.data_dir / "config_minimal.json"
+        config = load_mtd_configuration(config_path)
+        mtd_config = MTDConfiguration(**config)
+        dictionary = MTDictionary(mtd_config)
+        self.assertEqual(dictionary.data[0]["entryID"], "words0")
 
     def test_missing_required_fields(self):
-        self.assertCountEqual(["7", "6"], self.dictionary.missing_data)
+        self.assertCountEqual(["words7", "words6"], self.dictionary.missing_data)
         looser_config = deepcopy(self.mtd_config)
         looser_config.config.required_fields = [CheckableParserTargetFieldNames.theme]
         dictionary = MTDictionary(looser_config)
-        self.assertCountEqual(["7", "5"], dictionary.missing_data)
+        self.assertCountEqual(["words7", "words5"], dictionary.missing_data)

@@ -1,0 +1,14 @@
+{
+    "config": {
+        "L1": "Danish",
+        "L2": "English",
+        "build": "mothertongues.utils.get_current_time",
+        "optional_field_name": "Optional Info",
+        "alphabet": "./alphabet.json",
+        "sorting_field": "word"
+    },
+    "data": [{
+        "manifest": "./manifest_minimal.json",
+        "resource": "./data_minimal.csv"
+    }]
+}

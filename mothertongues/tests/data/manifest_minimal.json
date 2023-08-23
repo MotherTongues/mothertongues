@@ -1,0 +1,9 @@
+{
+    "file_type": "csv",
+    "name": "words",
+    "transducers": [],
+    "targets": {
+        "definition": "0",
+        "word": "1"
+    }
+}
