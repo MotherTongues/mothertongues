@@ -1,0 +1,3 @@
+[submodule "mothertongues-UI"]
+	path = mothertongues-UI
+	url = https://github.com/MotherTongues/mothertongues-UI.git
