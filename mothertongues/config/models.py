@@ -54,8 +54,8 @@ class SearchAlgorithms(str, Enum):
 class WeightedLevensteinConfig(BaseConfig):
     insertionCost: float = 1.0
     deletionCost: float = 1.0
-    insertionAtBeginningCost: float = 0.5
-    deletionAtEndCost: float = 0.5
+    insertionAtBeginningCost: float = 1.0
+    deletionAtEndCost: float = 1.0
     substitutionCosts: Dict[str, Dict[str, float]] = {}
     substitutionCostsPath: Optional[FilePath] = None
     defaultSubstitutionCost: float = 1.0
@@ -64,6 +64,7 @@ class WeightedLevensteinConfig(BaseConfig):
         sub_costs: Dict[str, Dict[str, float]] = defaultdict(dict)
         for item in data:
             sub_costs[str(item[0])][str(item[1])] = float(item[2])
+            sub_costs[str(item[1])][str(item[0])] = float(item[2])
         return sub_costs
 
     @root_validator(pre=True)
