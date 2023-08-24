@@ -182,6 +182,7 @@ class MTDictionary:
         duplicate_fields = {
             x.value: Counter() for x in self.config.config.duplicate_fields_subset
         }
+        to_delete = []
         for i, entry in tqdm(
             enumerate(self.data),
             desc=f"Finding duplicates and entries that are missing fields for {', '.join(required_fields)}",
@@ -196,14 +197,18 @@ class MTDictionary:
                         entry[CheckableParserTargetFieldNames.entryID.value]
                     )
                     duplicate = True
+                    break
             if not all(truthy_fields):
                 self.missing_data.append(
                     entry[CheckableParserTargetFieldNames.entryID.value]
                 )
                 missing_fields = True
             if duplicate or missing_fields:
-                del self.data[i]
-        self.duplicates = list(set(self.duplicates))
+                to_delete.append(i)
+        to_delete.sort(reverse=True)
+        for item in to_delete:
+            del self.data[item]
+        self.duplicates = list(self.duplicates)
         self.missing_data = list(set(self.missing_data))
         # missing chars
         self.missing_chars = set(self.sorter.oovs)

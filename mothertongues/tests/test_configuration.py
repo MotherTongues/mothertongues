@@ -36,17 +36,27 @@ class ConfigurationTest(BasicTestCase):
         # check that input fields exist
         pass
 
+    # def test_config_does_not_raise_unexpected_errors(self):
+    #     """Generate configurations based on the schemas. These won't work, but shouldn't raise unexpected errors"""
+    #     language_config_faker = JSF(LanguageConfiguration.schema())
+    #     entry_faker = JSF(DictionaryEntry.schema())
+    #     data_source_faker = JSF(DataSource.schema())
+    #     manifest_faker = JSF(ResourceManifest.schema())
+    #     mtd_faker = JSF(MTDConfiguration.schema())
+
     def test_no_file_config(self):
-        """Create a dictionary without any files"""
+        """Create a dictionary without any files and generated data"""
         language_config = LanguageConfiguration(sorting_field="word")
         entry_schema = DictionaryEntry.schema()
         entry_faker = JSF(entry_schema)
         # generate fake data based on DictionaryEntry schema
-        entries = [entry_faker.generate() for _ in range(100)]
+        entries = [entry_faker.generate() for _ in range(1000)]
+        for i, entry in enumerate(entries):
+            entry["entryID"] = str(i)
         data = DataSource(manifest=ResourceManifest(), resource=entries)
         self.mtd_config = MTDConfiguration(config=language_config, data=data)
         self.dictionary = MTDictionary(self.mtd_config)
-        self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 100)
+        self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 1000)
 
     def test_lev_weights(self):
         self.assertEqual(
