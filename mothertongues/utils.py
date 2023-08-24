@@ -10,6 +10,8 @@ from g2p import Mapping, Transducer
 from g2p.mappings.utils import load_mapping_from_path
 from loguru import logger
 
+from mothertongues.exceptions import ConfigurationError
+
 
 @contextmanager
 def tqdm_joblib_context(tqdm_instance):
@@ -84,9 +86,18 @@ def load_mtd_configuration(path: Path, base_path: Union[None, Path] = None):
     if base_path is None:
         base_path = path.parent
     config = load_json_from_path(path)
-    config["config"]["alphabet"] = resolve_possible_path(
-        config["config"]["alphabet"], list, base_path
-    )
+    if "data" not in config or "config" not in config:
+        raise ConfigurationError(
+            f"Your configuration file at {path} is malformed. It must have both a 'config' and 'data' key."
+        )
+    if "alphabet" in config["config"]:
+        config["config"]["alphabet"] = resolve_possible_path(
+            config["config"]["alphabet"], list, base_path
+        )
+    if "no_sort_characters" in config["config"]:
+        config["config"]["no_sort_characters"] = resolve_possible_path(
+            config["config"]["no_sort_characters"], list, base_path
+        )
     if "l1_search_config" in config["config"] and (
         "substitutionCostsPath" in config["config"]["l1_search_config"]
         and config["config"]["l1_search_config"]["substitutionCostsPath"] is not None

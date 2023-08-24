@@ -1,4 +1,10 @@
-from mothertongues.config.models import MTDConfiguration
+from mothertongues.config.models import (
+    DataSource,
+    DictionaryEntry,
+    LanguageConfiguration,
+    MTDConfiguration,
+    ResourceManifest,
+)
 from mothertongues.dictionary import MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
@@ -27,6 +33,21 @@ class ConfigurationTest(BasicTestCase):
     def test_transducers(self):
         # check that input fields exist
         pass
+
+    def test_no_file_config(self):
+        """Create a dictionary without any files"""
+        language_config = LanguageConfiguration(
+            no_sort_characters=["4", "7"], sorting_field="word"
+        )
+        entries = [
+            DictionaryEntry(word="7test", definition="test1"),
+            DictionaryEntry(word="4best", definition="test2"),
+        ]
+        data = DataSource(manifest=ResourceManifest(), resource=entries)
+        self.mtd_config = MTDConfiguration(config=language_config, data=data)
+        self.dictionary = MTDictionary(self.mtd_config)
+        self.assertEqual(self.dictionary.data[0]["word"], "4best")
+        self.assertEqual(self.dictionary.data[1]["word"], "7test")
 
     def test_lev_weights(self):
         self.assertEqual(

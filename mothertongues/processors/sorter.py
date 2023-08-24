@@ -5,7 +5,8 @@ from typing import List, Union, no_type_check
 
 
 class ArbSorter(object):
-    """Sort entries based on alphabet. Thanks to Lingweenie: https://lingweenie.org/conlang/sort.html
+    """Sort entries based on alphabet. Inspired by Lingweenie: https://lingweenie.org/conlang/sort.html
+       with adaptations for OOV and ignorable characters.
 
     Given a sequence of letters (arbitrary-length Unicode strings), convert each into a numerical code.
     Then, convert any string to be sorted into its numerical equivalent and sort on that.

@@ -71,22 +71,29 @@ class MTDictionary:
                     ) from e
             else:
                 data = self.parse(data_source)
-            # Prepend image and audio paths
-            if (
-                data_source.manifest.audio_path is not None
-                and data_source.manifest.img_path is not None
-            ):
-                for entry in data:
-                    if data_source.manifest.img_path and entry.get("img", None):
-                        entry["img"] = urljoin(
-                            data_source.manifest.img_path, entry["img"]
+
+            for i, entry in enumerate(data):
+                if not isinstance(entry, DictionaryEntry):
+                    entry = DictionaryEntry(**entry)
+                # Add entryID if it was not provided.
+                if entry.entryID is None:
+                    entry.entryID = str(i)
+                # Prepend image path
+                if data_source.manifest.img_path and entry.img:
+                    entry.img = urljoin(data_source.manifest.img_path, entry.img)
+                # Prepend audio paths
+                if data_source.manifest.audio_path and entry.audio:
+                    for audio_i in range(len(entry.audio)):
+                        entry.audio[audio_i].filename = urljoin(
+                            data_source.manifest.audio_path,
+                            entry.audio[audio_i].filename,
                         )
-                    if data_source.manifest.audio_path and entry.get("audio", None):
-                        for audio_i in range(len(entry["audio"])):
-                            entry["audio"][audio_i]["filename"] = urljoin(
-                                data_source.manifest.audio_path,
-                                entry["audio"][audio_i]["filename"],
-                            )
+                # Add the source
+                entry.source = data_source.manifest.name
+                entry.entryID = entry.source + entry.entryID
+                # Convert back to dict
+                data[i] = entry.dict()
+
             # Transduce Data
             data = self.transduce(data, data_source.manifest.transducers)
             if self.data is None:
@@ -95,7 +102,9 @@ class MTDictionary:
                 self.data += data
         # Sort
         if self.data is not None:
-            self.sorter = ArbSorter(self.config.config.alphabet)
+            self.sorter = ArbSorter(
+                self.config.config.alphabet, self.config.config.no_sort_characters
+            )
             try:
                 self.data = self.sorter(self.data, self.config.config.sorting_field)
             except KeyError as e:
@@ -157,21 +166,11 @@ class MTDictionary:
 
     def parse(self, data_source: DataSource) -> List[dict]:
         """Parse the data in the file_path using the parser specified in the config"""
-        # parse raw data
-        if data_source.manifest.file_type == ParserEnum.custom:
-            data = self.custom_parse_method(data_source)
-        else:
-            data = parse(data_source)
-        sourced_data = []
-        # Add entryID if it was not provided.
-        # Add the source
-        for i, entry in enumerate(data):
-            if entry.entryID is None:
-                entry.entryID = str(i)
-            entry.source = data_source.manifest.name
-            entry.entryID = entry.source + entry.entryID
-            sourced_data.append(entry.dict())
-        return sourced_data
+        return (
+            self.custom_parse_method(data_source)
+            if data_source.manifest.file_type == ParserEnum.custom
+            else parse(data_source)
+        )
 
     def check_data(self):
         """

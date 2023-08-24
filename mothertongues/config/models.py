@@ -501,29 +501,6 @@ class LanguageConfigurationExportFormat(BaseModel):
             values["build"] = v
         return v
 
-    @validator("alphabet")
-    def load_alphabet(cls, v, values):
-        """Load the alphabet
-
-        Args:
-            v (_type_): _description_
-            values (_type_): _description_
-
-        Returns:
-            list[str]: The alphabet as a list
-        """
-        if isinstance(v, Path):
-            if v.suffix.endswith("json"):
-                with open(v, encoding="utf8") as f:
-                    return json.load(f)
-            if v.suffix.endswith("txt"):
-                with open(v, encoding="utf8") as f:
-                    return [x.strip() for x in f]
-            raise ValidationError(
-                "If providing a file with your alphabet, it must be either 'json' or 'txt'."
-            )
-        return v
-
     class Config:
         extra = Extra.ignore
 
@@ -561,6 +538,9 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     alphabet: Union[List[str], FilePath] = list(ascii_letters)  # type: ignore
     """The Symbols/Letters present in Your Dictionary"""
 
+    no_sort_characters: Union[List[str], FilePath] = []
+    """Symbols/letters in your data that should be ignored by the sorting algorithm"""
+
     sorting_field: str = "sort_form"
     """The fieldname to pass to the sorting algorithm"""
 
@@ -588,6 +568,29 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
         CheckableParserTargetFieldNames.definition,
     ]
     """The name of required truthy fields"""
+
+    @validator("alphabet")
+    def load_alphabet(cls, v, values):
+        """Load the alphabet
+
+        Args:
+            v (_type_): _description_
+            values (_type_): _description_
+
+        Returns:
+            list[str]: The alphabet as a list
+        """
+        if isinstance(v, Path):
+            if v.suffix.endswith("json"):
+                with open(v, encoding="utf8") as f:
+                    return json.load(f)
+            if v.suffix.endswith("txt"):
+                with open(v, encoding="utf8") as f:
+                    return [x.strip() for x in f]
+            raise ValidationError(
+                "If providing a file with your alphabet, it must be either 'json' or 'txt'."
+            )
+        return v
 
     @root_validator
     def warn_that_functionality_is_limited_if_none(cls, v):
