@@ -1,5 +1,7 @@
 # Mother Tongues Dictionaries (MTD)
 
+:construction: This repo is a near-complete re-write of the [legacy mothertongues](https://github.com/roedoejet/mothertongues) code and is set to replace it. It is under development however and is not complete yet. For a list of planned improvements see [this section](#improvements) :construction:
+
 [![codecov](https://codecov.io/gh/MotherTongues/mothertongues/branch/main/graph/badge.svg?token=7JUKAAHZDV)](https://codecov.io/gh/MotherTongues/mothertongues)
 [![Documentation Status](https://img.shields.io/badge/-docs-blue)](https://docs.mothertongues.org)
 [![Build Status](https://github.com/MotherTongues/mothertongues/actions/workflows/tests.yml/badge.svg)](https://github.com/MotherTongues/mothertongues/actions)
@@ -7,7 +9,7 @@
 [![license](https://img.shields.io/badge/Licence-MIT-green)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-MTD is the first of two open-source tools that allow language communities and developers to quickly and inexpensively make their dictionary data digitally accessible. MTD is a tool that parses and prepares your data for being used with an MTD User Interface. Currently [mobile](https://github.com/roedoejet/mothertongues-ui) and [web](https://github.com/MotherTongues/mothertongues-UI-Web) are supported.
+MTD is an open-source tool that allow language communities and developers to quickly and inexpensively make their dictionary data digitally accessible. MTD is a tool that parses and prepares your data for being used with an [MTD User Interface](https://github.com/MotherTongues/mothertongues-UI).
 
 Please visit the [website](https://www.mothertongues.org) or [docs](https://docs.mothertongues.org) for more information.
 
@@ -28,17 +30,26 @@ This project started as just a single dictionary for Gitxsan - a language spoken
 
 ## Install
 
-It is recommended to install mothertongues using pip. The package name is `mothertongues`, and as of version 1.0.x it is imported with `import mothertongues`. The CLI can be run using either `mothertongues` or `mtd`.
+It is recommended to install mothertongues using pip. The package name is `mothertongues`, and as of version 1.0.x it is imported with `import mothertongues`. The CLI can be run using `mothertongues --help`.
 
 ```
 pip install mothertongues
 ```
 
+### Local Install
+
+To install locally you will have to have Git, Python 3.8+, [poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) and Node 16+ on your machine. You can then follow these steps:
+
+1. Clone repo and UI submodule `git clone https://github.com/MotherTongues/mothertongues.git --recursive`
+2. Build the UI: `cd mothertongues/mothertongues-UI && npm install`
+3. Build the Python Development version of the UI: `npx nx build mtd-mobile-ui --configuration=pydev`
+4. Install the Python package: `cd .. && poetry install`
+
 ## Usage
 
 In order to create a Mother Tongues Dictionary you will need at least two things:
 
-- A configuration file for you language/dictionary
+- A configuration file for your language/dictionary
 - A configuration file for each source of data
 
 You can find out more about how to create these files against the MTD configuration schema by visiting the [guides](https://docs.mothertongues.org/docs/mtd-guides)
@@ -50,8 +61,23 @@ The basic workflow for creating a dictionary is as follows:
 1. Fork and clone the [mtd-starter](https://github.com/roedoejet/mtd-starter)
 2. [Edit and prepare](https://docs.mothertongues.org/docs/mtd-guides-prepare) the repo using your own data
 3. [Export your data](https://docs.mothertongues.org/docs/mtd-guides-ui#exporting-your-data) to a format readable by the Mother Tongues User Interfaces
-4. Chose an interface, either [mobile](https://github.com/roedoejet/mothertongues-ui) or [web](https://github.com/MotherTongues/mothertongues-UI-Web)
-5. Add your exported data (`config.js` and `dict_cached.js`) from step 3 and then [publish](https://docs.mothertongues.org/docs/mtd-guides-publishing) your dictionary! 🎉
+4. Add your exported data (`dictionary_data.json`) from step 3 and then [publish](https://docs.mothertongues.org/docs/mtd-guides-publishing) your dictionary! 🎉
+
+
+## Improvements
+
+There are a variety of improvements from the legacy mothertongues library. Here are a few of them:
+
+- The CLI now builds an inverted index over any of your dictionary entry keys and search is conducted on the terms of that index.
+- Results are now ranked by a combination of Edit Distance and [OkapiBM25](https://en.wikipedia.org/wiki/Okapi_BM25) meaning you're likely to get better results. We sort results by first sorting them based on edit distance - for results with the same edit distance, we then sort them based on their OkapiBM25 score.
+- We use strongly typed configurations to reduce errors when building your dictionary
+- We support two search algorithms out-of-the-box: an unweighted Levenstein search over [Levenstein automata](http://blog.notdot.net/2010/07/Damn-Cool-Algorithms-Levenshtein-Automata#:~:text=The%20basic%20insight%20behind%20Levenshtein,distance%20of%20a%20target%20word.) (very fast) or a quadratic weighted Levenstein search over the terms of the index (flexible and slower, but still pretty fast).
+- The search algorithm is now optimized for multi-term searches
+- There is a unified normalization strategy between the UI and CLI that allows for performing case normalization, Unicode normalization, removal of punctuation (customizable), arbitrary replace rules, and removal of combining diacritics/accents.
+- There is a built in web-server in the CLI for quickly spinning up a development version of your app `mothertongues build-and-run <path_to_language_config>`
+- There is an API that serves the MTD JSON schemas and validates your configuration files and dictionary data.
+- The sorter is improved to be able to handle Out of Vocabulary (OOV) characters
+- Parsing JSON is many times faster thanks to @dhdaines
 
 
 ## Contributing
@@ -70,6 +96,7 @@ Thank you to all other contributors for support with improving MotherTongues, fi
 
 This project exists thanks to all the people who contribute.
 
+[@dhdaines](https://github.com/dhdaines).
 [@littell](https://github.com/littell).
 [@markturin](https://github.com/markturin).
 [@eddieantonio](https://github.com/eddieantonio).
@@ -78,10 +105,3 @@ This project exists thanks to all the people who contribute.
 ## License
 
 [MIT © Aidan Pine.](LICENSE)
-
-
-TODO:
-
-- export to format used by demo - `poetry run python3 mothertongues/cli.py export ~/Desktop/test_mtd/config.json --no-single-file` - might require change to namedtuple format.
-
-- Continue to do test-driven development for loading dictionaries, validating data and exporting to standard format.
