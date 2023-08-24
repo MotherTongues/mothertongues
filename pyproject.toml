@@ -18,6 +18,7 @@ jsonpath-ng = "^1.5.3"
 jsonpointer = "^2.3"
 nltk = "^3.8.1"
 rank-bm25 = "^0.2.2"
+jsf = "^0.7.1"
 
 
 [tool.poetry.group.dev.dependencies]

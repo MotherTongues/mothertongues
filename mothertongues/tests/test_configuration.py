@@ -1,3 +1,5 @@
+from jsf import JSF
+
 from mothertongues.config.models import (
     DataSource,
     DictionaryEntry,
@@ -36,18 +38,15 @@ class ConfigurationTest(BasicTestCase):
 
     def test_no_file_config(self):
         """Create a dictionary without any files"""
-        language_config = LanguageConfiguration(
-            no_sort_characters=["4", "7"], sorting_field="word"
-        )
-        entries = [
-            DictionaryEntry(word="7test", definition="test1"),
-            DictionaryEntry(word="4best", definition="test2"),
-        ]
+        language_config = LanguageConfiguration(sorting_field="word")
+        entry_schema = DictionaryEntry.schema()
+        entry_faker = JSF(entry_schema)
+        # generate fake data based on DictionaryEntry schema
+        entries = [entry_faker.generate() for _ in range(100)]
         data = DataSource(manifest=ResourceManifest(), resource=entries)
         self.mtd_config = MTDConfiguration(config=language_config, data=data)
         self.dictionary = MTDictionary(self.mtd_config)
-        self.assertEqual(self.dictionary.data[0]["word"], "4best")
-        self.assertEqual(self.dictionary.data[1]["word"], "7test")
+        self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 100)
 
     def test_lev_weights(self):
         self.assertEqual(
