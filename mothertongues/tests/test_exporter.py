@@ -15,7 +15,7 @@ class DictionaryExporterTest(BasicTestCase):
         self.dictionary = MTDictionary(self.mtd_config)
 
     def test_export_data(self):
-        output = self.dictionary.export()
+        output = self.dictionary.export().dict()
         self.assertIn("config", output)
         self.assertIn("l1_index", output)
         self.assertIn("l2_index", output)

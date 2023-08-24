@@ -75,14 +75,13 @@ class WeightedLevensteinConfig(BaseConfig):
         ):
             v_path = Path(values["substitutionCostsPath"])
             assert v_path.exists(), f"{v_path} does not exist"
+            data = None
             if v_path.suffix == ".json":
                 with open(v_path, encoding="utf8") as f:
                     data = json.load(f)
-                values["substitutionCosts"] = cls._convert_list_to_sub_costs(cls, data)
             if v_path.suffix == ".xlsx":
                 with open(v_path, encoding="utf8") as f:
                     data = json.load(f)
-                values["substitutionCosts"] = cls._convert_list_to_sub_costs(cls, data)
             if v_path.suffix.endswith("sv"):
                 delimiter = None
                 if v_path.suffix == ".csv":
@@ -97,9 +96,15 @@ class WeightedLevensteinConfig(BaseConfig):
                 with open(v_path, encoding="utf8") as f:
                     reader = csv.reader(f, delimiter=delimiter)
                     data = list(reader)
+            try:
+                if data:
                     values["substitutionCosts"] = cls._convert_list_to_sub_costs(
                         cls, data
                     )
+            except IndexError as e:
+                raise IndexError(
+                    f"The file at {v_path} is not formatted properly. For each entry you must have two charactesr and a number between 0.0 and 1.0. Please check your file again."
+                ) from e
         return values
 
 
@@ -112,7 +117,7 @@ class RestrictedTransducer(BaseConfig):
     lower: bool = True
     unicode_normalization: NormalizationEnum = NormalizationEnum.nfc
     remove_punctuation: str = "[.,/#!$%^&?*';:{}=\\-_`~()]"
-    replace_rules: Optional[List[Dict[str, str]]] = None
+    replace_rules: Optional[Dict[str, str]] = None
 
 
 def create_restricted_transducer(config: RestrictedTransducer) -> Callable:

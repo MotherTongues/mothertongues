@@ -343,6 +343,6 @@ class MTDictionary:
                 sorted_data=self.data,
                 l1_index=self.l1_index.data,
                 l2_index=self.l2_index.data,
-            ).dict()
+            )
         else:
             return config_export, self.data, self.l1_index.data, self.l2_index.data

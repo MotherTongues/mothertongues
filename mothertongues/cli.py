@@ -70,9 +70,9 @@ def build_and_run(
     output = dictionary.export()
     UI_DIR = Path(__file__).parent / "ui"
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
-
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
-        json.dump(output, f)
+        # I use f.write because output.json() returns a string (but is needed for proper serialization)
+        f.write(output.json())
     logger.warning(
         "WARNING: This is a Development server and is not secure for production"
     )
@@ -123,9 +123,7 @@ def export(
         dir_okay=True,
         help="The output directory to write to.",
     ),
-    single_file: bool = typer.Option(
-        default=True, help="Whether to export to a single file or separate files."
-    ),
+    include_info: bool = True,
 ):
     """
     ## Export your dictionary for use in a MTD UI\
@@ -134,26 +132,15 @@ def export(
     """
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
-    if single_file:
-        output = dictionary.export()
+    output = dictionary.export()
+    if include_info:
         dictionary.print_info()
-        logger.info(
-            f"Writing dictionary data file to {(output_directory / 'dictionary_data.json')}"
-        )
-        with open(output_directory / "dictionary_data.json", "w", encoding="utf8") as f:
-            json.dump(output, f)
-    else:
-        config, data, l1_index, l2_index = dictionary.export(combine=False)
-        dictionary.print_info()
-        logger.info(f"Writing config, data, and index files to {(output_directory)}")
-        with open(output_directory / "config.json", "w", encoding="utf8") as f:
-            json.dump(config, f)
-        with open(output_directory / "data_hash.json", "w", encoding="utf8") as f:
-            json.dump(data, f)
-        with open(output_directory / "l1_index.json", "w", encoding="utf8") as f:
-            json.dump(l1_index, f)
-        with open(output_directory / "l2_index.json", "w", encoding="utf8") as f:
-            json.dump(l2_index, f)
+    logger.info(
+        f"Writing dictionary data file to {(output_directory / 'dictionary_data.json')}"
+    )
+    with open(output_directory / "dictionary_data.json", "w", encoding="utf8") as f:
+        # I use f.write because output.json() returns a string (but is needed for proper serialization)
+        f.write(output.json())
 
 
 if __name__ == "__main__":
