@@ -208,13 +208,13 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
     try:
         module = import_module(module_name)
     except ImportError as e:
-        raise ImportError(
-            f"Cannot import module {module_name} - this must be a valid module"
+        raise ConfigurationError(
+            f"Cannot import module '{module_name}' - this must be a valid Python module"
         ) from e
     try:
         function = getattr(module, function_name)
     except AttributeError as exc:
-        raise AttributeError(
-            f"Cannot find method {function} in module {module}"
+        raise ConfigurationError(
+            f"Cannot find method '{function}' in module '{module}'"
         ) from exc
     return function

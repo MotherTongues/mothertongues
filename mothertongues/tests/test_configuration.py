@@ -1,4 +1,7 @@
+import contextlib
+
 from jsf import JSF
+from pydantic import error_wrappers
 
 from mothertongues.config.models import (
     DataSource,
@@ -8,6 +11,11 @@ from mothertongues.config.models import (
     ResourceManifest,
 )
 from mothertongues.dictionary import MTDictionary
+from mothertongues.exceptions import (
+    ConfigurationError,
+    ParserError,
+    UnsupportedFiletypeError,
+)
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
 
@@ -36,13 +44,30 @@ class ConfigurationTest(BasicTestCase):
         # check that input fields exist
         pass
 
-    # def test_config_does_not_raise_unexpected_errors(self):
-    #     """Generate configurations based on the schemas. These won't work, but shouldn't raise unexpected errors"""
-    #     language_config_faker = JSF(LanguageConfiguration.schema())
-    #     entry_faker = JSF(DictionaryEntry.schema())
-    #     data_source_faker = JSF(DataSource.schema())
-    #     manifest_faker = JSF(ResourceManifest.schema())
-    #     mtd_faker = JSF(MTDConfiguration.schema())
+    def test_config_does_not_raise_unexpected_errors(self):
+        """Generate 1000 fake dictionaries based on the schemas alone.
+        These won't work, but shouldn't raise unexpected errors either"""
+        language_config_faker = JSF(LanguageConfiguration.schema())
+        entry_faker = JSF(DictionaryEntry.schema())
+        manifest_faker = JSF(ResourceManifest.schema())
+        for _ in range(1000):
+            # Custom exceptions from mothertongues.exceptions are ok, as are NotImplementedErrors for configurations that try to use the Custom Parser Method
+            # UnsupportedFiletypeError is OK and so are various pydantic ValidationErrors
+            with contextlib.suppress(
+                ConfigurationError,
+                ParserError,
+                NotImplementedError,
+                UnsupportedFiletypeError,
+                error_wrappers.ValidationError,
+            ):
+                language_config = LanguageConfiguration(
+                    **language_config_faker.generate()
+                )
+                manifest = ResourceManifest(**manifest_faker.generate())
+                data = [DictionaryEntry(**entry_faker.generate()) for _ in range(50)]
+                data_source = DataSource(manifest=manifest, resource=data)
+                config = MTDConfiguration(config=language_config, data=data_source)
+                MTDictionary(config)
 
     def test_no_file_config(self):
         """Create a dictionary without any files and generated data"""

@@ -628,7 +628,23 @@ class DataSource(BaseConfig):
             and not values["resource"].exists()
         ):
             raise  # TODO: what should this raise?
-
+        if values and "manifest" in values:
+            if values["manifest"].file_type == ParserEnum.none and isinstance(
+                values["resource"], Path
+            ):
+                raise ConfigurationError(
+                    "You cannot provide a path to your data if the parser is set 'none', instead you must pass the raw, parsed data."
+                )
+            if values["manifest"].file_type in [
+                ParserEnum.csv,
+                ParserEnum.psv,
+                ParserEnum.tsv,
+                ParserEnum.xlsx,
+                ParserEnum.json,
+            ] and not isinstance(values["resource"], Path):
+                raise ConfigurationError(
+                    f"Your parser was set to {values['manifest'].file_type} but you provided raw data, instead you must pass a list to your file or change your parser type."
+                )
         return values
 
 
