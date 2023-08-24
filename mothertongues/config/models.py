@@ -117,6 +117,7 @@ class RestrictedTransducer(BaseConfig):
     lower: bool = True
     unicode_normalization: NormalizationEnum = NormalizationEnum.nfc
     remove_punctuation: str = "[.,/#!$%^&?*';:{}=\\-_`~()]"
+    remove_combining_characters: bool = True
     replace_rules: Optional[Dict[str, str]] = None
 
 
@@ -133,6 +134,15 @@ def create_restricted_transducer(config: RestrictedTransducer) -> Callable:
     callables = []
     if config.lower:
         callables.append(lambda x: x.lower())
+    if config.remove_combining_characters:
+
+        def remove_combining_characters(text: str):
+            text = normalize("NFD", text)
+            return re.sub(
+                r"[\u0300-\u036f]", "", text
+            )  # TODO: test, and consider adding the other 4 unicode blocks
+
+        callables.append(remove_combining_characters)
     if config.unicode_normalization != NormalizationEnum.none:
         callables.append(partial(normalize, config.unicode_normalization.value))
     if config.remove_punctuation:
