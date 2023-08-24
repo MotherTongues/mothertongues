@@ -1,4 +1,8 @@
 import json
+import shutil
+import socketserver
+from functools import partial
+from http.server import SimpleHTTPRequestHandler
 from pathlib import Path
 
 import typer
@@ -10,6 +14,73 @@ from mothertongues.dictionary import MTDictionary
 from mothertongues.utils import load_mtd_configuration
 
 app = typer.Typer(rich_markup_mode="markdown")
+
+
+@app.command()
+def run(
+    dictionary_data: Path = typer.Argument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="The path to your generated dictionary data",
+    ),
+    port: int = 3636,
+):
+    """
+    ## Run your dictionary in your browser\
+
+    This is helpful for debugging, just run this command and your dictionary will be available at [http://localhost:3636](http://localhots:3636)
+    You can exit the server by pressing ctrl+c.
+
+    If you haven't generated your dictionary data yet, use the export command first or use the build-and-run command instead.
+    """
+    UI_DIR = Path(__file__).parent / "ui"
+    shutil.copy(dictionary_data, UI_DIR / "assets" / "dictionary_data.json")
+    Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
+    logger.warning(
+        "WARNING: This is a Development server and is not secure for production"
+    )
+    httpd = socketserver.TCPServer(("", port), Handler)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
+
+
+@app.command()
+def build_and_run(
+    language_config_path: Path = typer.Argument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="The path to your dictionary's language configuration file.",
+    ),
+    port: int = 3636,
+):
+    """
+    ## Build your dictionary and run it in your browser\
+
+    This is helpful for debugging, just run this command and your dictionary will be available at [http://localhost:3636](http://localhots:3636)
+    You can exit the server by pressing ctrl+c.
+    """
+    config = MTDConfiguration(**load_mtd_configuration(language_config_path))
+    dictionary = MTDictionary(config)
+    output = dictionary.export()
+    UI_DIR = Path(__file__).parent / "ui"
+    Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
+
+    with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
+        json.dump(output, f)
+    logger.warning(
+        "WARNING: This is a Development server and is not secure for production"
+    )
+    httpd = socketserver.TCPServer(("", port), Handler)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        httpd.server_close()
 
 
 @app.command()

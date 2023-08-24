@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["roedoejet <hello@aidanpine.ca>"]
 readme = "README.md"
+include = ["mothertongues/ui"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
