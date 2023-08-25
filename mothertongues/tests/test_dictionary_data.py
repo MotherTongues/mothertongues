@@ -27,6 +27,9 @@ class DictionaryDataTest(BasicTestCase):
             self.dictionary.duplicates, ["words4", "words6", "words9"]
         )
 
+    def test_info(self):
+        self.assertEqual(self.dictionary[0]["entryID"], "words5")
+
     def test_minimal(self):
         config_path = self.data_dir / "config_minimal.json"
         config = load_mtd_configuration(config_path)

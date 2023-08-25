@@ -4,6 +4,7 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 
 from loguru import logger
 
+from mothertongues.tests.test_cli import CommandLineTest
 from mothertongues.tests.test_configuration import ConfigurationTest
 from mothertongues.tests.test_dictionary_data import DictionaryDataTest
 from mothertongues.tests.test_exporter import DictionaryExporterTest
@@ -12,6 +13,8 @@ from mothertongues.tests.test_parsers import DictionaryParserTest
 from mothertongues.tests.test_sorter import SorterTest
 
 LOADER = TestLoader()
+
+INTEGRATION_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [CommandLineTest]]
 
 CONFIG_TESTS = [
     LOADER.loadTestsFromTestCase(test)
@@ -48,13 +51,17 @@ def run_tests(suite: str, describe: bool = False) -> bool:
     if suite == "all":
         test_suite = LOADER.discover(os.path.dirname(__file__))
     elif suite == "dev":
-        test_suite = TestSuite(CONFIG_TESTS + DATA_TESTS + PROCESSOR_TESTS)
+        test_suite = TestSuite(
+            CONFIG_TESTS + DATA_TESTS + PROCESSOR_TESTS + INTEGRATION_TESTS
+        )
     elif suite == "config":
         test_suite = TestSuite(CONFIG_TESTS)
     elif suite == "data":
         test_suite = TestSuite(DATA_TESTS)
     elif suite == "processors":
         test_suite = TestSuite(PROCESSOR_TESTS)
+    elif suite == "integ":
+        test_suite = TestSuite(INTEGRATION_TESTS)
     else:
         logger.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
         return False

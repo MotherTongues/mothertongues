@@ -69,19 +69,25 @@ class ConfigurationTest(BasicTestCase):
                 config = MTDConfiguration(config=language_config, data=data_source)
                 MTDictionary(config)
 
-    def test_no_file_config(self):
-        """Create a dictionary without any files and generated data"""
-        language_config = LanguageConfiguration(sorting_field="word")
+    def _generate_fake_data(self):
         entry_schema = DictionaryEntry.schema()
         entry_faker = JSF(entry_schema)
-        # generate fake data based on DictionaryEntry schema
         entries = [entry_faker.generate() for _ in range(1000)]
         for i, entry in enumerate(entries):
             entry["entryID"] = str(i)
-        data = DataSource(manifest=ResourceManifest(), resource=entries)
-        self.mtd_config = MTDConfiguration(config=language_config, data=data)
+        return DataSource(manifest=ResourceManifest(), resource=entries)
+
+    def test_no_file_config(self):
+        """Create a dictionary without any files and generated data"""
+        language_config = LanguageConfiguration(sorting_field="word")
+        # generate fake data based on DictionaryEntry schema
+        fake_data_source1 = self._generate_fake_data()
+        fake_data_source2 = self._generate_fake_data()
+        self.mtd_config = MTDConfiguration(
+            config=language_config, data=[fake_data_source1, fake_data_source2]
+        )
         self.dictionary = MTDictionary(self.mtd_config)
-        self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 1000)
+        self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 2000)
 
     def test_lev_weights(self):
         self.assertEqual(

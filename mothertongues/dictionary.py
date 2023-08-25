@@ -19,7 +19,7 @@ from mothertongues.config.models import (
     ParserEnum,
     Transducer,
 )
-from mothertongues.exceptions import ConfigurationError, ParserError
+from mothertongues.exceptions import ConfigurationError
 from mothertongues.parsers import parse
 from mothertongues.processors.index_builder import create_inverted_index
 from mothertongues.processors.sorter import ArbSorter
@@ -63,12 +63,7 @@ class MTDictionary:
             self.config.data = [self.config.data]
         for data_source in self.config.data:
             if data_source.manifest.file_type == ParserEnum.none:
-                try:
-                    data = data_source.resource
-                except TypeError as e:
-                    raise ParserError(
-                        "Sorry, please try setting your parser to an appropriate value (ie 'csv' or 'json'), implement a custom parser, or pass valid data."
-                    ) from e
+                data = data_source.resource
             else:
                 data = self.parse(data_source)
 
@@ -316,7 +311,7 @@ class MTDictionary:
             )
         )
 
-    def export(self, combine=True):
+    def export(self):
         config_export = self.config.config.dict(
             include={
                 "L1": True,
@@ -341,12 +336,9 @@ class MTDictionary:
             self.l2_index = create_inverted_index(self.data, self.config, "l2")
             self.l2_index.build()
             self.l2_index.calculate_scores()
-        if combine:
-            return MTDExportFormat(
-                config=config_export,
-                sorted_data=self.data,
-                l1_index=self.l1_index.data,
-                l2_index=self.l2_index.data,
-            )
-        else:
-            return config_export, self.data, self.l1_index.data, self.l2_index.data
+        return MTDExportFormat(
+            config=config_export,
+            sorted_data=self.data,
+            l1_index=self.l1_index.data,
+            l2_index=self.l2_index.data,
+        )
