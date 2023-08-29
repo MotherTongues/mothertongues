@@ -33,6 +33,14 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+      - name: Use Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Install & Build UI
+        run: |
+          # The default config is for the monorepo, while this is for standalone
+          cd mothertongues-UI && npm install && npx nx build mtd-mobile-ui --configuration=pydev
       - name: Run image
         uses: abatilo/actions-poetry@v2
         with:
