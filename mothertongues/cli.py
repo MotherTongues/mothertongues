@@ -5,15 +5,27 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler
 from pathlib import Path
 
+import nltk
+import questionary
 import typer
 from loguru import logger
+from openpyxl import Workbook
 
 from mothertongues.config import SchemaTypes, get_schemas
-from mothertongues.config.models import MTDConfiguration
+from mothertongues.config.models import (
+    SCHEMA_DIR,
+    DataSource,
+    LanguageConfiguration,
+    MTDConfiguration,
+    ParserEnum,
+    ParserTargets,
+    ResourceManifest,
+)
 from mothertongues.dictionary import MTDictionary
 from mothertongues.utils import load_mtd_configuration
 
 app = typer.Typer(rich_markup_mode="markdown")
+UI_DIR = Path(__file__).parent / "ui"
 
 
 @app.command()
@@ -35,7 +47,6 @@ def run(
 
     If you haven't generated your dictionary data yet, use the export command first or use the build-and-run command instead.
     """
-    UI_DIR = Path(__file__).parent / "ui"
     shutil.copy(dictionary_data, UI_DIR / "assets" / "dictionary_data.json")
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     logger.warning(
@@ -68,7 +79,6 @@ def build_and_run(
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
     output = dictionary.export()
-    UI_DIR = Path(__file__).parent / "ui"
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
         # I use f.write because output.json() returns a string (but is needed for proper serialization)
@@ -109,6 +119,30 @@ def schema(
 
 
 @app.command()
+def update_schemas():
+    """
+    ## Update the packaged version of the schemas, this is useful in development.
+
+    Unless you are an advanced user of mothertongues, do not worry about this command.
+
+    """
+    manifest_schema = json.loads(get_schemas(SchemaTypes.manifest, json=True))
+    # manifest_schema['properties']['$schema'] = {
+    #         "title": "Schema Path",
+    #         "type": "string"
+    #     }
+    config_schema = json.loads(get_schemas(SchemaTypes.config, json=True))
+    # config_schema['properties']['$schema'] = {
+    #         "title": "Schema Path",
+    #         "type": "string"
+    #     }
+    with open(SCHEMA_DIR / "manifest.json", "w", encoding="utf8") as f:
+        json.dump(manifest_schema, f)
+    with open(SCHEMA_DIR / "config.json", "w", encoding="utf8") as f:
+        json.dump(config_schema, f)
+
+
+@app.command()
 def export(
     language_config_path: Path = typer.Argument(
         exists=True,
@@ -141,6 +175,69 @@ def export(
     with open(output_directory / "dictionary_data.json", "w", encoding="utf8") as f:
         # I use f.write because output.json() returns a string (but is needed for proper serialization)
         f.write(output.json())
+
+
+@app.command()
+def new_project(
+    outdir: Path = typer.Option(
+        default=None,
+        file_okay=False,
+        dir_okay=True,
+        help="The output directory to write to.",
+    ),
+    overwrite: bool = typer.Option(default=False, help="Overwrite any existing files."),
+):
+    """Create a start project with default configurations and some mock data
+
+    Args:
+        outdir (Path, optional): The output directory to write to. Defaults to typer.Option( default=None, file_okay=False, dir_okay=True, help="The output directory to write to.", ).
+        overwrite (bool, optional): _description_. Defaults to typer.Option(default=False).
+    """
+    if outdir is None:
+        outdir = Path(
+            questionary.path(
+                "Where would you like to save your project?", only_directories=True
+            ).ask()
+        )
+    outdir.mkdir(exist_ok=True)
+    # Create the sample resource manifest and configuration
+    resource_manifest = ResourceManifest(
+        file_type=ParserEnum.xlsx, targets=ParserTargets(word="A", definition="B")
+    )
+    resource_path = outdir / "data.xlsx"
+    config_path = outdir / "config.mtd.json"
+    if resource_path.exists() and not overwrite:
+        logger.warning(
+            f"Tried to generate sample data at {resource_path} but it already exists. Please choose another location or re-run with the --overwrite flag"
+        )
+        exit()
+    if config_path.exists() and not overwrite:
+        logger.warning(
+            f"Tried to generate configuration file at {config_path} but it already exists. Please choose another location or re-run with the --overwrite flag"
+        )
+        exit()
+    # Create and write the sample data
+    wb = Workbook()
+    ws = wb.active
+    # TODO: get more reasonable example data
+    nltk.download("brown")
+    for i, sent in enumerate(nltk.corpus.brown.words()[:50]):
+        ws[f"A{i+1}"] = sent
+        ws[f"B{i+1}"] = sent
+    wb.save(resource_path)
+    config = MTDConfiguration(
+        config=LanguageConfiguration(sorting_field="word"),
+        data=[DataSource(manifest=resource_manifest, resource=resource_path)],
+    )
+    # TODO: This adds a path that gets incorrectly resolved otherwise
+    config.data[0].resource = "data.xlsx"  # type: ignore
+    # Serialize the models, then deserialize and add the $schema key
+    config_json = json.loads(config.json(exclude_none=True))
+    # TODO: This is awkward, use schemastore or something equivalent for intellisense
+    # config_json['$schema'] = str(SCHEMA_DIR / 'config.json')
+    # write the configuration files
+    with open(config_path, "w", encoding="utf8") as f:
+        json.dump(config_json, f, indent=4)
 
 
 if __name__ == "__main__":

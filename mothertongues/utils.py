@@ -124,9 +124,9 @@ def load_mtd_configuration(path: Path, base_path: Union[None, Path] = None):
         config["data"][i]["resource"] = resolve_possible_path(
             config["data"][i]["resource"], list, base_path
         )
-        config["data"][i]["manifest"] = load_manifest_configuration(
-            resolve_possible_path(config["data"][i]["manifest"], dict, base_path)
-        )
+        manifest = resolve_possible_path(config["data"][i]["manifest"], dict, base_path)
+        if not isinstance(manifest, dict):
+            config["data"][i]["manifest"] = load_manifest_configuration(manifest)
     return config
 
 

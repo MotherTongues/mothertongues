@@ -21,8 +21,11 @@ from pydantic import (
     validator,
 )
 
+from mothertongues import __file__ as mtd_dir
 from mothertongues.exceptions import ConfigurationError
 from mothertongues.utils import string_to_callable
+
+SCHEMA_DIR = Path(mtd_dir).parent / "schemas"
 
 
 class BaseConfig(BaseModel):
@@ -628,7 +631,7 @@ class DataSource(BaseConfig):
             and not values["resource"].exists()
         ):
             raise  # TODO: what should this raise?
-        if values and "manifest" in values:
+        if values and "manifest" in values and "resource" in values:
             if values["manifest"].file_type == ParserEnum.none and isinstance(
                 values["resource"], Path
             ):

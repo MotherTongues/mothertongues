@@ -5,7 +5,7 @@ from typer.testing import CliRunner
 from mothertongues.cli import app
 from mothertongues.config.models import (
     DictionaryEntryExportFormat,
-    LanguageConfigurationExportFormat,
+    MTDConfiguration,
     MTDExportFormat,
 )
 from mothertongues.tests.base_test_case import BasicTestCase
@@ -37,7 +37,7 @@ class CommandLineTest(BasicTestCase):
         self.assertEqual(result.exit_code, 0)
         with open(self.tempdir / "schema.json", encoding="utf8") as f:
             data = json.load(f)
-        self.assertDictEqual(data, LanguageConfigurationExportFormat.schema())
+        self.assertDictEqual(data, MTDConfiguration.schema())
         result = self.runner.invoke(
             app, ["schema", "entry", str(self.tempdir / "schema.json")]
         )
