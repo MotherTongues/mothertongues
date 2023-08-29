@@ -10,6 +10,21 @@ The simplest way to install `mothertongues` is with pip:
 pip install mothertongues
 ```
 
+!!! tip
+
+    If you are using [Visual Studio Code](https://code.visualstudio.com/), you can add the [schema to your for intellisense](https://code.visualstudio.com/docs/languages/json#:~:text=The%20association%20of%20a%20JSON,under%20the%20property%20json.schemas%20.)!
+
+    ```json
+    "json.schemas": [
+            {
+                "fileMatch": [
+                    "config.mtd.json"
+                ],
+                "url": "https://raw.githubusercontent.com/MotherTongues/mothertongues/main/mothertongues/schemas/config.json"
+            }
+        ]
+    ```
+
 ## Local Development
 
 Alternatively you can clone and install from source (advanced). To install locally you will have to have Git, Python 3.8+, [poetry](https://python-poetry.org/docs/) and Node 16+ on your machine. You can then follow these steps:
