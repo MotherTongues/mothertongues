@@ -1,0 +1,32 @@
+name: Create 'latest' docs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    # #no-ci in the commit log flags commit we don't want CI-validated
+    if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Run image
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.3.0"
+      - name: Install dependencies
+        run: |
+          poetry install --with docs
+      - name: Setup doc deploy
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Deploy docs with mike 🚀
+        run: |
+          poetry run mkdocs build
+          poetry run mike deploy --push --update-aliases latest
