@@ -1,0 +1,37 @@
+site_name: Mother Tongues Dictionaries Documentation
+theme:
+  name: material
+  favicon: favicon-32x32.png
+  logo: logo_no_text.png
+  palette:
+    primary: white
+  features:
+    - content.code.copy
+    - content.code.select
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [mothertongues]
+extra:
+  homepage: https://docs.mothertongues.org
+  version:
+    provider: mike
+    default: stable
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Quick Start: quickstart.md
+  - Guides:
+    - How to follow the guides: guides/index.md
+    - Preparing your data: guides/prepare.md
+    - Building & publishing your dictionary: guides/build.md
+  - Advanced Guides:
+    - Configuring the approximate search algorithm: guides/search.md
