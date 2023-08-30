@@ -1,3 +1,7 @@
+---
+comments: true
+---
+
 # Approximate Search
 
 Approximate search isn't just a *nice* feature for dictionaries of

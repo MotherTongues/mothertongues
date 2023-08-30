@@ -2,12 +2,14 @@ site_name: Mother Tongues Dictionaries Documentation
 theme:
   name: material
   favicon: favicon-32x32.png
+  custom_dir: docs/overrides
   logo: logo_no_text.png
   palette:
     primary: white
   features:
     - content.code.copy
     - content.code.select
+    - announce.dismiss
 plugins:
   - mkdocstrings:
       default_handler: python
