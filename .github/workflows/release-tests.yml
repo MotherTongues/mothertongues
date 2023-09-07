@@ -85,4 +85,4 @@ jobs:
       - name: Deploy docs with mike 🚀
         run: |
           poetry run mkdocs build
-          poetry run mike deploy --push --update-aliases ${{ steps.tag_version.outputs.new_tag }} stable
+          poetry run mike deploy --push --update-aliases latest ${{ steps.tag_version.outputs.new_tag }} stable
