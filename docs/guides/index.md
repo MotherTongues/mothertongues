@@ -7,7 +7,7 @@ a Mother Tongues Dictionary. There are a lot of guides here and some of them are
 
 Mother Tongues Starter
 ----------------------
-Before proceeding to any of the sections below, it's highly recommended to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/roedoejet/mtd-starter). It is set up with automated GitHub actions that will make your life easier!
+Before proceeding to any of the sections below, it's highly recommended to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/MotherTongues/mtd-starter). It is set up with automated GitHub actions that will make your life easier!
 
 
 Sections

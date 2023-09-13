@@ -65,7 +65,7 @@ Once you have those files, you can either create a dictionary using the command 
 
 The basic workflow for creating a dictionary is as follows:
 
-1. Fork and clone the [mtd-starter](https://github.com/roedoejet/mtd-starter)
+1. Fork and clone the [mtd-starter](https://github.com/MotherTongues/mtd-starter)
 2. [Edit and prepare](https://docs.mothertongues.org/docs/mtd-guides-prepare) the repo using your own data
 3. [Export your data](https://docs.mothertongues.org/docs/mtd-guides-ui#exporting-your-data) to a format readable by the Mother Tongues User Interfaces
 4. Add your exported data (`dictionary_data.json`) from step 3 and then [publish](https://docs.mothertongues.org/docs/mtd-guides-publishing) your dictionary! 🎉

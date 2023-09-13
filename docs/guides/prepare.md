@@ -4,7 +4,7 @@ comments: true
 
 # Preparing your data
 
-*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface), [Git](https://en.wikipedia.org/wiki/Git) and [Python](https://en.wikipedia.org/wiki/Python_(programming_language)). You must have all of these installed on your machine. You are also strongly encouraged to have a [GitHub](https://github.com) account. You are encouraged to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/roedoejet/mtd-starter) and follow along.*
+*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface), [Git](https://en.wikipedia.org/wiki/Git) and [Python](https://en.wikipedia.org/wiki/Python_(programming_language)). You must have all of these installed on your machine. You are also strongly encouraged to have a [GitHub](https://github.com) account. You are encouraged to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/MotherTongues/mtd-starter) and follow along.*
 
 The most time-intensive part of building your dictionary, depending on how you want to publish it, is preparing your data.
 
@@ -28,7 +28,7 @@ Every dictionary must have a configuration file, which helps define which data b
 
 ## Sorting your data
 
-Your data will get sorted based on your defined [alphabet](#customized-alphabet). By default, the sorting form is created from the "word" key from each entry and characters that aren't defined in your alphabet will be sorted at the beginning. If you want ignore certain characters from being sorted, or sort using different data, you can change this in the configuration:
+Your data will get sorted based on your defined [alphabet](#customized-alphabet). By default, the sorting form is created from the "word" key from each entry and characters that aren't defined in your alphabet will be sorted at the end. If you want ignore certain characters from being sorted, or sort using different data, you can change this in the configuration:
 
 ```json hl_lines="7-8"
 {
@@ -46,12 +46,10 @@ Your data will get sorted based on your defined [alphabet](#customized-alphabet)
 
 ### Customized Alphabet
 
-Adding your custom alphabet allows your entries to be sorted based on
-that alphabet. If you don't use a custom alphabet, the English alphabet will be used instead.
+Adding your custom alphabet allows your entries to be sorted based on that alphabet. If you don't use a custom alphabet, the English alphabet will be used instead.
 
 In your Language Configuration file, set the `alphabet`
-key equal to an array containing the letters in your language's
-alphabet in alphabetical order:
+key equal to an array containing the letters in your language's alphabet in alphabetical order:
 
 ```json hl_lines="6"
 {
@@ -80,7 +78,7 @@ You can also reference a file that contains a csv of your alphabet:
 ```
 
 !!! tip
-    In the [starter](https://github.com/roedoejet/mtd-starter), an alphabet file is used at `mtd-starter/alphabet.csv`
+    In the [starter](https://github.com/MotherTongues/mtd-starter), an alphabet file is used at `mtd-starter/alphabet.csv`
 
 ### Custom Sort Form (Advanced)
 
