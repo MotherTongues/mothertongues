@@ -672,7 +672,7 @@
 
 
 <h1 id="preparing-your-data">Preparing your data<a class="headerlink" href="#preparing-your-data" title="Permanent link">&para;</a></h1>
-<p><em>These guides assume you are comfortable with the <a href="https://en.wikipedia.org/wiki/Command-line_interface">Command Line</a>, <a href="https://en.wikipedia.org/wiki/Git">Git</a> and <a href="https://en.wikipedia.org/wiki/Python_(programming_language)">Python</a>. You must have all of these installed on your machine. You are also strongly encouraged to have a <a href="https://github.com">GitHub</a> account. You are encouraged to fork or clone the <a href="https://github.com/roedoejet/mtd-starter">Mother Tongues Dictionary Starter</a> and follow along.</em></p>
+<p><em>These guides assume you are comfortable with the <a href="https://en.wikipedia.org/wiki/Command-line_interface">Command Line</a>, <a href="https://en.wikipedia.org/wiki/Git">Git</a> and <a href="https://en.wikipedia.org/wiki/Python_(programming_language)">Python</a>. You must have all of these installed on your machine. You are also strongly encouraged to have a <a href="https://github.com">GitHub</a> account. You are encouraged to fork or clone the <a href="https://github.com/MotherTongues/mtd-starter">Mother Tongues Dictionary Starter</a> and follow along.</em></p>
 <p>The most time-intensive part of building your dictionary, depending on how you want to publish it, is preparing your data.</p>
 <h2 id="project-folder-structure">Project folder structure<a class="headerlink" href="#project-folder-structure" title="Permanent link">&para;</a></h2>
 <p>To generate a sample project that you can edit to suit your needs, use the <code>mothertongues new-project</code> command. For example <code>mothertongues new-project --outdir . --name 'DanishDictionary'</code> will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a <a href="#mtd-language-configuration-file">MTD configuration file</a> ('mtd.config.json').</p>
@@ -687,7 +687,7 @@
 </div>
 <p>Every dictionary must have a configuration file, which helps define which data belongs to your dictionary and meta data like your dictionary's <a href="#customized-alphabet">alphabet</a></p>
 <h2 id="sorting-your-data">Sorting your data<a class="headerlink" href="#sorting-your-data" title="Permanent link">&para;</a></h2>
-<p>Your data will get sorted based on your defined <a href="#customized-alphabet">alphabet</a>. By default, the sorting form is created from the "word" key from each entry and characters that aren't defined in your alphabet will be sorted at the beginning. If you want ignore certain characters from being sorted, or sort using different data, you can change this in the configuration:</p>
+<p>Your data will get sorted based on your defined <a href="#customized-alphabet">alphabet</a>. By default, the sorting form is created from the "word" key from each entry and characters that aren't defined in your alphabet will be sorted at the end. If you want ignore certain characters from being sorted, or sort using different data, you can change this in the configuration:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:{</span>
 <span class="w">        </span><span class="nt">&quot;L1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Danish&quot;</span><span class="p">,</span>
@@ -701,11 +701,9 @@
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="customized-alphabet">Customized Alphabet<a class="headerlink" href="#customized-alphabet" title="Permanent link">&para;</a></h3>
-<p>Adding your custom alphabet allows your entries to be sorted based on
-that alphabet. If you don't use a custom alphabet, the English alphabet will be used instead.</p>
+<p>Adding your custom alphabet allows your entries to be sorted based on that alphabet. If you don't use a custom alphabet, the English alphabet will be used instead.</p>
 <p>In your Language Configuration file, set the <code>alphabet</code>
-key equal to an array containing the letters in your language's
-alphabet in alphabetical order:</p>
+key equal to an array containing the letters in your language's alphabet in alphabetical order:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:{</span>
 <span class="w">        </span><span class="nt">&quot;L1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Danish&quot;</span><span class="p">,</span>
@@ -729,7 +727,7 @@ alphabet in alphabetical order:</p>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>In the <a href="https://github.com/roedoejet/mtd-starter">starter</a>, an alphabet file is used at <code>mtd-starter/alphabet.csv</code></p>
+<p>In the <a href="https://github.com/MotherTongues/mtd-starter">starter</a>, an alphabet file is used at <code>mtd-starter/alphabet.csv</code></p>
 </div>
 <h3 id="custom-sort-form-advanced">Custom Sort Form (Advanced)<a class="headerlink" href="#custom-sort-form-advanced" title="Permanent link">&para;</a></h3>
 <p>It's possible that you want to sort based on a form other than the <code>word</code> or display form by changing the word in some way. To do this, you must adjust the <a href="#parsing-your-data">configuration for your data</a> to include a transducer. In this example, we are adding a <code>sort_form</code> which is just a lowercased version of the <code>word</code> and then defining that as the field to sort.</p>
