@@ -89,7 +89,7 @@ There are a variety of improvements from the legacy mothertongues library. Here 
 
 ## Contributing
 
-If something is not working, or you'd like to see another feature added, feel free to dive in! [Open an issue](https://github.com/MotherTongues/mothertongues/issues/new) or submit PRs. Help writing and clarifying documentation is also very welcome.
+If something is not working, or you'd like to see another feature added, feel free to dive in! We please ask that you read the [contributing guidelines](Contributing.md) before submitting any pull requests. [Open an issue](https://github.com/MotherTongues/mothertongues/issues/new) or submit PRs. Help writing and clarifying documentation is also very welcome.
 
 This repo follows the [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
 
