@@ -50,7 +50,7 @@ Pre-commit hooks enabled:
 - [Black](https://github.com/psf/black), the Uncompromising Code Formatter, refortmats all
   Python code according to very strict rules we've agreed to follow; more info about Black
   formatting rules in
-  [The Black code style](https://black.readthedocs.io/en/stable/the_black_code_style.html)
+  [The Black code style](https://black.readthedocs.io/en/stable/the_black_code_style/index.html)
 - [mypy](http://mypy-lang.org/) runs type checking for any statically-typed Python code in
   the repo
 
