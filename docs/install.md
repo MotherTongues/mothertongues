@@ -30,8 +30,15 @@ pip install mothertongues
     ```
 
 ## Local Development
+Alternatively you can clone and install from source (advanced).
 
-Alternatively you can clone and install from source (advanced). To install locally you will have to have Git, Python 3.8+, [poetry](https://python-poetry.org/docs/) and Node 16+ on your machine. You can then follow these steps:
+Before installing locally, make sure you have the following on your machine:
+-  Git
+- Python 3.8+
+- [poetry](https://python-poetry.org/docs/)
+-  Node 16+
+
+Then follow these steps:
 
 ```bash
 # Clone repo and UI submodule
