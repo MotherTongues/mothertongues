@@ -65,9 +65,9 @@ git submodule foreach 'gitlint install-hook'
 
 And you're ready to start contributing!
 
-[!IMPORTANT]
-You have to run the second command in every sandbox you create, so please
-don't forget to do so when you clone a new sandbox!
+!!! important
+
+  You have to run the second command in every sandbox you create, so please don't forget to do so when you clone a new sandbox!
 
 ## Enforced Commit Message Formatting
 Contributions to mothertongues will only be accepted if commit messages conform to [Conventional Commits](https://www.conventionalcommits.org/).
