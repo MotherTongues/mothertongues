@@ -28,7 +28,7 @@ cd mothertongues/mothertongues-UI && npm install
 # Build the Python Development version of the UI:
 npx nx build mtd-mobile-ui --configuration=pydev
 # Install the Python package:
-cd .. && poetry install
+cd .. && poetry install --with dev,docs
 ```
 
 !!! tip
