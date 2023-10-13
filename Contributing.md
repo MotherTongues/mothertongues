@@ -45,6 +45,14 @@ cd .. && poetry install --with dev,docs
             }
         ]
     ```
+    For Emacs with [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) you can add this to your `.emacs`
+    file (or use `M-x customize-variable lsp-json-schemas`):
+
+    ```lisp
+    (setq lsp-json-schemas
+      `[(:fileMatch ["config.mtd.json"]
+         :url "https://raw.githubusercontent.com/MotherTongues/mothertongues/main/mothertongues/schemas/config.json")])
+    ```
 
 
 
