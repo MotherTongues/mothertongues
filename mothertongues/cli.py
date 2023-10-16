@@ -239,6 +239,12 @@ def new_project(
     with open(config_path, "w", encoding="utf8") as f:
         json.dump(config_json, f, indent=4)
 
+    print("")
+    print("COMPLETE: MotherTongues project created with sample data")
+    print(
+        "You can find your configuration and data files here: " + str(outdir.absolute())
+    )
+
 
 if __name__ == "__main__":
     app()
