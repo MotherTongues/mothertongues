@@ -30,11 +30,13 @@ markdown_extensions:
       permalink: true
 nav:
   - Home: index.md
-  - Installation: install.md
-  - Quick Start: quickstart.md
-  - Guides:
+  - Creating A Dictionary (No Code Guide): nocode/install.md
+  - Creating A Dictionary (Advanced Developer Guide):
     - How to follow the guides: guides/index.md
-    - Preparing your data: guides/prepare.md
+    - Installation: developer/install.md
+    - Installation Again (clean up): install.md
+    - Quick Start: quickstart.md
     - Building & publishing your dictionary: guides/build.md
-  - Advanced Guides:
+  - Configuration Guides:
+    - Preparing your data: guides/prepare.md
     - Configuring the approximate search algorithm: guides/search.md
