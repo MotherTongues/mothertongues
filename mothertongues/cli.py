@@ -240,7 +240,7 @@ def new_project(
         json.dump(config_json, f, indent=4)
 
     print("")
-    print("COMPLETE: Mothertounges project created with sample data")
+    print("COMPLETE: MotherTongues project created with sample data")
     print(
         "You can find your configuration and data files here: " + str(outdir.absolute())
     )
