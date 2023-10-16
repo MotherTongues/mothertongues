@@ -20,4 +20,4 @@ pip install mothertongues
 
 !!! tip
 
-    If you are developer looking to install locally, see this [Contributing page](/Contributing.md)
+    If you are an advanced developer looking to install locally, see this [Contributing page](/Contributing.md)
