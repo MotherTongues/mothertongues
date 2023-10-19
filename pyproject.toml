@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mothertongues"
-version = "1.0.20230829"
+version = "1.0.20231019"
 description = ""
 authors = ["roedoejet <hello@aidanpine.ca>"]
 readme = "README.md"

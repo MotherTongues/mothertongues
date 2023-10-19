@@ -35,6 +35,8 @@ class MTDictionary:
         config: MTDConfiguration,
         custom_parse_method: Union[Callable, None] = None,
         parse_data_on_initialization: bool = True,
+        sort_data: bool = True,
+        apply_transducers: bool = True,
         **kwargs,
     ):
         """Create Data Frame from Config"""
@@ -45,7 +47,10 @@ class MTDictionary:
         self.duplicates: List[str] = []
         self.unparsable_entries: int = 0
         self.data = None
-        self.index = None
+        self.l1_index = None
+        self.l2_index = None
+        self.sort_data = sort_data
+        self.apply_transducers = apply_transducers
         if parse_data_on_initialization:
             self.initialize()
         super().__init__()
@@ -100,13 +105,14 @@ class MTDictionary:
                 data[i] = entry.model_dump()
 
             # Transduce Data
-            data = self.transduce(data, data_source.manifest.transducers)
+            if self.apply_transducers:
+                data = self.transduce(data, data_source.manifest.transducers)
             if self.data is None:
                 self.data = data
             else:
                 self.data += data
         # Sort
-        if self.data is not None:
+        if self.sort_data and self.data is not None:
             self.sorter = ArbSorter(
                 self.config.config.alphabet, self.config.config.no_sort_characters
             )
@@ -327,31 +333,28 @@ class MTDictionary:
             )
         )
 
+    def build_indices(self):
+        self.l1_index = self.return_single_index("l1")
+        self.l2_index = self.return_single_index("l2")
+
+    def return_single_index(self, lang: str):
+        if lang not in ["l1", "l2"]:
+            raise ValueError("Sorry we can only build indices for either 'l1' or 'l2'")
+        if not self.data:
+            raise ValueError(
+                "Sorry your dictionary does not have any entries so we cannot build the index for it."
+            )
+        result = create_inverted_index(self.data, self.config, lang)
+        result.build()
+        result.calculate_scores()
+        return result
+
     def export(self):
-        config_export = self.config.config.dict(
-            include={
-                "L1": True,
-                "L2": True,
-                "alphabet": True,
-                "build": True,
-                "l1_search_strategy": True,
-                "l2_search_strategy": True,
-                "l1_search_config": True,
-                "l2_search_config": True,
-                "l1_stemmer": True,
-                "l2_stemmer": True,
-                "l1_normalization_transducer": True,
-                "l2_normalization_transducer": True,
-                "optional_field_name": True,
-            }
-        )
-        if self.index is None:
-            self.l1_index = create_inverted_index(self.data, self.config, "l1")
-            self.l1_index.build()
-            self.l1_index.calculate_scores()
-            self.l2_index = create_inverted_index(self.data, self.config, "l2")
-            self.l2_index.build()
-            self.l2_index.calculate_scores()
+        config_export = self.config.config.export()
+        if self.l1_index is None:
+            self.l1_index = self.return_single_index("l1")
+        if self.l2_index is None:
+            self.l2_index = self.return_single_index("l2")
         return MTDExportFormat(
             config=config_export,
             sorted_data=self.data,
