@@ -1,7 +1,8 @@
 from collections import Counter
-from typing import Callable, List, Union
+from typing import Any, Callable, List, Tuple, Union
 from urllib.parse import urljoin
 
+from loguru import logger
 from rich import print
 from rich.align import Align
 from rich.console import Group
@@ -11,13 +12,13 @@ from rich.table import Table
 from tqdm import tqdm
 
 from mothertongues.config.models import (
+    ArbitraryFieldRestrictedTransducer,
     CheckableParserTargetFieldNames,
     DataSource,
     DictionaryEntry,
     MTDConfiguration,
     MTDExportFormat,
     ParserEnum,
-    Transducer,
 )
 from mothertongues.exceptions import ConfigurationError
 from mothertongues.parsers import parse
@@ -42,6 +43,7 @@ class MTDictionary:
         self.config = config
         self.missing_data: List[str] = []
         self.duplicates: List[str] = []
+        self.unparsable_entries: int = 0
         self.data = None
         self.index = None
         if parse_data_on_initialization:
@@ -49,7 +51,8 @@ class MTDictionary:
         super().__init__()
 
     def __repr__(self):
-        return f"MTDictionary(L1={self.config.config.L1}, L2={self.config.config.L2}, n_entries={len(self.data)})"
+        n_entries = len(self.data) if self.data else 0
+        return f"MTDictionary(L1={self.config.config.L1}, L2={self.config.config.L2}, n_entries={n_entries})"
 
     def __len__(self):
         return len(self.data)
@@ -65,8 +68,12 @@ class MTDictionary:
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
             else:
-                data = self.parse(data_source)
-
+                data, unparsable = self.parse(data_source)
+                self.unparsable_entries += len(unparsable)
+                if unparsable:
+                    logger.debug(
+                        f"Tried parsing {data_source.resource} but there were {len(unparsable)} unparsable entries."
+                    )
             for i, entry in enumerate(data):
                 if not isinstance(entry, DictionaryEntry):
                     entry = DictionaryEntry(**entry)
@@ -75,19 +82,22 @@ class MTDictionary:
                     entry.entryID = str(i)
                 # Prepend image path
                 if data_source.manifest.img_path and entry.img:
-                    entry.img = urljoin(data_source.manifest.img_path, entry.img)
+                    entry.img = urljoin(
+                        str(data_source.manifest.img_path), str(entry.img)
+                    )
+
                 # Prepend audio paths
                 if data_source.manifest.audio_path and entry.audio:
                     for audio_i in range(len(entry.audio)):
                         entry.audio[audio_i].filename = urljoin(
-                            data_source.manifest.audio_path,
-                            entry.audio[audio_i].filename,
+                            str(data_source.manifest.audio_path),
+                            str(entry.audio[audio_i].filename),
                         )
                 # Add the source
                 entry.source = data_source.manifest.name
                 entry.entryID = entry.source + entry.entryID
                 # Convert back to dict
-                data[i] = entry.dict()
+                data[i] = entry.model_dump()
 
             # Transduce Data
             data = self.transduce(data, data_source.manifest.transducers)
@@ -108,9 +118,11 @@ class MTDictionary:
                 ) from e
             self.check_data()
 
-    def custom_parse_method(self, data_source: DataSource) -> List[DictionaryEntry]:
+    def custom_parse_method(
+        self, data_source: DataSource
+    ) -> Tuple[List[DictionaryEntry], List[Any]]:
         """Custom Parser for your data. This method is meant to be overridden by subclasses.
-        To implement, you must parse the targets in self.parser_targets and return a list of DictionaryEntry objects.
+        To implement, you must parse the targets in self.parser_targets and return a list of DictionaryEntry objects and a list of unparsable objects (i.e. objects that failed being parsed into a DictionaryEntry).
 
         You can either implement by initializing the MTDictionary object with a custom parse function like so:
 
@@ -118,7 +130,7 @@ class MTDictionary:
 
         Here, custom_parser_function has to be a function that takes a data_source as its only argument and return a list of DictionaryEntry of the parsed data:
 
-        >>> def custom_parser_function(data_source: DataSource) -> List[DictionaryEntry]:
+        >>> def custom_parser_function(data_source: DataSource) -> Tuple[List[DictionaryEntry], List[Any]]:
                 ...parse the data...
                 return list_of_entry_data
 
@@ -136,10 +148,10 @@ class MTDictionary:
 
         Where custom_parser_method is a function that takes two arguments and returns a list of DictionaryEntry:
 
-        >>>  def custom_parser_method(self: MTDictionary, data_source: DataSource) -> List[DictionaryEntry]:
+        >>>  def custom_parser_method(self: MTDictionary, data_source: DataSource) -> Tuple[List[DictionaryEntry], List[Any]]:
                 ...do stuff with self...
                 ...parse the data...
-                return list_of_entry_data
+                return list_of_entry_data, list_of_unparsable_objects
 
         Then, don't forget to initialize the data:
 
@@ -151,12 +163,16 @@ class MTDictionary:
             "Your data was specified as 'custom' but the MTDictionary.custom_parse_method was not implemented. You must implement a custom parser for your data."
         )
 
-    def transduce(self, data: List[dict], transducers: List[Transducer]) -> List[dict]:
+    def transduce(
+        self, data: List[dict], transducers: List[ArbitraryFieldRestrictedTransducer]
+    ) -> List[dict]:
         """Transduce the data in the dataframe using the transducers specified in the config"""
         for transducer in transducers:
-            for fn in transducer.functions:
-                for datum in data:
-                    datum[transducer.output_field] = fn(datum[transducer.input_field])
+            transducer_function = transducer.create_callable()
+            for datum in data:
+                datum[transducer.output_field] = transducer_function(
+                    datum[transducer.input_field]
+                )
         return data
 
     def parse(self, data_source: DataSource) -> List[dict]:

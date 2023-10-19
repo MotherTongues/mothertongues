@@ -81,8 +81,7 @@ def build_and_run(
     output = dictionary.export()
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
-        # I use f.write because output.json() returns a string (but is needed for proper serialization)
-        f.write(output.json())
+        json.dump(output.model_dump(mode="json"), f)
     logger.warning(
         "WARNING: This is a Development server and is not secure for production"
     )
@@ -173,8 +172,7 @@ def export(
         f"Writing dictionary data file to {(output_directory / 'dictionary_data.json')}"
     )
     with open(output_directory / "dictionary_data.json", "w", encoding="utf8") as f:
-        # I use f.write because output.json() returns a string (but is needed for proper serialization)
-        f.write(output.json())
+        json.dump(output.model_dump(mode="json"), f)
 
 
 @app.command()
@@ -231,10 +229,7 @@ def new_project(
     )
     # TODO: This adds a path that gets incorrectly resolved otherwise
     config.data[0].resource = "data.xlsx"  # type: ignore
-    # Serialize the models, then deserialize and add the $schema key
-    config_json = json.loads(config.json(exclude_none=True))
-    # TODO: This is awkward, use schemastore or something equivalent for intellisense
-    # config_json['$schema'] = str(SCHEMA_DIR / 'config.json')
+    config_json = config.model_dump(exclude_none=True, mode="json")
     # write the configuration files
     with open(config_path, "w", encoding="utf8") as f:
         json.dump(config_json, f, indent=4)

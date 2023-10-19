@@ -1,5 +1,5 @@
 import importlib
-from typing import List, Type, Union, no_type_check
+from typing import List, Tuple, Type, Union, no_type_check
 
 from jsonpath_ng import jsonpath
 from loguru import logger
@@ -48,7 +48,7 @@ class BaseTabularParser:
             isinstance(v, list)
             and len(v) == 1
             and self.return_manifest_key_type(
-                k, self.manifest.targets.dict(exclude_none=True)
+                k, self.manifest.targets.model_dump(exclude_none=True)
             )
             != list
         ):
@@ -101,21 +101,23 @@ class BaseTabularParser:
     def resolve_targets(self) -> List[dict]:
         # not type checking because targets.dict() complains, but targets is only none with custom parser
         # also, self.resource is created by the classes that inherit the base parser.
-        targets = self.manifest.targets.dict(exclude_none=True)
+        targets = self.manifest.targets.model_dump(exclude_none=True)
         return [
             self.fill_entry_template(targets, entry, self.parse_fn)
             for entry in tqdm(self.resource, desc="Parsing data")
         ]
 
-    def parse(self) -> List[dict]:
+    def parse(self) -> Tuple[List[dict], List[dict]]:
         data = self.resolve_targets()
+        unparsable = []
         for i in reversed(range(len(data))):
             try:
                 data[i] = DictionaryEntry(**data[i])  # type: ignore
             except ValidationError:
+                unparsable.append(data[i])
                 del data[i]
                 continue
-        return data
+        return data, unparsable
 
 
 def parse(data_source: DataSource):

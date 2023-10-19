@@ -1,6 +1,8 @@
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 from unittest import main
+
+from pydantic import ValidationError
 
 from mothertongues.config.models import (
     DataSource,
@@ -17,12 +19,13 @@ from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
 
 
-def _custom_parser(data_source: DataSource) -> List[DictionaryEntry]:
+def _custom_parser(data_source: DataSource) -> Tuple[List[DictionaryEntry], List[dict]]:
     if not isinstance(data_source.resource, Path):
         raise TypeError("Sorry, this parser can only read from pathlib.Path's")
     with open(data_source.resource, encoding="utf8") as f:
         data = [x.strip() for x in f]
     records = []
+    unparsable = []
     for line in data:
         row = line.split(" ")
         record = {
@@ -43,8 +46,11 @@ def _custom_parser(data_source: DataSource) -> List[DictionaryEntry]:
             record["audio"] = []
             record["theme"] = row[6][1:-1]
             record["optional"] = {"Part of Speech": row[7][1:-1]}
-        records.append(DictionaryEntry(**record))  # type: ignore
-    return records
+        try:
+            records.append(DictionaryEntry(**record))  # type: ignore
+        except ValidationError:
+            unparsable.append(record)
+    return records, unparsable
 
 
 class DictionaryParserTest(BasicTestCase):
@@ -61,7 +67,6 @@ class DictionaryParserTest(BasicTestCase):
                 "audio": [],
                 "theme": "greetings",
                 "optional": {"Part of Speech": "interjection"},
-                "compare_form": "farvel",
                 "sort_form": "farvel",
             },
             {
@@ -71,7 +76,6 @@ class DictionaryParserTest(BasicTestCase):
                 "audio": [{"description": "Aidan Pine", "filename": "hej.mp3"}],
                 "theme": "greetings",
                 "optional": {"Part of Speech": "interjection"},
-                "compare_form": "hej",
                 "sort_form": "hej",
             },
             {
@@ -81,7 +85,6 @@ class DictionaryParserTest(BasicTestCase):
                 "audio": [{"description": "Aidan Pine", "filename": "ord.mp3"}],
                 "theme": "abstract",
                 "optional": {"Part of Speech": "noun"},
-                "compare_form": "ord",
                 "sort_form": "ord",
             },
             {
@@ -91,7 +94,6 @@ class DictionaryParserTest(BasicTestCase):
                 "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
                 "theme": "plants",
                 "optional": {"Part of Speech": "noun"},
-                "compare_form": "tre",
                 "sort_form": "træ",
             },
         ]
@@ -110,7 +112,6 @@ class DictionaryParserTest(BasicTestCase):
                 "example_sentence_audio": [],
                 "example_sentence_definition_audio": [],
                 "optional": {"Part of Speech": "interjection"},
-                "compare_form": "farvel",
                 "source": "words",
                 "sort_form": "farvel",
                 "sorting_form": [5, 0, 17, 21, 4, 11],
@@ -129,7 +130,6 @@ class DictionaryParserTest(BasicTestCase):
                 "example_sentence_audio": [],
                 "example_sentence_definition_audio": [],
                 "optional": {"Part of Speech": "interjection"},
-                "compare_form": "hej",
                 "source": "words",
                 "sort_form": "hej",
                 "sorting_form": [7, 4, 9],
@@ -148,7 +148,6 @@ class DictionaryParserTest(BasicTestCase):
                 "example_sentence_audio": [],
                 "example_sentence_definition_audio": [],
                 "optional": {"Part of Speech": "noun"},
-                "compare_form": "ord",
                 "source": "words",
                 "sort_form": "ord",
                 "sorting_form": [14, 17, 3],
@@ -173,13 +172,12 @@ class DictionaryParserTest(BasicTestCase):
                 "example_sentence_audio": [],
                 "example_sentence_definition_audio": [],
                 "optional": {"Part of Speech": "noun"},
-                "compare_form": "tre",
                 "source": "words",
                 "sort_form": "træ",
                 "sorting_form": [19, 17, 26],
             },
         ]
-        self.parsed_data = [DictionaryEntry(**x).dict() for x in self.parsed_data]
+        self.parsed_data = [DictionaryEntry(**x).model_dump() for x in self.parsed_data]
 
     def test_json_parser(self):
         language_config_path = self.data_dir / "config_json.json"
@@ -248,7 +246,7 @@ class DictionaryParserTest(BasicTestCase):
         class CustomParserDictionary(MTDictionary):
             def custom_parse_method(
                 self, data_source: DataSource
-            ) -> List[DictionaryEntry]:
+            ) -> Tuple[List[DictionaryEntry], List[dict]]:
                 print(
                     f"Testing accessing the dictionary config. Here is the build number: {self.config.config.build}"
                 )
@@ -271,6 +269,12 @@ class DictionaryParserTest(BasicTestCase):
             "example_sentence_definition"
         ]
         return data
+
+    def test_unparsable_data(self):
+        """This is a stub for a test that should check how many items are unparsable in a given DataSource's Resource
+        I need to think more about how to notify the user about this as well
+        """
+        pass
 
     def test_no_parser(self):
         data = DataSource(manifest=ResourceManifest(), resource=self.raw_data)
