@@ -472,6 +472,26 @@ class LanguageConfigurationExportFormat(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
+    def export(self):
+        return self.model_dump(
+            mode="json",
+            include={
+                "L1": True,
+                "L2": True,
+                "alphabet": True,
+                "build": True,
+                "l1_search_strategy": True,
+                "l2_search_strategy": True,
+                "l1_search_config": True,
+                "l2_search_config": True,
+                "l1_stemmer": True,
+                "l2_stemmer": True,
+                "l1_normalization_transducer": True,
+                "l2_normalization_transducer": True,
+                "optional_field_name": True,
+            },
+        )
+
 
 class LanguageConfiguration(LanguageConfigurationExportFormat):
 
