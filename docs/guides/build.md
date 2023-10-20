@@ -4,7 +4,7 @@ comments: true
 
 # Building & Publishing your Dictionary
 
-*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface), [Git](https://en.wikipedia.org/wiki/Git) and [NPM](https://en.wikipedia.org/wiki/Npm_(software)). You must have all of these installed on your machine. You are also strongly encouraged to have a [GitHub](https://github.com) account. You are encouraged to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/MotherTongues/mtd-starter) and follow along.*
+*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface) and [NPM](https://en.wikipedia.org/wiki/Npm_(software)).*
 
 ## Seeing your dictionary in action (i.e. Local Development)
 
@@ -24,10 +24,6 @@ Then run:
 
 And your dictionary will be served at [http://localhost:3636](http://localhost:3636)
 
-!!! tip
-    If you just edit the configuration file in your clone/fork of the [mtd-starter](https://github.com/MotherTongues/mtd-starter) repo and push the changes, the demo will be automatically built and available at `https://YOUR_GITHUB_USERNAME.github.io/mtd-starter/`. Note that you will have to [enable GitHub Actions](https://docs.github.com/en/github/administering-a-repository/disabling-or-limiting-github-actions-for-a-repository#managing-github-actions-permissions-for-your-repository) on your MTD starter for the automatic builds to work.
-
-
 ## Exporting your data
 
 First, you need to export the dictionary data required by any MTD UI.
@@ -41,11 +37,9 @@ First, you need to export the dictionary data required by any MTD UI.
 
 This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI.
 
-!!! tip
-    By simply changing the `dictionary_data.json` file in your MTD Starter, GitHub will automatically build your dictionary using the [MTD
-    mobile UI](https://github.com/MotherTongues/mothertongues-ui). Note that you will have to [enable GitHub Actions](https://docs.github.com/en/github/administering-a-repository/disabling-or-limiting-github-actions-for-a-repository#managing-github-actions-permissions-for-your-repository) on your MTD starter for the automatic builds to work.
+**TODO: @Aidan**, this the above casually mentioned "tranfer to your MTD UI". Is that the next section? (mobile development)? Or is there something else missing here?
 
-## Local Development (Advanced)
+## Mobile/UI Development -- this section needs work!!!
 
 Here are the steps for creating a mobile dictionary on your machine.
 

@@ -3,6 +3,7 @@ comments: true
 ---
 
 # Approximate Search
+*This guide applies for all paths (no-code and advanced developer)*
 
 Approximate search isn't just a *nice* feature for dictionaries of
 endangered languages - it's usually a requirement. Often, it's

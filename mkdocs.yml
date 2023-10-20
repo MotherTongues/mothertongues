@@ -36,12 +36,12 @@ nav:
     - Quick Start: developer/quickstart.md
     - Configuring your dictionary: guides/prepare.md
     - Building & publishing your dictionary: guides/build.md
-    - This is a placeholder menu item. Items above this have been modified by PT. Below are still in raw form: install.md
+    - This is a placeholder menu item. Items above this have been modified by PT and are closer to their final form (though not done). PT *thinks* the items below can be deleted...: install.md
     - How to follow the guides: guides/index.md
     - Aidan, is this still relavent?: developer/install.md
   - Configuration Guides:
     - Preparing your data: guides/prepare.md
-    - Configuring the approximate search algorithm: guides/search.md
+  - Configuring the approximate search algorithm: guides/search.md
   - Misc Developer Guides:
     - Code Completion Tools: developer/vscode.md
     - Running Unit Tests: developer/unittests.md
