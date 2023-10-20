@@ -2,7 +2,7 @@
 comments: true
 ---
 
-# Advanced Developer Installation
+# Advanced Developer Guide
 (PT removed this section from `index.md` and stuck it here for now)
 
 To make a dictionary from your data, you need to do the following three

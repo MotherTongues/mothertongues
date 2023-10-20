@@ -32,10 +32,12 @@ nav:
   - Home: index.md
   - Creating A Dictionary (No Code Guide): nocode/install.md
   - Creating A Dictionary (Advanced Developer Guide):
+    - Installation: developer/prerequisites.md
+    - Quick Start: developer/quickstart.md
+    - This is a placeholder menu item. Items above this have been modified by PT. Below are still in raw form: install.md
     - How to follow the guides: guides/index.md
     - Installation: developer/install.md
     - Installation Again (clean up): install.md
-    - Quick Start: quickstart.md
     - Building & publishing your dictionary: guides/build.md
   - Configuration Guides:
     - Preparing your data: guides/prepare.md
