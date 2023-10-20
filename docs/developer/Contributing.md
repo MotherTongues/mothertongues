@@ -1,4 +1,5 @@
 # Contributing to MotherTongues
+*Guides here are intended to help those navigate the "advanced developer" path. **None** of these guides are required to successfully install, customize or run Mother Tongues dictionares. If these guides are greek to you, feel free to skip them.*
 
 Feel free to dive in! [Open an issue](https://github.com/MotherTongues/mothertongues/issues/new) or submit PRs.
 
@@ -10,51 +11,6 @@ commits.
    formatting rules.
  - [gitlint](#enforced-commit-message-formatting) is used as a commit message hook to validate that
    commit messages follow the convention.
-
-## Install Locally
-Before installing the repo locally, make sure you have the following on your machine:
--  Git
-- Python 3.8+
-- [poetry](https://python-poetry.org/docs/)
--  Node 16+
-
-Then follow these steps:
-
-```bash
-# Clone repo and UI submodule
-git clone https://github.com/MotherTongues/mothertongues.git --recursive
-# Build the UI:
-cd mothertongues/mothertongues-UI && npm install
-# Build the Python Development version of the UI:
-npx nx build mtd-mobile-ui --configuration=pydev
-# Install the Python package:
-cd .. && poetry install --with dev,docs
-```
-
-!!! tip
-
-    If you are using [Visual Studio Code](https://code.visualstudio.com/), you can add the [schema to your for intellisense](https://code.visualstudio.com/docs/languages/json#:~:text=The%20association%20of%20a%20JSON,under%20the%20property%20json.schemas%20.)!
-
-    ```json
-    "json.schemas": [
-            {
-                "fileMatch": [
-                    "config.mtd.json"
-                ],
-                "url": "https://raw.githubusercontent.com/MotherTongues/mothertongues/main/mothertongues/schemas/config.json"
-            }
-        ]
-    ```
-    For Emacs with [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) you can add this to your `.emacs`
-    file (or use `M-x customize-variable lsp-json-schemas`):
-
-    ```lisp
-    (setq lsp-json-schemas
-      `[(:fileMatch ["config.mtd.json"]
-         :url "https://raw.githubusercontent.com/MotherTongues/mothertongues/main/mothertongues/schemas/config.json")])
-    ```
-
-
 
 ## Set up Pre-commit Hooks
 
@@ -131,6 +87,7 @@ We systematically use a number of pre-commit hooks to
 normalize formatting of code. [Follow the installation steps above](#set-up-pre-commit-hooks) to have these used automatically when you do your own commits.
 
 Pre-commit hooks enabled:
+
 - check-yaml validates YAML files
 - end-of-file-fixer makes sure each text file ends with exactly one newline character
 - trailing-whitespace removes superfluous whitespace at the end of lines in text files
