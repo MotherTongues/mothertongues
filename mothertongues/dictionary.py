@@ -232,17 +232,6 @@ class MTDictionary:
         return True
 
     def print_info(self):
-        if not self.data:
-            print(
-                Padding(
-                    Panel(
-                        "",
-                        title="Nothing here, your dictionary is empty!",
-                        subtitle="Please check your data and configurations.",
-                    ),
-                    (2, 4),
-                )
-            )
         n_entries = len(self.data)
         n_dupes = len(self.duplicates)
         n_missing = len(self.missing_data)
