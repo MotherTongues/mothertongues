@@ -10,6 +10,9 @@ import questionary
 import typer
 from loguru import logger
 from openpyxl import Workbook
+from rich import print
+from rich.padding import Padding
+from rich.panel import Panel
 
 from mothertongues.config import SchemaTypes, get_schemas
 from mothertongues.config.models import (
@@ -165,6 +168,18 @@ def export(
     """
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
+    if not dictionary.data:
+        print(
+            Padding(
+                Panel(
+                    "",
+                    title="[red]Nothing here, your dictionary is empty!",
+                    subtitle="Please check your data and configurations.",
+                ),
+                (2, 4),
+            )
+        )
+        return
     output = dictionary.export()
     if include_info:
         dictionary.print_info()
