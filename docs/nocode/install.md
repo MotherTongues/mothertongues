@@ -16,7 +16,7 @@ here
 ### Add your data
 data.csv location and update instructions
 
-Remember: Getting dictionary data together can take a long time. You can alwawys upload a small subset to play around with the dictionary in the meantime.
+Remember: Getting dictionary data together can take a long time. You can always upload a small subset to play around with the dictionary in the meantime.
 
 !!! Important
 

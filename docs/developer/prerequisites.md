@@ -16,7 +16,7 @@ Mother Tongues dictionaries can be created on any operating system (Mac, Windows
 
 We have made our best effort to ensure that all documentation found here works cross-platform.
 
-That said, Mother Tongues is primary developed on MacOS and recieves most extensive testing on that operating system. If you find something that does not work for you, please modify actions according to your operating system - and feel free to let us know! (or [contribute](/Contributing.md)!)
+That said, Mother Tongues is primary developed on MacOS and recieves most extensive testing on that operating system. If you find something that does not work for you, please modify actions according to your operating system - and feel free to let us know! (or [contribute](Contributing.md)!)
 
 Prerequisites
 ------------------------
