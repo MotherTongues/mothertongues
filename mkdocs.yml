@@ -36,8 +36,6 @@ nav:
     - Quick Start: developer/quickstart.md
     - Configuring your dictionary: guides/prepare.md
     - Building & publishing your dictionary: guides/build.md
-    - How to follow the guides: guides/index.md
-    - Aidan, is this still relavent?: developer/install.md
   - Preparing your data: guides/prepare.md
   - Configuring the approximate search algorithm: guides/search.md
   - Misc Developer Guides:
