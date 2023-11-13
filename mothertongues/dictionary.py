@@ -99,8 +99,8 @@ class MTDictionary:
                             str(entry.audio[audio_i].filename),
                         )
                 # Add the source
-                entry.source = data_source.manifest.name
-                entry.entryID = entry.source + entry.entryID
+                if not entry.source:
+                    entry.source = data_source.manifest.name
                 # Convert back to dict
                 data[i] = entry.model_dump()
 
