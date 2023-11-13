@@ -6,20 +6,18 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, Union
 from unicodedata import normalize
 from uuid import UUID
 
-from pydantic import (
+from pydantic import (  # type: ignore
     BaseModel,
     ConfigDict,
     Field,
     FilePath,
     HttpUrl,
-    ValidationError,
     field_validator,
     model_validator,
-    validator,
 )
 from typing_extensions import TypedDict
 
@@ -472,26 +470,6 @@ class LanguageConfigurationExportFormat(BaseModel):
     build: str
     """The build identifier for your dictionary build"""
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("build", always=True, pre=True)
-    def convert_callable_build(cls, v, values):
-        """Take the build argument (string) and if it's in dot notation,
-           convert it to a callable and call it.
-
-        Args:
-            v (_type_): the build value
-            values (_type_): all values
-
-        Returns:
-            string: the called value of the build function (if it's not a function, just return the string)
-        """
-        v = string_to_callable(v)
-        if callable(v):
-            v = v()
-            values["build"] = v
-        return v
-
     model_config = ConfigDict(extra="ignore")
 
 
@@ -540,7 +518,7 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
-    build: str = "mothertongues.utils.get_current_time"
+    build: str = Field("mothertongues.utils.get_current_time", validate_default=True)
     """The build identifier for your dictionary build"""
 
     l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
@@ -559,10 +537,9 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     ]
     """The name of required truthy fields"""
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("alphabet")
-    def load_alphabet(cls, v, values):
+    @field_validator("alphabet", mode="before")
+    @classmethod
+    def load_alphabet(cls, alphabet: Any):
         """Load the alphabet
 
         Args:
@@ -572,17 +549,35 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
         Returns:
             list[str]: The alphabet as a list
         """
-        if isinstance(v, Path):
-            if v.suffix.endswith("json"):
-                with open(v, encoding="utf8") as f:
+        if isinstance(alphabet, str):
+            alphabet = Path(alphabet)
+        if isinstance(alphabet, Path):
+            if alphabet.suffix.endswith("json"):
+                with open(alphabet, encoding="utf8") as f:
                     return json.load(f)
-            if v.suffix.endswith("txt"):
-                with open(v, encoding="utf8") as f:
+            if alphabet.suffix.endswith("txt"):
+                with open(alphabet, encoding="utf8") as f:
                     return [x.strip() for x in f]
-            raise ValidationError(
-                "If providing a file with your alphabet, it must be either 'json' or 'txt'."
+            raise ValueError(
+                f"If providing a file ({alphabet}) with your alphabet, it must be either 'json' or 'txt'."
             )
-        return v
+        return alphabet
+
+    @field_validator("build", mode="before")
+    @classmethod
+    def convert_callable_build(cls, build: Any):
+        """Take the build argument (string) and if it's in dot notation,
+        convert it to a callable and call it.
+
+        Args:
+            v (_type_): the build value
+            values (_type_): all values
+
+        Returns:
+            string: the called value of the build function (if it's not a function, just return the string)
+        """
+        build = string_to_callable(build)
+        return build() if callable(build) else build
 
     model_config = ConfigDict(extra="forbid")
 

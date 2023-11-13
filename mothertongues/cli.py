@@ -36,7 +36,7 @@ def run(
         dir_okay=False,
         readable=True,
         help="The path to your generated dictionary data",
-    ),
+    ),  # type: ignore
     port: int = 3636,
 ):
     """
@@ -67,7 +67,7 @@ def build_and_run(
         dir_okay=False,
         readable=True,
         help="The path to your dictionary's language configuration file.",
-    ),
+    ),  # type: ignore
     port: int = 3636,
 ):
     """
@@ -103,7 +103,7 @@ def schema(
         file_okay=True,
         dir_okay=False,
         help="The file path to write the JSON schema",
-    ),
+    ),  # type: ignore
 ):
     """
     ## Export the JSON Schema for various MotherTongues Dictionary data definitions\
@@ -117,7 +117,7 @@ def schema(
     return schema
 
 
-@app.command()
+@app.command(hidden=True)
 def update_schemas():
     """
     ## Update the packaged version of the schemas, this is useful in development.
@@ -149,13 +149,13 @@ def export(
         dir_okay=False,
         readable=True,
         help="The path to your dictionary's language configuration file.",
-    ),
+    ),  # type: ignore
     output_directory: Path = typer.Argument(
         exists=True,
         file_okay=False,
         dir_okay=True,
         help="The output directory to write to.",
-    ),
+    ),  # type: ignore
     include_info: bool = True,
 ):
     """
@@ -229,7 +229,8 @@ def new_project(
     )
     # TODO: This adds a path that gets incorrectly resolved otherwise
     config.data[0].resource = "data.xlsx"  # type: ignore
-    config_json = config.model_dump(exclude_none=True, mode="json")
+    # Ignore the type check because model_dump is provided by the inherited pydantic class
+    config_json = config.model_dump(exclude_none=True, mode="json")  # type: ignore
     # write the configuration files
     with open(config_path, "w", encoding="utf8") as f:
         json.dump(config_json, f, indent=4)

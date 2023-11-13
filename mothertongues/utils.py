@@ -179,7 +179,7 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
         ) from e
     try:
         function = getattr(module, function_name)
-    except AttributeError as exc:
+    except (AttributeError, ModuleNotFoundError) as exc:
         raise ConfigurationError(
             f"Cannot find method '{function}' in module '{module}'"
         ) from exc
