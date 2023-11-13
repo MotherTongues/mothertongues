@@ -20,7 +20,9 @@ Remember: Getting dictionary data together can take a long time. You can always 
 
 !!! Important
 
-    Uploading data.csv will result in the data being published to your public github page. If you do not want public access to your dictionary, do the following.... (@Aidan, thoughts?)
+    Uploading data.csv will result in the data being published to your public github page. If you do not want public access to your dictionary, you must follow the [advanced developer guide](/developer/prerequisites).
+
+For more details on preparing your dictionary data, see [Preparing Your Data](/guides/prepare)
 
 ### See your dictionary!
 after the github actions happen
