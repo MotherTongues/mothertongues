@@ -346,7 +346,7 @@ class MTDictionary:
             self.l2_index = self.return_single_index("l2")
         return MTDExportFormat(
             config=config_export,
-            sorted_data=self.data,
+            data=self.data,
             l1_index=self.l1_index.data,
             l2_index=self.l2_index.data,
         )
