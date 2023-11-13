@@ -6,8 +6,6 @@ from pathlib import Path
 from typing import Callable, Union
 
 import joblib
-from g2p import Mapping, Transducer
-from g2p.mappings.utils import load_mapping_from_path
 from loguru import logger
 
 from mothertongues.exceptions import ConfigurationError
@@ -139,23 +137,7 @@ def load_manifest_configuration(path: Path, base_path: Union[None, Path] = None)
     """
     if base_path is None:
         base_path = path.parent
-    config = load_json_from_path(path)
-    # for each transducer
-    for t in range(len(config["transducers"])):
-        # for each function belonging to that transducer
-        for f in range(len(config["transducers"][t]["functions"])):
-            fn = config["transducers"][t]["functions"][f]
-            # if it's a string (and not already callable), it could be a lambda function
-            # or it could be a function in dot notation, or it could be a path
-            if isinstance(fn, str):
-                # check if the path exists relative to the base_path. If it does, resolve it
-                # as a path. This isn't 100% safe since the path might not exist, but in that case
-                # the user should still get a warning and update the path defined in the configuration
-                # TODO: make this less hacky
-                fn_path = resolve_relative_path(Path(fn), base_path, False)
-                if fn_path.exists():
-                    config["transducers"][t]["functions"][f] = fn_path
-    return config
+    return load_json_from_path(path)
 
 
 def load_json_from_path(path: Path):
@@ -170,13 +152,11 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
 
     - Callable, in which case they are returned
     - start with "lambda" in which case they are eval'ed
-    - if they are a path to a yaml file, create a g2p mapping from them
     - dot notation import, like "mothertongues.utils.get_current_time"
 
     """
     if callable(string):
         return string
-    path = Path(string)
     string = str(string)
     if string.startswith("lambda"):
         try:
@@ -185,20 +165,6 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
             raise ValueError(
                 f"Expected a callable, and was provided something that looked like a lambda function but was invalid: {type(string)}"
             ) from e
-    elif path.is_file():
-        try:
-            # TODO: This should actually be updated in g2p
-            mapping_data = load_mapping_from_path(path)
-            mapping_data["mapping_path"] = mapping_data["mapping"]
-            mapping_data["mapping"] = mapping_data["mapping_data"]
-            transducer = Transducer(Mapping(**mapping_data))
-            return lambda x: transducer(x).output_string
-        except:  # noqa: E722 TODO: find exception
-            raise ValueError("Expected file at to be loadable to g2p")
-    elif string.endswith(".yaml") or string.endswith(".yml"):
-        raise FileNotFoundError(
-            f"File '{string}' looks like yaml but does not seem to exist. Please provide an absolute path or a path relative to your configuration file"
-        )
     if "." not in string:
         logger.debug(
             f"String must be in the format <module>.<function>. If {string} is actually a string, you can ignore this."
@@ -213,7 +179,7 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
         ) from e
     try:
         function = getattr(module, function_name)
-    except AttributeError as exc:
+    except (AttributeError, ModuleNotFoundError) as exc:
         raise ConfigurationError(
             f"Cannot find method '{function}' in module '{module}'"
         ) from exc

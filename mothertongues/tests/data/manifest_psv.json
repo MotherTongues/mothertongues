@@ -2,20 +2,10 @@
     "file_type": "psv",
     "name": "words",
     "transducers": [{
-            "input_field": "word",
-            "output_field": "compare_form",
-            "functions": [
-                "./transducers/danish-approx.yaml"
-            ]
-        },
-        {
-            "input_field": "word",
-            "output_field": "sort_form",
-            "functions": [
-                "lambda x: x.lower()"
-            ]
-        }
-    ],
+        "input_field": "word",
+        "output_field": "sort_form",
+        "lower": true
+    }],
     "targets": {
         "entryID": "0",
         "definition": "1",

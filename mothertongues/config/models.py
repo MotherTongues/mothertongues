@@ -6,20 +6,20 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Callable, Dict, List, NamedTuple, Optional, Tuple, TypedDict, Union
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, Union
 from unicodedata import normalize
+from uuid import UUID
 
-from loguru import logger
-from pydantic import (
+from pydantic import (  # type: ignore
     BaseModel,
-    Extra,
+    ConfigDict,
     Field,
     FilePath,
     HttpUrl,
-    ValidationError,
-    root_validator,
-    validator,
+    field_validator,
+    model_validator,
 )
+from typing_extensions import TypedDict
 
 from mothertongues import __file__ as mtd_dir
 from mothertongues.exceptions import ConfigurationError
@@ -29,12 +29,11 @@ SCHEMA_DIR = Path(mtd_dir).parent / "schemas"
 
 
 class BaseConfig(BaseModel):
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
 
 class Audio(BaseConfig):
-    description: Optional[str]
+    description: Optional[str] = None
     """The location of the description of the audio (including speaker)"""
 
     filename: str
@@ -70,7 +69,8 @@ class WeightedLevensteinConfig(BaseConfig):
             sub_costs[str(item[1])][str(item[0])] = float(item[2])
         return sub_costs
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def convert_sub_costs(cls, values):
         if (
             "substitutionCostsPath" in values
@@ -123,69 +123,57 @@ class RestrictedTransducer(BaseConfig):
     remove_combining_characters: bool = True
     replace_rules: Optional[Dict[str, str]] = None
 
+    def create_callable(self: "RestrictedTransducer") -> Callable:
+        """Create a callable function from the Restricted Transducer configuration.
+        It's restricted because the same functionality needs to be available on the client.
 
-def create_restricted_transducer(config: RestrictedTransducer) -> Callable:
-    """Create a callable function from the Restricted Transducer configuration.
-       It's restricted because the same functionality needs to be available on the client.
+        Args:
+            config (RestrictedTransducer): pre-defined acceptable transductions
 
-    Args:
-        config (RestrictedTransducer): pre-defined acceptable transductions
+        Returns:
+            Callable: a callable that takes one argument (string) and returns the transduced string
+        """
+        callables = []
+        if self.lower:
+            callables.append(lambda x: x.lower())
+        if self.remove_combining_characters:
 
-    Returns:
-        Callable: a callable that takes one argument (string) and returns the transduced string
-    """
-    callables = []
-    if config.lower:
-        callables.append(lambda x: x.lower())
-    if config.remove_combining_characters:
+            def remove_combining_characters(text: str):
+                text = normalize("NFD", text)
+                return re.sub(
+                    r"[\u0300-\u036f]", "", text
+                )  # TODO: test, and consider adding the other 4 unicode blocks
 
-        def remove_combining_characters(text: str):
-            text = normalize("NFD", text)
-            return re.sub(
-                r"[\u0300-\u036f]", "", text
-            )  # TODO: test, and consider adding the other 4 unicode blocks
+            callables.append(remove_combining_characters)
+        if self.unicode_normalization != NormalizationEnum.none:
+            callables.append(partial(normalize, self.unicode_normalization.value))
+        if self.remove_punctuation:
+            callables.append(partial(re.sub, re.compile(self.remove_punctuation), ""))
+        if self.replace_rules:
 
-        callables.append(remove_combining_characters)
-    if config.unicode_normalization != NormalizationEnum.none:
-        callables.append(partial(normalize, config.unicode_normalization.value))
-    if config.remove_punctuation:
-        callables.append(partial(re.sub, re.compile(config.remove_punctuation), ""))
-    if config.replace_rules:
+            def replace(term):
+                for inp, outp in self.replace_rules.items():
+                    term = re.sub(inp, outp, term)
+                return term
 
-        def replace(term):
-            for inp, outp in config.replace_rules.items():
-                term = re.sub(inp, outp, term)
-            return term
+            callables.append(replace)
+        if not callables:
+            callables.append(lambda x: x)
 
-        callables.append(replace)
-    if not callables:
-        callables.append(lambda x: x)
+        def new_callable(text):
+            for callable in callables:
+                text = callable(text)
+            return text
 
-    def new_callable(text):
-        for callable in callables:
-            text = callable(text)
-        return text
-
-    return new_callable
+        return new_callable
 
 
-class Transducer(BaseConfig):
+class ArbitraryFieldRestrictedTransducer(RestrictedTransducer):
     input_field: str
     """The fieldname to use as the input for the transducer"""
 
     output_field: str
     """The fieldname for the transducer to write its output to"""
-
-    functions: List[Callable]
-
-    @validator("functions", always=True, pre=True)
-    def convert_callables(cls, v, values):
-        funcs = []
-        for func in v:
-            func = string_to_callable(func)
-            funcs.append(func)
-        values["functions"] = funcs
-        return funcs
 
 
 class ParserEnum(Enum):
@@ -231,41 +219,41 @@ class ParserTargets(BaseConfig):
     definition: str
     """The location of the definitions in your dictionary"""
 
-    entryID: Optional[str]
+    entryID: Optional[str] = None
     """The location of the unique IDs in your dictionary. If None, ID's will be automatically assigned."""
 
-    theme: Optional[str]
+    theme: Optional[str] = None
     """The location of the main theme to group the entry under."""
 
-    secondary_theme: Optional[str]
+    secondary_theme: Optional[str] = None
     """The location of the secondary theme to group the entry under."""
 
-    img: Optional[str]
+    img: Optional[str] = None
     """The location of the image path associated with the entry. Path is prepended with ResourceManifest.img_path"""
 
     source: Optional[str] = ""
     """The location of the source of the entry. Note that this can be applied on each DataSource in manifest instead"""
 
     # Dict is used in case of json listof parser syntax
-    audio: Optional[Union[List[Audio], Dict]]
+    audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the entry."""
 
-    definition_audio: Optional[Union[List[Audio], Dict]]
+    definition_audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the definition of the entry."""
 
-    example_sentence: Optional[Union[List[str], Dict]]
+    example_sentence: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentences associated with the entry"""
 
-    example_sentence_definition: Optional[Union[List[str], Dict]]
+    example_sentence_definition: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[Union[List[Audio], Dict]]
+    example_sentence_audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[Union[List[Audio], Dict]]
+    example_sentence_definition_audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
-    optional: Optional[Dict[str, str]]
+    optional: Optional[Dict[str, str]] = None
     """A list of information to optionally display"""
 
     # @root_validator
@@ -295,7 +283,7 @@ class DictionaryEntry(BaseModel):
     definition: str
     """The definitions in your dictionary"""
 
-    entryID: Optional[str]
+    entryID: Optional[Union[str, int, UUID]] = None
     """The unique IDs for entries in your dictionary. If None, ID's will be automatically assigned."""
 
     theme: Optional[str] = ""
@@ -330,9 +318,13 @@ class DictionaryEntry(BaseModel):
 
     source: Optional[str] = ""
     """The source of the entry"""
+    model_config = ConfigDict(extra="allow")
 
-    class Config:
-        extra = Extra.allow
+    @model_validator(mode="after")
+    def entryID_to_str(self) -> "DictionaryEntry":
+        if self.entryID is not None:
+            self.entryID = str(self.entryID)
+        return self
 
 
 class DictionaryEntryExportFormat(BaseModel):
@@ -387,9 +379,7 @@ class DictionaryEntryExportFormat(BaseModel):
 
     source: Optional[str] = ""
     """The source of the entry"""
-
-    class Config:
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 class ResourceManifest(BaseConfig):
@@ -402,25 +392,26 @@ class ResourceManifest(BaseConfig):
     skip_header: bool = False
     """Whether to skip the header when parsing. Applies to spreadsheet formats"""
 
-    transducers: List[Transducer] = []
+    transducers: List[ArbitraryFieldRestrictedTransducer] = []
     """A list of Transducers to apply to your data"""
 
-    audio_path: Optional[HttpUrl]
+    audio_path: Optional[HttpUrl] = None
     """This is a path to your audio files that will be pre-pended to each audio path"""
 
-    img_path: Optional[HttpUrl]
+    img_path: Optional[HttpUrl] = None
     """This is a path to your image files that will be pre-pended to each image path"""
 
-    targets: Optional[ParserTargets]
+    targets: Optional[ParserTargets] = None
     """The ParserTargets for parsing the resource. They are optional if providing a custom parser method"""
 
-    sheet_name: Optional[str]
+    sheet_name: Optional[str] = None
     """The sheet name; only used for xlsx parsers since workbooks can have multiple sheets"""
 
-    json_parser_entrypoint: Optional[str]
+    json_parser_entrypoint: Optional[str] = None
     """The entrypoint for parsing json; only used with json parsers when the json is nested and you only want to parse something further down in the tree"""
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def targets_none_only_if_custom_parser(cls, values):
         targets, file_type = values.get("targets"), values.get("file_type")
 
@@ -436,16 +427,9 @@ class ResourceManifest(BaseConfig):
             )
         return values
 
-    @validator("audio_path", "img_path")
+    @field_validator("audio_path", "img_path")
+    @classmethod
     def check_paths_are_pingable(cls, v):
-        return v
-
-    @root_validator
-    def warn_that_functionality_is_limited_if_none(cls, v):
-        if v is None:
-            logger.warning(
-                f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
-            )
         return v
 
 
@@ -460,9 +444,9 @@ class LanguageConfigurationExportFormat(BaseModel):
 
     l2_search_strategy: SearchAlgorithms
 
-    l1_search_config: Optional[WeightedLevensteinConfig]
+    l1_search_config: Optional[WeightedLevensteinConfig] = None
 
-    l2_search_config: Optional[WeightedLevensteinConfig]
+    l2_search_config: Optional[WeightedLevensteinConfig] = None
 
     l1_stemmer: StemmerEnum
 
@@ -480,32 +464,33 @@ class LanguageConfigurationExportFormat(BaseModel):
     optional_field_name: str
     """The display name for the optional field"""
 
-    credits: Optional[List[Contributor]]
+    credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
     build: str
     """The build identifier for your dictionary build"""
 
-    @validator("build", always=True, pre=True)
-    def convert_callable_build(cls, v, values):
-        """Take the build argument (string) and if it's in dot notation,
-           convert it to a callable and call it.
+    model_config = ConfigDict(extra="ignore")
 
-        Args:
-            v (_type_): the build value
-            values (_type_): all values
-
-        Returns:
-            string: the called value of the build function (if it's not a function, just return the string)
-        """
-        v = string_to_callable(v)
-        if callable(v):
-            v = v()
-            values["build"] = v
-        return v
-
-    class Config:
-        extra = Extra.ignore
+    def export(self):
+        return self.model_dump(
+            mode="json",
+            include={
+                "L1": True,
+                "L2": True,
+                "alphabet": True,
+                "build": True,
+                "l1_search_strategy": True,
+                "l2_search_strategy": True,
+                "l1_search_config": True,
+                "l2_search_config": True,
+                "l1_stemmer": True,
+                "l2_stemmer": True,
+                "l1_normalization_transducer": True,
+                "l2_normalization_transducer": True,
+                "optional_field_name": True,
+            },
+        )
 
 
 class LanguageConfiguration(LanguageConfigurationExportFormat):
@@ -553,7 +538,7 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
-    build: str = "mothertongues.utils.get_current_time"
+    build: str = Field("mothertongues.utils.get_current_time", validate_default=True)
     """The build identifier for your dictionary build"""
 
     l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]
@@ -572,8 +557,9 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     ]
     """The name of required truthy fields"""
 
-    @validator("alphabet")
-    def load_alphabet(cls, v, values):
+    @field_validator("alphabet", mode="before")
+    @classmethod
+    def load_alphabet(cls, alphabet: Any):
         """Load the alphabet
 
         Args:
@@ -583,28 +569,37 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
         Returns:
             list[str]: The alphabet as a list
         """
-        if isinstance(v, Path):
-            if v.suffix.endswith("json"):
-                with open(v, encoding="utf8") as f:
+        if isinstance(alphabet, str):
+            alphabet = Path(alphabet)
+        if isinstance(alphabet, Path):
+            if alphabet.suffix.endswith("json"):
+                with open(alphabet, encoding="utf8") as f:
                     return json.load(f)
-            if v.suffix.endswith("txt"):
-                with open(v, encoding="utf8") as f:
+            if alphabet.suffix.endswith("txt"):
+                with open(alphabet, encoding="utf8") as f:
                     return [x.strip() for x in f]
-            raise ValidationError(
-                "If providing a file with your alphabet, it must be either 'json' or 'txt'."
+            raise ValueError(
+                f"If providing a file ({alphabet}) with your alphabet, it must be either 'json' or 'txt'."
             )
-        return v
+        return alphabet
 
-    @root_validator
-    def warn_that_functionality_is_limited_if_none(cls, v):
-        if v is None:
-            logger.warning(
-                f"Your configuration didn't include a value for {v}, you may not have full functionality in your dictionary."
-            )
-        return v
+    @field_validator("build", mode="before")
+    @classmethod
+    def convert_callable_build(cls, build: Any):
+        """Take the build argument (string) and if it's in dot notation,
+        convert it to a callable and call it.
 
-    class Config:
-        extra = Extra.forbid
+        Args:
+            v (_type_): the build value
+            values (_type_): all values
+
+        Returns:
+            string: the called value of the build function (if it's not a function, just return the string)
+        """
+        build = string_to_callable(build)
+        return build() if callable(build) else build
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class DataSource(BaseConfig):
@@ -614,41 +609,34 @@ class DataSource(BaseConfig):
     resource: Union[FilePath, List[dict], List[DictionaryEntry]]
     """The data or a path to the data"""
 
-    @validator("resource")
+    @field_validator("resource")
+    @classmethod
     def check_data_is_parsable(cls, v):
         return v
 
-    @root_validator
-    def data_is_valid(cls, values):
+    @model_validator(mode="after")
+    def data_is_valid(self) -> "DataSource":
         """Validates:
         - Data is parsable
         - ParserTargets are of the valid type given file_type
         - ParserTargets exist in data"""
-        if (
-            values
-            and "resource" in values
-            and isinstance(values["resource"], Path)
-            and not values["resource"].exists()
+        if self.manifest.file_type == ParserEnum.none and isinstance(
+            self.resource, Path
         ):
-            raise  # TODO: what should this raise?
-        if values and "manifest" in values and "resource" in values:
-            if values["manifest"].file_type == ParserEnum.none and isinstance(
-                values["resource"], Path
-            ):
-                raise ConfigurationError(
-                    "You cannot provide a path to your data if the parser is set 'none', instead you must pass the raw, parsed data."
-                )
-            if values["manifest"].file_type in [
-                ParserEnum.csv,
-                ParserEnum.psv,
-                ParserEnum.tsv,
-                ParserEnum.xlsx,
-                ParserEnum.json,
-            ] and not isinstance(values["resource"], Path):
-                raise ConfigurationError(
-                    f"Your parser was set to {values['manifest'].file_type} but you provided raw data, instead you must pass a list to your file or change your parser type."
-                )
-        return values
+            raise ConfigurationError(
+                "You cannot provide a path to your data if the parser is set 'none', instead you must pass the raw, parsed data."
+            )
+        if self.manifest.file_type in [
+            ParserEnum.csv,
+            ParserEnum.psv,
+            ParserEnum.tsv,
+            ParserEnum.xlsx,
+            ParserEnum.json,
+        ] and not isinstance(self.resource, Path):
+            raise ConfigurationError(
+                f"Your parser was set to {self.manifest.file_type} but you provided raw data, instead you must pass a list to your file or change your parser type."
+            )
+        return self
 
 
 class Location(NamedTuple):

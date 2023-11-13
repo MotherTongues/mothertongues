@@ -15,7 +15,6 @@ from mothertongues.config.models import (
     IndexType,
     MTDConfiguration,
     StemmerEnum,
-    create_restricted_transducer,
 )
 
 SNOWBALL_STEMMER = SnowballStemmer("english")
@@ -277,7 +276,7 @@ def create_inverted_index(data: List[dict], config: MTDConfiguration, l1_or_l2: 
         )
         return InvertedIndex(
             data,
-            create_restricted_transducer(config.config.l1_normalization_transducer),
+            config.config.l1_normalization_transducer.create_callable(),
             stemmer_function=stemmer_fn,
             keys_to_index=config.config.l1_keys_to_index,
         )
@@ -289,7 +288,7 @@ def create_inverted_index(data: List[dict], config: MTDConfiguration, l1_or_l2: 
         )
         return InvertedIndex(
             data,
-            create_restricted_transducer(config.config.l2_normalization_transducer),
+            config.config.l2_normalization_transducer.create_callable(),
             stemmer_function=stemmer_fn,
             keys_to_index=config.config.l2_keys_to_index,
         )

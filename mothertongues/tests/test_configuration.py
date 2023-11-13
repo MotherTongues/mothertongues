@@ -1,7 +1,10 @@
 import contextlib
+import sys
+from string import ascii_lowercase
 
 from jsf import JSF
-from pydantic import error_wrappers
+from loguru import logger
+from pydantic import ValidationError
 
 from mothertongues.config.models import (
     DataSource,
@@ -17,7 +20,7 @@ from mothertongues.exceptions import (
     UnsupportedFiletypeError,
 )
 from mothertongues.tests.base_test_case import BasicTestCase
-from mothertongues.utils import load_mtd_configuration
+from mothertongues.utils import load_mtd_configuration, string_to_callable
 
 
 class ConfigurationTest(BasicTestCase):
@@ -44,12 +47,44 @@ class ConfigurationTest(BasicTestCase):
         # check that input fields exist
         pass
 
+    def test_string_to_callable_conversion(self):
+        # Pass a Callable
+        def test():
+            return "this is a test"
+
+        self.assertEqual(string_to_callable(test), test)
+        # Pass a lambda function
+        # TODO: maybe remove this legacy code for security reasons
+        lambda_test = string_to_callable("lambda x: x.lower()")
+        self.assertEqual(lambda_test("TEST"), "test")
+        with self.assertRaises(ValueError):
+            string_to_callable("lambda could just be a word in a string")
+        # Pass a dot notation import
+        self.assertEqual(
+            string_to_callable("mothertongues.utils.string_to_callable"),
+            string_to_callable,
+        )
+        with self.assertRaises(ConfigurationError):
+            string_to_callable("foo.module.does.not.exist")
+
     def test_config_does_not_raise_unexpected_errors(self):
         """Generate 1000 fake dictionaries based on the schemas alone.
         These won't work, but shouldn't raise unexpected errors either"""
         language_config_faker = JSF(LanguageConfiguration.schema())
         entry_faker = JSF(DictionaryEntry.schema())
-        manifest_faker = JSF(ResourceManifest.schema())
+        resource_schema = ResourceManifest.schema()
+        try:
+            # This is an annoying error related to the ordering of elements
+            # in the schema https://github.com/ghandic/jsf/issues/80
+            # since this is only for testing and random generation of the transducer
+            # doesn't really matter, we can just delete the problematic keys.
+            manifest_faker = JSF(resource_schema)
+        except AttributeError:
+            del resource_schema["$defs"]["ArbitraryFieldRestrictedTransducer"]
+            del resource_schema["properties"]["transducers"]
+            manifest_faker = JSF(resource_schema)
+        logger.remove()
+        logger.add(sys.stderr, level="INFO")
         for _ in range(1000):
             # Custom exceptions from mothertongues.exceptions are ok, as are NotImplementedErrors for configurations that try to use the Custom Parser Method
             # UnsupportedFiletypeError is OK and so are various pydantic ValidationErrors
@@ -58,7 +93,7 @@ class ConfigurationTest(BasicTestCase):
                 ParserError,
                 NotImplementedError,
                 UnsupportedFiletypeError,
-                error_wrappers.ValidationError,
+                ValidationError,
             ):
                 language_config = LanguageConfiguration(
                     **language_config_faker.generate()
@@ -102,6 +137,46 @@ class ConfigurationTest(BasicTestCase):
         self.assertEqual(
             self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
         )
+
+    def test_alphabet(self):
+        # Plain
+        english_alphabet = list(ascii_lowercase)
+        eng_lc = LanguageConfiguration(alphabet=english_alphabet)
+        self.assertEqual(eng_lc.alphabet, list(ascii_lowercase))
+        # JSON
+        alphabet_json_path = self.data_dir / "alphabet.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+        self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["æ", "ø", "å"])
+        # TXT
+        alphabet_text_path = self.data_dir / "alphabet.txt"
+        txt_lc = LanguageConfiguration(alphabet=alphabet_text_path)
+        self.assertEqual(txt_lc.alphabet, list(ascii_lowercase) + ["æ", "ø", "å"])
+        # str(TXT)
+        txt_string_lc = LanguageConfiguration(alphabet=str(alphabet_text_path))
+        self.assertEqual(
+            txt_string_lc.alphabet, list(ascii_lowercase) + ["æ", "ø", "å"]
+        )
+        # Missing File Error
+        with self.assertRaises(FileNotFoundError):
+            LanguageConfiguration(alphabet="path/to/foo/bar.json")
+        # Bad File type
+        with self.assertRaises(ValidationError):
+            LanguageConfiguration(alphabet="path/to/foo/bar.xlsx")
+
+    def test_build_identifier(self):
+        # Default
+        lc = LanguageConfiguration()
+        self.assertGreater(int(lc.build), 1)
+        # Constant
+        lc = LanguageConfiguration(build="test")
+        self.assertEqual(lc.build, "test")
+        # Callable
+
+        def test():
+            return "bloop"
+
+        lc = LanguageConfiguration(build=test)
+        self.assertEqual(lc.build, "bloop")
 
     def test_paths(self):
         # img and audio

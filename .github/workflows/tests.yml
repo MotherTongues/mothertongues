@@ -20,7 +20,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install
-          poetry run pip install coverage g2p
+          poetry run pip install coverage
       - name: Run tests
         run: |
           poetry run coverage run mothertongues/tests/run.py dev
