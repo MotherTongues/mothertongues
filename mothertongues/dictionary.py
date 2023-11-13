@@ -329,13 +329,14 @@ class MTDictionary:
     def return_single_index(self, lang: str):
         if lang not in ["l1", "l2"]:
             raise ValueError("Sorry we can only build indices for either 'l1' or 'l2'")
-        if not self.data:
-            raise ValueError(
+        result = create_inverted_index(self.data, self.config, lang)
+        if self.data:
+            result.build()
+            result.calculate_scores()
+        else:
+            logger.debug(
                 "Sorry your dictionary does not have any entries so we cannot build the index for it."
             )
-        result = create_inverted_index(self.data, self.config, lang)
-        result.build()
-        result.calculate_scores()
         return result
 
     def export(self):

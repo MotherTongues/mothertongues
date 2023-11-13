@@ -29,7 +29,7 @@ class InvertedIndex:
 
     def __init__(
         self,
-        raw_data: List[dict],
+        raw_data: Union[None, List[dict]],
         normalization_function: Union[Callable, None] = None,
         stemmer_function: Union[Callable, None] = None,
         keys_to_index: List[str] = [
@@ -46,10 +46,12 @@ class InvertedIndex:
             )
         }
         self.keys_to_index = keys_to_index
-        self.raw_data = sorted(
-            raw_data,
-            key=lambda x: x[CheckableParserTargetFieldNames.entryID.value],
-        )
+        self.raw_data = raw_data
+        if self.raw_data:
+            self.raw_data = sorted(
+                self.raw_data,
+                key=lambda x: x[CheckableParserTargetFieldNames.entryID.value],
+            )
 
     def load(self, data):
         self.data = data
@@ -267,7 +269,9 @@ class InvertedIndex:
         return self.data
 
 
-def create_inverted_index(data: List[dict], config: MTDConfiguration, l1_or_l2: str):
+def create_inverted_index(
+    data: Union[None, List[dict]], config: MTDConfiguration, l1_or_l2: str
+):
     if l1_or_l2.lower() == "l1":
         stemmer_fn = (
             DEFAULT_STEMMER
