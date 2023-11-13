@@ -35,31 +35,26 @@ First, you need to export the dictionary data required by any MTD UI.
 `mothertongues export <path_to_mtd.config.json> <output_folder>`
 
 
-This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI.
+This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI in the next section.
 
-**TODO: @Aidan**, this the above casually mentioned "tranfer to your MTD UI". Is that the next section? (mobile development)? Or is there something else missing here?
 
-## Mobile/UI Development -- this section needs work!!!
+## Mobile/UI Development
 
 Here are the steps for creating a mobile dictionary on your machine.
 
 !!! note
-    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine]() or [exporting your data]() and [publishing to GitHub]()
+    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine](#seeing-your-dictionary-in-action-ie-local-development) or [exporting your data](#exporting-your-data) and [publishing to GitHub]()
 
-1. Fork the repository in GitHub
-
-2. Follow the [local installation instructions](../install.md#local-development)
-
-3. Change into the UI directory:
+1. Change into the UI directory:
 
     `cd mothertongues-UI`
 
-4. Install dependencies:
+2. Install dependencies:
 
     `npm install`
 
-5. Move your [exported data](#exporting-your-data) to `mothertongues-UI/packages/mtd-mobile-ui/src/assets/dictionary_data.json`
+3. Move your [exported data](#exporting-your-data) to `mothertongues-UI/packages/mtd-mobile-ui/src/assets/dictionary_data.json`
 
-6. Serve your dictionary:
+4. Serve your dictionary:
 
     `npx nx serve mtd-mobile-ui`
