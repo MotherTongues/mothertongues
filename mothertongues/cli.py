@@ -79,8 +79,7 @@ def build_and_run(
     This is helpful for debugging, just run this command and your dictionary will be available at [http://localhost:3636](http://localhots:3636)
     You can exit the server by pressing ctrl+c.
     """
-    config = MTDConfiguration(**load_mtd_configuration(language_config_path))
-    dictionary = MTDictionary(config)
+    dictionary = MTDictionary(**load_mtd_configuration(language_config_path))
     output = dictionary.export()
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
@@ -166,8 +165,7 @@ def export(
 
     You need to export your data to create the file necessary for the UI. Read more about it here: [https://docs.mothertongues.org/](https://docs.mothertongues.org/)
     """
-    config = MTDConfiguration(**load_mtd_configuration(language_config_path))
-    dictionary = MTDictionary(config)
+    dictionary = MTDictionary(**load_mtd_configuration(language_config_path))
     if not dictionary.data:
         print(
             Padding(

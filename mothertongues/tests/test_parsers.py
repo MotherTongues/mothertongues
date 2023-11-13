@@ -182,8 +182,7 @@ class DictionaryParserTest(BasicTestCase):
     def test_json_parser(self):
         language_config_path = self.data_dir / "config_json.json"
         config = load_mtd_configuration(language_config_path)
-        mtd_config = MTDConfiguration(**config)
-        dictionary = MTDictionary(mtd_config)
+        dictionary = MTDictionary(**config)
         self.maxDiff = None
         self.assertEqual(dictionary.data[0]["word"], "farvel")
         self.assertEqual(dictionary.data[3]["word"], "træ")
@@ -193,8 +192,7 @@ class DictionaryParserTest(BasicTestCase):
         for format in [ParserEnum.csv, ParserEnum.tsv, ParserEnum.psv, ParserEnum.xlsx]:
             language_config_path = self.data_dir / f"config_{format.name}.json"
             config = load_mtd_configuration(language_config_path)
-            mtd_config = MTDConfiguration(**config)
-            dictionary = MTDictionary(mtd_config)
+            dictionary = MTDictionary(**config)
             self.maxDiff = None
             self.assertEqual(dictionary.data[0]["word"], "farvel")
             self.assertEqual(dictionary.data[3]["word"], "træ")
@@ -226,18 +224,16 @@ class DictionaryParserTest(BasicTestCase):
             resource=self.data_dir / "data_check.csv",
         )
         looser_config = LanguageConfiguration()
-        mtd_config = MTDConfiguration(config=looser_config, data=[data])
         with self.assertRaises(ConfigurationError):
-            MTDictionary(mtd_config)
+            MTDictionary(config=looser_config, data=[data])
 
     def test_custom_parser(self):  # sourcery skip: extract-duplicate-method
         language_config_path = self.data_dir / "config_custom.json"
         config = load_mtd_configuration(language_config_path)
-        mtd_config = MTDConfiguration(**config)
         # Will raise a NotImplementedError if initialize without custom parse function
         with self.assertRaises(NotImplementedError):
-            dictionary = MTDictionary(mtd_config)
-        dictionary = MTDictionary(mtd_config, custom_parse_method=_custom_parser)
+            dictionary = MTDictionary(**config)
+        dictionary = MTDictionary(**config, custom_parse_method=_custom_parser)
         data = dictionary.data
         self.maxDiff = None
         self.assertEqual(data[0]["word"], "farvel")
@@ -299,8 +295,7 @@ class DictionaryParserTest(BasicTestCase):
             ),
             resource=data_plus_img,
         )
-        mtd_config = MTDConfiguration(config=language_configuration, data=[data])
-        dictionary = MTDictionary(mtd_config)
+        dictionary = MTDictionary(config=language_configuration, data=[data])
         data = dictionary.data
         self.assertEqual(data[1]["audio"][0]["filename"], "https://foo.bar/hej.mp3")
         self.assertEqual(data[0]["img"], "http://bar.foo/test.jpg")

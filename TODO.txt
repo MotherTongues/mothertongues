@@ -1,0 +1,3 @@
+This was an attempt to simplify the API for creating a dictionary but 
+I will need to rethink it a bit because turning MTDictionary into a pydantic model 
+without its own __init__ method is maybe misguided. TBD.

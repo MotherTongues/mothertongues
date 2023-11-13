@@ -10,7 +10,6 @@ from mothertongues.config.models import (
     DataSource,
     DictionaryEntry,
     LanguageConfiguration,
-    MTDConfiguration,
     ResourceManifest,
 )
 from mothertongues.dictionary import MTDictionary
@@ -32,8 +31,7 @@ class ConfigurationTest(BasicTestCase):
         super().setUp()
         language_config_path = self.data_dir / "config_data_search_algs.json"
         config = load_mtd_configuration(language_config_path)
-        self.mtd_config = MTDConfiguration(**config)
-        self.dictionary = MTDictionary(self.mtd_config)
+        self.dictionary = MTDictionary(**config)
 
     def test_data_source_is_parsable(self):
         pass
@@ -101,8 +99,7 @@ class ConfigurationTest(BasicTestCase):
                 manifest = ResourceManifest(**manifest_faker.generate())
                 data = [DictionaryEntry(**entry_faker.generate()) for _ in range(50)]
                 data_source = DataSource(manifest=manifest, resource=data)
-                config = MTDConfiguration(config=language_config, data=data_source)
-                MTDictionary(config)
+                MTDictionary(config=language_config, data=data_source)
 
     def _generate_fake_data(self):
         entry_schema = DictionaryEntry.schema()
@@ -118,10 +115,7 @@ class ConfigurationTest(BasicTestCase):
         # generate fake data based on DictionaryEntry schema
         fake_data_source1 = self._generate_fake_data()
         fake_data_source2 = self._generate_fake_data()
-        self.mtd_config = MTDConfiguration(
-            config=language_config, data=[fake_data_source1, fake_data_source2]
-        )
-        self.dictionary = MTDictionary(self.mtd_config)
+        self.dictionary = MTDictionary(config=language_config, data=[fake_data_source1, fake_data_source2])
         self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 2000)
 
     def test_lev_weights(self):

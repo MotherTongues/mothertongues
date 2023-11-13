@@ -4,7 +4,6 @@ import nltk
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
-    MTDConfiguration,
 )
 from mothertongues.dictionary import MTDictionary
 from mothertongues.processors.index_builder import InvertedIndex, create_inverted_index
@@ -19,8 +18,7 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         super().setUp()
         language_config_path = self.data_dir / "config_json.json"
         config = load_mtd_configuration(language_config_path)
-        self.mtd_config = MTDConfiguration(**config)
-        self.dictionary = MTDictionary(self.mtd_config)
+        self.dictionary = MTDictionary(**config)
 
     def test_build_index(self):
         index = create_inverted_index(

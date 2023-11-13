@@ -651,6 +651,18 @@ class MTDConfiguration(BaseConfig):
     data: Union[DataSource, List[DataSource]]
     """The data sources for your dictionary"""
 
+    custom_parse_method: Optional[Callable]
+    """Used for using a custom-defined parse method"""
+
+    parse_data_on_initialization: bool = True
+    """Whether to parse the data on initialization"""
+
+    sort_data: bool = True
+    """Whether to sort the dictionary on initialization"""
+
+    apply_transducers: bool = True
+    """Whether to apply any transducers to the dictionary on initialization"""
+
 
 PostingData = TypedDict(
     "PostingData", {"location": List[Location], "score": Dict[str, float]}

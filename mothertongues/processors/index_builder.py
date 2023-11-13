@@ -13,7 +13,7 @@ from tqdm import tqdm
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
     IndexType,
-    MTDConfiguration,
+    LanguageConfiguration,
     StemmerEnum,
 )
 
@@ -267,29 +267,29 @@ class InvertedIndex:
         return self.data
 
 
-def create_inverted_index(data: List[dict], config: MTDConfiguration, l1_or_l2: str):
+def create_inverted_index(data: List[dict], config: LanguageConfiguration, l1_or_l2: str):
     if l1_or_l2.lower() == "l1":
         stemmer_fn = (
             DEFAULT_STEMMER
-            if config.config.l1_stemmer == StemmerEnum.snowball_english
+            if config.l1_stemmer == StemmerEnum.snowball_english
             else None
         )
         return InvertedIndex(
             data,
-            config.config.l1_normalization_transducer.create_callable(),
+            config.l1_normalization_transducer.create_callable(),
             stemmer_function=stemmer_fn,
-            keys_to_index=config.config.l1_keys_to_index,
+            keys_to_index=config.l1_keys_to_index,
         )
     elif l1_or_l2.lower() == "l2":
         stemmer_fn = (
             DEFAULT_STEMMER
-            if config.config.l2_stemmer == StemmerEnum.snowball_english
+            if config.l2_stemmer == StemmerEnum.snowball_english
             else None
         )
         return InvertedIndex(
             data,
-            config.config.l2_normalization_transducer.create_callable(),
+            config.l2_normalization_transducer.create_callable(),
             stemmer_function=stemmer_fn,
-            keys_to_index=config.config.l2_keys_to_index,
+            keys_to_index=config.l2_keys_to_index,
         )
     raise ValueError(f"Expected 'l1' or 'l2', but got {l1_or_l2}")

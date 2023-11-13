@@ -22,42 +22,26 @@ from mothertongues.config.models import (
 )
 from mothertongues.exceptions import ConfigurationError
 from mothertongues.parsers import parse
-from mothertongues.processors.index_builder import create_inverted_index
+from mothertongues.processors.index_builder import create_inverted_index, InvertedIndex
 from mothertongues.processors.sorter import ArbSorter
 
+class MTDictionary(MTDConfiguration):
+    """The main Mother Tongues Dictionary class"""
+    missing_data: list[str] = []
+    duplicates: List[str] = []
+    unparsable_entries: int = 0
+    l1_index: InvertedIndex = None
+    l2_index: InvertedIndex = None
 
-class MTDictionary:
-    config: MTDConfiguration
-    """The Configuration for your Dictionary"""
-
-    def __init__(
-        self,
-        config: MTDConfiguration,
-        custom_parse_method: Union[Callable, None] = None,
-        parse_data_on_initialization: bool = True,
-        sort_data: bool = True,
-        apply_transducers: bool = True,
-        **kwargs,
-    ):
-        """Create Data Frame from Config"""
-        if custom_parse_method is not None:
-            setattr(self, "custom_parse_method", custom_parse_method)
-        self.config = config
-        self.missing_data: List[str] = []
-        self.duplicates: List[str] = []
-        self.unparsable_entries: int = 0
-        self.data = None
-        self.l1_index = None
-        self.l2_index = None
-        self.sort_data = sort_data
-        self.apply_transducers = apply_transducers
-        if parse_data_on_initialization:
+    def model_post_init(self, *args, **kwargs) -> None:
+        if self.custom_parse_method is not None:
+            setattr(self, "custom_parse_method", self.custom_parse_method)
+        if self.parse_data_on_initialization:
             self.initialize()
-        super().__init__()
 
     def __repr__(self):
         n_entries = len(self.data) if self.data else 0
-        return f"MTDictionary(L1={self.config.config.L1}, L2={self.config.config.L2}, n_entries={n_entries})"
+        return f"MTDictionary(L1={self.config.L1}, L2={self.config.L2}, n_entries={n_entries})"
 
     def __len__(self):
         return len(self.data)
@@ -67,9 +51,9 @@ class MTDictionary:
 
     def initialize(self):
         # convert single DataSource to list
-        if isinstance(self.config.data, DataSource):
-            self.config.data = [self.config.data]
-        for data_source in self.config.data:
+        if isinstance(self.data, DataSource):
+            self.data = [self.data]
+        for data_source in self.data:
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
             else:
@@ -114,13 +98,13 @@ class MTDictionary:
         # Sort
         if self.sort_data and self.data is not None:
             self.sorter = ArbSorter(
-                self.config.config.alphabet, self.config.config.no_sort_characters
+                self.config.alphabet, self.config.no_sort_characters
             )
             try:
-                self.data = self.sorter(self.data, self.config.config.sorting_field)
+                self.data = self.sorter(self.data, self.config.sorting_field)
             except KeyError as e:
                 raise ConfigurationError(
-                    f"Sorry, the key '{self.config.config.sorting_field}' is not found in your data, please change the sorting_field to a field name that exists in your data. Your data fieldnames are: {self.data[0].keys()}"
+                    f"Sorry, the key '{self.config.sorting_field}' is not found in your data, please change the sorting_field to a field name that exists in your data. Your data fieldnames are: {self.data[0].keys()}"
                 ) from e
             self.check_data()
 
@@ -132,7 +116,7 @@ class MTDictionary:
 
         You can either implement by initializing the MTDictionary object with a custom parse function like so:
 
-        >>> dictionary = MTDictionary(mtd_config: MTDConfiguration, custom_parse_method=custom_parser_function)
+        >>> dictionary = MTDictionary(config: LanguageConfiguration, data: Union[DataSource, List[DataSource]], custom_parse_method=custom_parser_function)
 
         Here, custom_parser_function has to be a function that takes a data_source as its only argument and return a list of DictionaryEntry of the parsed data:
 
@@ -195,9 +179,9 @@ class MTDictionary:
             _type_: _description_
         """
         # find missing data and duplicates
-        required_fields = [x.value for x in self.config.config.required_fields]
+        required_fields = [x.value for x in self.config.required_fields]
         duplicate_fields = {
-            x.value: Counter() for x in self.config.config.duplicate_fields_subset
+            x.value: Counter() for x in self.config.duplicate_fields_subset
         }
         to_delete = []
         for i, entry in tqdm(
@@ -269,14 +253,14 @@ class MTDictionary:
                 "[red]Watch out! There are lots of possible errors in your dictionary"
             )
         basic = Padding(
-            f"\nYour dictionary for {self.config.config.L1} and {self.config.config.L2} has {n_entries} entries.",
+            f"\nYour dictionary for {self.config.L1} and {self.config.L2} has {n_entries} entries.",
             (2, 2),
         )
         dupe_fields = ", ".join(
-            [x.value for x in self.config.config.duplicate_fields_subset]
+            [x.value for x in self.config.duplicate_fields_subset]
         )
         required_fields = ", ".join(
-            [x.value for x in self.config.config.required_fields]
+            [x.value for x in self.config.required_fields]
         )
         body = Align(basic, align="center")
 
@@ -339,7 +323,7 @@ class MTDictionary:
         return result
 
     def export(self):
-        config_export = self.config.config.export()
+        config_export = self.config.export()
         if self.l1_index is None:
             self.l1_index = self.return_single_index("l1")
         if self.l2_index is None:

@@ -3,7 +3,6 @@ from copy import deepcopy
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
     LanguageConfiguration,
-    MTDConfiguration,
     ResourceManifest,
 )
 from mothertongues.dictionary import DataSource, MTDictionary
@@ -18,13 +17,12 @@ class DictionaryDataTest(BasicTestCase):
         super().setUp()
         language_config_path = self.data_dir / "config_data_check.json"
         config = load_mtd_configuration(language_config_path)
-        self.mtd_config = MTDConfiguration(**config)
-        self.dictionary = MTDictionary(self.mtd_config)
+        breakpoint()
+        self.dictionary = MTDictionary(**config)
 
     def test_no_data(self):
         empty_data = DataSource(manifest=ResourceManifest(), resource=[])
-        config = MTDConfiguration(config=LanguageConfiguration(), data=empty_data)
-        dictionary = MTDictionary(config)
+        dictionary = MTDictionary(config=LanguageConfiguration(), data=empty_data)
         self.assertEqual(len(dictionary), 0)
 
     def test_missing_chars(self):
@@ -41,8 +39,7 @@ class DictionaryDataTest(BasicTestCase):
     def test_minimal(self):
         config_path = self.data_dir / "config_minimal.json"
         config = load_mtd_configuration(config_path)
-        mtd_config = MTDConfiguration(**config)
-        dictionary = MTDictionary(mtd_config)
+        dictionary = MTDictionary(**config)
         self.assertEqual(dictionary.data[0]["entryID"], "words0")
 
     def test_missing_required_fields(self):
