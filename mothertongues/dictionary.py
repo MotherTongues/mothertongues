@@ -67,9 +67,10 @@ class MTDictionary:
 
     def initialize(self):
         # convert single DataSource to list
+
         if isinstance(self.config.data, DataSource):
             self.config.data = [self.config.data]
-        for data_source in self.config.data:
+        for i, data_source in enumerate(self.config.data):
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
             else:
@@ -79,12 +80,9 @@ class MTDictionary:
                     logger.debug(
                         f"Tried parsing {data_source.resource} but there were {len(unparsable)} unparsable entries."
                     )
-            for i, entry in enumerate(data):
+            for j, entry in enumerate(data):
                 if not isinstance(entry, DictionaryEntry):
                     entry = DictionaryEntry(**entry)
-                # Add entryID if it was not provided.
-                if entry.entryID is None:
-                    entry.entryID = str(i)
                 # Prepend image path
                 if data_source.manifest.img_path and entry.img:
                     entry.img = urljoin(
@@ -101,8 +99,12 @@ class MTDictionary:
                 # Add the source
                 if not entry.source:
                     entry.source = data_source.manifest.name
+                # Add entryID if it was not provided.
+                # Add data source and entry index
+                if entry.entryID is None:
+                    entry.entryID = entry.source + str(i) + str(j)
                 # Convert back to dict
-                data[i] = entry.model_dump()
+                data[j] = entry.model_dump()
 
             # Transduce Data
             if self.apply_transducers:

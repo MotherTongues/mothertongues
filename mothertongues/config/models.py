@@ -494,7 +494,6 @@ class LanguageConfigurationExportFormat(BaseModel):
 
 
 class LanguageConfiguration(LanguageConfigurationExportFormat):
-
     L1: str = "YourLanguage"
     """The Language of Your Dictionary"""
 
@@ -538,7 +537,9 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
-    build: str = Field("mothertongues.utils.get_current_time", validate_default=True)
+    build: str = Field(
+        default="mothertongues.utils.get_current_time", validate_default=True
+    )
     """The build identifier for your dictionary build"""
 
     l1_keys_to_index: List[str] = [CheckableParserTargetFieldNames.word.value]

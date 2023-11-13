@@ -101,7 +101,7 @@ class DictionaryParserTest(BasicTestCase):
             {
                 "word": "farvel",
                 "definition": "goodbye",
-                "entryID": "words4",
+                "entryID": "4",
                 "theme": "greetings",
                 "secondary_theme": "",
                 "img": "",
@@ -119,7 +119,7 @@ class DictionaryParserTest(BasicTestCase):
             {
                 "word": "hej",
                 "definition": "hello",
-                "entryID": "words3",
+                "entryID": "3",
                 "theme": "greetings",
                 "secondary_theme": "",
                 "img": "",
@@ -137,7 +137,7 @@ class DictionaryParserTest(BasicTestCase):
             {
                 "word": "ord",
                 "definition": "word",
-                "entryID": "words2",
+                "entryID": "2",
                 "theme": "abstract",
                 "secondary_theme": "",
                 "img": "",
@@ -155,7 +155,7 @@ class DictionaryParserTest(BasicTestCase):
             {
                 "word": "træ",
                 "definition": "tree",
-                "entryID": "words1",
+                "entryID": "1",
                 "theme": "plants",
                 "secondary_theme": "",
                 "img": "",

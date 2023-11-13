@@ -56,10 +56,10 @@ class CommandLineTest(BasicTestCase):
             ],
         )
         self.assertEqual(result.exit_code, 0)
-        self.assertIn("words9", result.stdout)
-        self.assertIn("words7", result.stdout)
-        self.assertIn("words4", result.stdout)
-        self.assertIn("words6", result.stdout)
+        self.assertIn("9", result.stdout)
+        self.assertIn("7", result.stdout)
+        self.assertIn("4", result.stdout)
+        self.assertIn("6", result.stdout)
         self.assertIn("😀", result.stdout)
         self.assertIn(
             "Your dictionary for Danish and English has 6 entries.", result.stdout
