@@ -2,9 +2,11 @@ from copy import deepcopy
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
+    LanguageConfiguration,
     MTDConfiguration,
+    ResourceManifest,
 )
-from mothertongues.dictionary import MTDictionary
+from mothertongues.dictionary import DataSource, MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
 
@@ -18,6 +20,12 @@ class DictionaryDataTest(BasicTestCase):
         config = load_mtd_configuration(language_config_path)
         self.mtd_config = MTDConfiguration(**config)
         self.dictionary = MTDictionary(self.mtd_config)
+
+    def test_no_data(self):
+        empty_data = DataSource(manifest=ResourceManifest(), resource=[])
+        config = MTDConfiguration(config=LanguageConfiguration(), data=empty_data)
+        dictionary = MTDictionary(config)
+        self.assertEqual(len(dictionary), 0)
 
     def test_missing_chars(self):
         self.assertIn("😀", self.dictionary.sorter.oovs)
