@@ -3,6 +3,7 @@ from typing import Any, Callable, List, Tuple, Union
 from urllib.parse import urljoin
 
 from loguru import logger
+from pydantic import ValidationError
 from rich import print
 from rich.align import Align
 from rich.console import Group
@@ -67,9 +68,9 @@ class MTDictionary:
 
     def initialize(self):
         # convert single DataSource to list
-
         if isinstance(self.config.data, DataSource):
             self.config.data = [self.config.data]
+        # Process all data sources
         for i, data_source in enumerate(self.config.data):
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
@@ -80,9 +81,21 @@ class MTDictionary:
                     logger.debug(
                         f"Tried parsing {data_source.resource} but there were {len(unparsable)} unparsable entries."
                     )
+            # create new list so that we only append valid
+            # DictionaryEntry objects
+            initialized_data = []
             for j, entry in enumerate(data):
                 if not isinstance(entry, DictionaryEntry):
-                    entry = DictionaryEntry(**entry)
+                    try:
+                        entry = DictionaryEntry(**entry)
+                    except ValidationError:
+                        self.missing_data.append(
+                            entry.get(
+                                CheckableParserTargetFieldNames.entryID.value,
+                                "NoIDFound",
+                            )
+                        )
+                        continue
                 # Prepend image path
                 if data_source.manifest.img_path and entry.img:
                     entry.img = urljoin(
@@ -104,15 +117,17 @@ class MTDictionary:
                 if entry.entryID is None:
                     entry.entryID = entry.source + str(i) + str(j)
                 # Convert back to dict
-                data[j] = entry.model_dump()
+                initialized_data.append(entry.model_dump())
 
             # Transduce Data
             if self.apply_transducers:
-                data = self.transduce(data, data_source.manifest.transducers)
+                data = self.transduce(
+                    initialized_data, data_source.manifest.transducers
+                )
             if self.data is None:
-                self.data = data
+                self.data = initialized_data
             else:
-                self.data += data
+                self.data += initialized_data
         # Sort
         if self.sort_data and self.data is not None:
             self.sorter = ArbSorter(
@@ -238,6 +253,7 @@ class MTDictionary:
         n_dupes = len(self.duplicates)
         n_missing = len(self.missing_data)
         n_oov_chars = len(self.missing_chars)
+        n_missing_ratio = n_missing / n_entries
         dupe_ratio = n_dupes / n_entries
         colors = {"duplicates": "", "missing": "", "oov_chars": ""}
         warning = False
@@ -250,10 +266,10 @@ class MTDictionary:
                 severe_warning = True
                 colors["duplicates"] = "[red]"
         # provide severe warnings if too many duplicates
-        if n_missing > 0.05 or n_missing > 100:
+        if n_missing_ratio > 0.05 or n_missing > 100:
             warning = True
             colors["missing"] = "[yellow]"
-            if n_missing > 0.25 or n_missing > 1000:
+            if n_missing_ratio > 0.25 or n_missing > 1000:
                 severe_warning = True
                 colors["missing"] = "[red]"
         if n_oov_chars > 5:

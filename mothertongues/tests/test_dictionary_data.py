@@ -1,5 +1,4 @@
 from copy import deepcopy
-from unittest import main
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
@@ -27,6 +26,17 @@ class DictionaryDataTest(BasicTestCase):
         config = MTDConfiguration(config=LanguageConfiguration(), data=empty_data)
         dictionary = MTDictionary(config)
         self.assertEqual(len(dictionary), 0)
+
+    def test_missing_definitions(self):
+        empty_data = DataSource(
+            manifest=ResourceManifest(),
+            resource=[{"word": "test"}, {"word": "foo", "definition": "bar"}],
+        )
+        config = MTDConfiguration(
+            config=LanguageConfiguration(sorting_field="word"), data=empty_data
+        )
+        dictionary = MTDictionary(config)
+        self.assertEqual(len(dictionary), 1)
 
     def test_multiple_sources(self):
         ds1 = DataSource(
@@ -74,7 +84,3 @@ class DictionaryDataTest(BasicTestCase):
         looser_config.config.required_fields = [CheckableParserTargetFieldNames.theme]
         dictionary = MTDictionary(looser_config)
         self.assertCountEqual(["7", "5", "9"], dictionary.missing_data)
-
-
-if __name__ == "__main__":
-    main()
