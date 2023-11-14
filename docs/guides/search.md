@@ -5,8 +5,14 @@ comments: true
 # Approximate Search
 *This guide applies for all paths (no-code and advanced developer)*
 
+## What is Approximate Search?
+
 Approximate search isn't just a *nice* feature for dictionaries of
-endangered languages - it's usually a requirement. Often, it's
+endangered languages - it's usually a requirement.
+
+Computers, by default, perform very narrow searches. If a dictionary user searches for 'cat', you expect an entry for 'cat'. But what if you search for 'kat' or 'kaat'? If you are learner of a language, these are honest mistakes to make. Approximate search allows *close* searches to return results.
+
+Often, it's
 learners of languages that want to use dictionaries the most, and if
 your dictionary doesn't allow approximate search, beginners might have
 a hard time accessing entries in the dictionary.
@@ -25,8 +31,6 @@ Typical learner/user mistakes come from the following issues:
 ## How does it work?
 
 Approximate search is partially achieved by trying to 'normalize' differences between the *query* (what the user types) and the data in your dictionary. How much you 'normalize' is up to you as the creator of your dictionary - too much and your users will get confusing results, too little and your algorithm won't return enough results.
-
-To illustrate this 'normalization', we probably (hopefully!) agree that if I type the word 'cat', I should get a result of 'cat' if it's in the dictionary. I should probably also get 'cat' as a result if I type 'Cat' or 'CAT' - in other words, my search should be [case insensitive](#case).
 
 All of the configuration for your search algorithm happens in the [MTD Configuration](prepare.md#mtd-configuration-file). You can configure the search differently for both L1 and L2 searches. The default configuration looks like this:
 
@@ -62,9 +66,13 @@ All of the configuration for your search algorithm happens in the [MTD Configura
     ...
 ```
 
-## Which keys get indexed?
+The following sections will show you different ways you can configure approximate search.
 
-By default, the inverted index is created with terms from `word` for L1 and `definition` for L2, but you can index other fields as well:
+## Index: Changing which fields get searched
+
+An index determines which fields are scanned during search.
+
+By default, the inverted index is created with terms from `word` for L1 and `definition` for L2. But you can index other fields as well. For example, if you'd like to see search results when 'cat' is in the example sentence, you might do the following:
 
 ```json hl_lines="6-13"
 {
@@ -85,8 +93,11 @@ By default, the inverted index is created with terms from `word` for L1 and `def
 ```
 
 ## Case
+Case refers to whether uppercase and lowercase letters are considered the same.
 
-You can normalize case differences between the query and the terms in the dictionary by setting `lower` to `true`:
+To illustrate this, we probably (hopefully!) agree that if I type the word 'cat', I should get a result of 'cat' if it's in the dictionary. I should probably also get 'cat' as a result if I type 'Cat' or 'CAT' of 'cAt' - in other words, my search should be [case insensitive](#case).
+
+The default configuration file already nomralizes case, by setting `"lower"` to `true`. If you would like to change that setting, adjust the value of `"lower"`:
 
 ```json hl_lines='3'
 ...
@@ -134,9 +145,11 @@ Stemming is all about normalizing words by turning them into the 'stem' (version
 }
 ```
 
+If you would to use other stemmers (for example, if the L2 is in Spanish, Arabic, etc.) - see these documents... TBD
+
 ## Punctuation
 
-You might want to remove all punctuation from your search results, in case you want to return a result for `"hello"` when someone searches for `hello`, for example.
+You might want to remove all punctuation from your search results, in case you want to return a result for `"hello"` when someone searches for `h,ello`, for example.
 
 ```json hl_lines='5'
 ...
