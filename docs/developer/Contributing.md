@@ -1,5 +1,5 @@
 # Contributing to MotherTongues
-*Guides here are intended to help those navigate the "advanced developer" path. **None** of these guides are required to successfully install, customize or run Mother Tongues dictionares. If these guides are greek to you, feel free to skip them.*
+*Guides here are intended to help developers set up their environment for making contributions back to the Mother Tongues code. **None** of these guides are required to successfully install, customize or run Mother Tongues dictionaries, so if you're not planning on contributing, feel free to skip these guides.*
 
 Feel free to dive in! [Open an issue](https://github.com/MotherTongues/mothertongues/issues/new) or submit PRs.
 

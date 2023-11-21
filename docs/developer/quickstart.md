@@ -13,6 +13,6 @@ This section is meant to get you set up with building your dictionary as quick a
     !!! Local-Development-Note
         If you are customizing MTD code, and you want to see your changes deployed locally, you need to run the above commands within the `poetry` environment that was automatically setup for you upon local installation.
 
-        This is can be done by including `poetry run` before all `mothertongues` commands or by activating your poestry env (`poetry shell`)
+        This is can be done by including `poetry run` before all `mothertongues` commands or by activating your poetry env (`poetry shell`)
 
         Check out [poetry documentation](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment) for more details

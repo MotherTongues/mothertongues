@@ -44,7 +44,7 @@ Mother Tongues Dictionaries are intentionally designed with different communitie
 ### Option 1: No-Code Option (Fastest)
 If any of the following describe you, then the no-code path may be right for you:
 
-- I want my dictionary running as quickly as possible with the least lift
+- I want my dictionary running as quickly as possible with the least effort
 - I want to try out-of-the-box MTD "as-is" (in other words, you don't need to make major code customizations right now)
 
 See docs here: [No Code Installation](nocode/install.md)
