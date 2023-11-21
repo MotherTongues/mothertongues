@@ -149,7 +149,7 @@ If you would to use other stemmers (for example, if the L2 is in Spanish, Arabic
 
 ## Punctuation
 
-You might want to remove all punctuation from your search results, in case you want to return a result for `"hello"` when someone searches for `h,ello`, for example.
+You might want to remove all punctuation from your search results. That means, for example, that `sunflower` would be returned, even if someone searches for `sun-flower`. By default, many punctuation marks will be removed. You can change which punctuation marks will be removed by modifying the following config value:
 
 ```json hl_lines='5'
 ...
