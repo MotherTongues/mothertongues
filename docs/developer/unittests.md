@@ -9,11 +9,6 @@ Unit tests for the MotherTongue repo are found in `/mothertongues/tests/`
 
 Test runner is found in `run.py` script.
 
-## Install Packages
-Run the following command
-
-`poetry run pip install g2p`
-
 ## Run Tests
 
 ### Run all tests
