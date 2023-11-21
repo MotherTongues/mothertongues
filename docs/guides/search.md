@@ -3,7 +3,7 @@ comments: true
 ---
 
 # Approximate Search
-*This guide applies for all paths (no-code and advanced developer)*
+*This guide applies for all paths ([no-code](../nocode/install.md) and [advanced developer](../developer/prerequisites.md))*
 
 ## What is Approximate Search?
 

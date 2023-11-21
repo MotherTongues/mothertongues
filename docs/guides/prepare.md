@@ -4,7 +4,7 @@ comments: true
 
 # Preparing your data
 
-*This guide is required for anyone creating a Mother Tongues Dictionary, regardless of which path they take (no code or advanced developer).*
+*This guide is required for anyone creating a Mother Tongues Dictionary, regardless of which path they take ([no code](../nocode/install.md) or [advanced developer](../developer/prerequisites.md)).*
 
 The most time-intensive part of building your dictionary, depending on how you want to publish it, is preparing your data.
 
