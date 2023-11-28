@@ -1,4 +1,5 @@
 import json
+import os
 
 from typer.testing import CliRunner
 
@@ -67,3 +68,50 @@ class CommandLineTest(BasicTestCase):
         with open(self.tempdir / "dictionary_data.json", encoding="utf8") as f:
             data = json.load(f)
         self.assertTrue(MTDExportFormat.validate(data))
+
+    def test_new_project_help(self):
+        result = self.runner.invoke(
+            app,
+            ["new-project", "--help"],
+        )
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Create a start project", result.stdout)
+
+    # def test_new_project_noArgs(self):
+    #     result = self.runner.invoke(
+    #         app,
+    #         [
+    #             "new-project",
+    #         ],
+    #     )
+
+    #     self.assertEqual(result.exit_code, 0)
+
+    def test_new_project_outputDir(self):
+        result = self.runner.invoke(
+            app,
+            ["new-project", "--outdir", str(self.tempdir)],
+        )
+
+        self.assertEqual(result.exit_code, 0)
+
+        # Assert that all expected files are created
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
+
+    # def test_new_project_outputDir_duplicateDir_noOverwrite(self):
+    #     # Arrange
+    #     path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
+    #     with open(path_dupe_file, "w"):
+    #         pass
+
+    #     # Act
+    #     result = self.runner.invoke(
+    #         app,
+    #         ["new-project", "--outdir", str(self.tempdir)],
+    #     )
+
+    #     # Assert
+    #     self.assertEqual(result.exit_code, 0)
+    #     self.assertIn("Create a start project", result.stdout)
