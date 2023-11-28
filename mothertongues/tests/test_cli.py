@@ -10,6 +10,7 @@ from mothertongues.config.models import (
     MTDExportFormat,
 )
 from mothertongues.tests.base_test_case import BasicTestCase
+from mothertongues.utils import capture_logs
 
 
 class CommandLineTest(BasicTestCase):
@@ -100,18 +101,40 @@ class CommandLineTest(BasicTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
 
-    # def test_new_project_outputDir_duplicateDir_noOverwrite(self):
-    #     # Arrange
-    #     path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
-    #     with open(path_dupe_file, "w"):
-    #         pass
+    def test_new_project_outputDir_duplicateDataFile_noOverwrite(self):
+        # Arrange
+        path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
+        with open(path_dupe_file, "w"):
+            pass
 
-    #     # Act
-    #     result = self.runner.invoke(
-    #         app,
-    #         ["new-project", "--outdir", str(self.tempdir)],
-    #     )
+        # Act
+        with capture_logs() as logs:
+            result = self.runner.invoke(
+                app,
+                ["new-project", "--outdir", str(self.tempdir)],
+            )
 
-    #     # Assert
-    #     self.assertEqual(result.exit_code, 0)
-    #     self.assertIn("Create a start project", result.stdout)
+        # Assert
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Tried to generate sample data", logs[0])
+        self.assertIn("already exists", logs[0])
+        self.assertIn("re-run with the --overwrite", logs[0])
+
+    def test_new_project_outputDir_duplicateConfigFile_noOverwrite(self):
+        # Arrange
+        path_dupe_file = os.path.join(self.tempdir, "config.mtd.json")
+        with open(path_dupe_file, "w"):
+            pass
+
+        # Act
+        with capture_logs() as logs:
+            result = self.runner.invoke(
+                app,
+                ["new-project", "--outdir", str(self.tempdir)],
+            )
+
+        # Assert
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Tried to generate configuration file", logs[0])
+        self.assertIn("already exists", logs[0])
+        self.assertIn("re-run with the --overwrite", logs[0])
