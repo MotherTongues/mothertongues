@@ -120,6 +120,23 @@ class CommandLineTest(BasicTestCase):
         self.assertIn("already exists", logs[0])
         self.assertIn("re-run with the --overwrite", logs[0])
 
+    def test_new_project_outputDir_duplicateDataFile_withOverwrite(self):
+        # Arrange
+        path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
+        with open(path_dupe_file, "w"):
+            pass
+
+        # Act
+        result = self.runner.invoke(
+            app,
+            ["new-project", "--outdir", str(self.tempdir), "--overwrite"],
+        )
+
+        # Assert
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
+
     def test_new_project_outputDir_duplicateConfigFile_noOverwrite(self):
         # Arrange
         path_dupe_file = os.path.join(self.tempdir, "config.mtd.json")
@@ -138,3 +155,20 @@ class CommandLineTest(BasicTestCase):
         self.assertIn("Tried to generate configuration file", logs[0])
         self.assertIn("already exists", logs[0])
         self.assertIn("re-run with the --overwrite", logs[0])
+
+    def test_new_project_outputDir_duplicateConfigFile_withOverwrite(self):
+        # Arrange
+        path_dupe_file = os.path.join(self.tempdir, "config.mtd.json")
+        with open(path_dupe_file, "w"):
+            pass
+
+        # Act
+        result = self.runner.invoke(
+            app,
+            ["new-project", "--outdir", str(self.tempdir), "--overwrite"],
+        )
+
+        # Assert
+        self.assertEqual(result.exit_code, 0)
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
+        self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
