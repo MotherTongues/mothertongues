@@ -72,17 +72,35 @@ class CommandLineTest(BasicTestCase):
     def test_export_configFileDoesNotExist(self):
         result = self.runner.invoke(
             app,
-            [
-                "export",
-                str(self.data_dir / "does_not_exist.json"),
-                str(self.tempdir),
-            ],
+            ["export", str(self.data_dir / "does_not_exist.json"), str(self.tempdir)],
         )
         self.assertEqual(result.exit_code, 2)
         self.assertIn("Invalid value for 'LANGUAGE_CONFIG_PATH'", result.stdout)
         self.assertIn("does not exist", result.stdout)
 
-    def test_export(self):
+    def test_export_missingOutputDirArg(self):
+        result = self.runner.invoke(
+            app,
+            ["export", str(self.data_dir / "config_data_check.json")],
+        )
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("Missing argument 'OUTPUT_DIRECTORY'", result.stdout)
+
+    def test_export_outputDirDoesNotExist(self):
+        result = self.runner.invoke(
+            app,
+            [
+                "export",
+                str(self.data_dir / "config_data_check.json"),
+                "nonexistant_output_dir",
+            ],
+        )
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("Invalid value for 'OUTPUT_DIRECTORY'", result.stdout)
+        self.assertIn("does not exist", result.stdout)
+
+    def test_export_validate_happyPath(self):
         result = self.runner.invoke(
             app,
             [
