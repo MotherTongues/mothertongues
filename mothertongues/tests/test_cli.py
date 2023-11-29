@@ -48,6 +48,40 @@ class CommandLineTest(BasicTestCase):
             data = json.load(f)
         self.assertDictEqual(data, DictionaryEntryExportFormat.schema())
 
+    ################
+    #### export ####
+    ################
+    def test_export_help(self):
+        result = self.runner.invoke(
+            app,
+            ["export", "--help"],
+        )
+
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Export your dictionary for use in a MTD UI", result.stdout)
+
+    def test_export_missingConfigFileArg(self):
+        result = self.runner.invoke(
+            app,
+            ["export"],
+        )
+
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("Missing argument 'LANGUAGE_CONFIG_PATH'", result.stdout)
+
+    def test_export_configFileDoesNotExist(self):
+        result = self.runner.invoke(
+            app,
+            [
+                "export",
+                str(self.data_dir / "does_not_exist.json"),
+                str(self.tempdir),
+            ],
+        )
+        self.assertEqual(result.exit_code, 2)
+        self.assertIn("Invalid value for 'LANGUAGE_CONFIG_PATH'", result.stdout)
+        self.assertIn("does not exist", result.stdout)
+
     def test_export(self):
         result = self.runner.invoke(
             app,
@@ -70,6 +104,9 @@ class CommandLineTest(BasicTestCase):
             data = json.load(f)
         self.assertTrue(MTDExportFormat.validate(data))
 
+    ###################
+    ### new-project ###
+    ###################
     def test_new_project_help(self):
         result = self.runner.invoke(
             app,
@@ -101,7 +138,7 @@ class CommandLineTest(BasicTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
 
-    def test_new_project_outputDir_duplicateDataFile_noOverwrite(self):
+    def test_new_project_duplicateDataFile_noOverwrite(self):
         # Arrange
         path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
         with open(path_dupe_file, "w"):
@@ -120,7 +157,7 @@ class CommandLineTest(BasicTestCase):
         self.assertIn("already exists", logs[0])
         self.assertIn("re-run with the --overwrite", logs[0])
 
-    def test_new_project_outputDir_duplicateDataFile_withOverwrite(self):
+    def test_new_project_duplicateDataFile_withOverwrite(self):
         # Arrange
         path_dupe_file = os.path.join(self.tempdir, "data.xlsx")
         with open(path_dupe_file, "w"):
@@ -137,7 +174,7 @@ class CommandLineTest(BasicTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
 
-    def test_new_project_outputDir_duplicateConfigFile_noOverwrite(self):
+    def test_new_project_duplicateConfigFile_noOverwrite(self):
         # Arrange
         path_dupe_file = os.path.join(self.tempdir, "config.mtd.json")
         with open(path_dupe_file, "w"):
@@ -156,7 +193,7 @@ class CommandLineTest(BasicTestCase):
         self.assertIn("already exists", logs[0])
         self.assertIn("re-run with the --overwrite", logs[0])
 
-    def test_new_project_outputDir_duplicateConfigFile_withOverwrite(self):
+    def test_new_project_duplicateConfigFile_withOverwrite(self):
         # Arrange
         path_dupe_file = os.path.join(self.tempdir, "config.mtd.json")
         with open(path_dupe_file, "w"):
