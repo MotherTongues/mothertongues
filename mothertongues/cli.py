@@ -56,6 +56,7 @@ def run(
         "WARNING: This is a Development server and is not secure for production"
     )
     httpd = socketserver.TCPServer(("", port), Handler)
+    logger.info("Open http://localhost:{port} in your browser to see your dictionary", port=port)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -84,11 +85,12 @@ def build_and_run(
     output = dictionary.export()
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
-        json.dump(output.model_dump(mode="json"), f)
+        json.dump(output.model_dump(mode="json"), f, indent=4)
     logger.warning(
         "WARNING: This is a Development server and is not secure for production"
     )
     httpd = socketserver.TCPServer(("", port), Handler)
+    logger.info("Open http://localhost:{port} in your browser to see your dictionary", port=port)
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
