@@ -38,8 +38,7 @@ class Parser(BaseTabularParser):
         if not path:
             return path
         jsonpath_expr = self.get_matcher(path)
-        result = jsonpath_expr.find(entry) or ""
-        return result
+        return jsonpath_expr.find(entry)
 
     def not_empty(self, value):
         if isinstance(value, dict):
