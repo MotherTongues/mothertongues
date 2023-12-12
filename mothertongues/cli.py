@@ -116,7 +116,7 @@ def schema(
     """
     schema = get_schemas(type)
     with open(output, "w", encoding="utf8") as f:
-        json.dump(schema, f)
+        json.dump(schema, f, indent=4)
     return schema
 
 
@@ -139,9 +139,9 @@ def update_schemas():
     #         "type": "string"
     #     }
     with open(SCHEMA_DIR / "manifest.json", "w", encoding="utf8") as f:
-        json.dump(manifest_schema, f)
+        json.dump(manifest_schema, f, indent=4)
     with open(SCHEMA_DIR / "config.json", "w", encoding="utf8") as f:
-        json.dump(config_schema, f)
+        json.dump(config_schema, f, indent=4)
 
 
 @app.command()
@@ -187,7 +187,7 @@ def export(
         f"Writing dictionary data file to {(output_directory / 'dictionary_data.json')}"
     )
     with open(output_directory / "dictionary_data.json", "w", encoding="utf8") as f:
-        json.dump(output.model_dump(mode="json"), f)
+        json.dump(output.model_dump(mode="json"), f, indent=4)
 
 
 @app.command()

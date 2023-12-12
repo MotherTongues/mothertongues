@@ -32,7 +32,7 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class Audio(BaseConfig):
+class Audio(BaseConfig, extra="allow"):
     description: Optional[str] = None
     """The location of the description of the audio (including speaker)"""
 
@@ -271,7 +271,7 @@ class ParserTargets(BaseConfig):
     #     return v
 
 
-class DictionaryEntry(BaseModel):
+class DictionaryEntry(BaseModel, extra="allow"):
     """There is a DictionaryEntry created for each entry in your dictionary.
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields.
@@ -307,10 +307,10 @@ class DictionaryEntry(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio]] = []
+    example_sentence_audio: Optional[List[Audio|List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio]] = []
+    example_sentence_definition_audio: Optional[List[Audio | List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}
@@ -327,7 +327,7 @@ class DictionaryEntry(BaseModel):
         return self
 
 
-class DictionaryEntryExportFormat(BaseModel):
+class DictionaryEntryExportFormat(BaseModel, extra="allow"):
     """There is a DictionaryEntry created for each entry in your dictionary.
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields. This is the same as DictionaryEntry except with
@@ -368,10 +368,10 @@ class DictionaryEntryExportFormat(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio]] = []
+    example_sentence_audio: Optional[List[Audio|List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio]] = []
+    example_sentence_definition_audio: Optional[List[Audio|List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}

@@ -109,11 +109,17 @@ class BaseTabularParser:
 
     def parse(self) -> Tuple[List[dict], List[dict]]:
         data = self.resolve_targets()
+        logger.debug("Resolved {n} targets", n=len(data))
         unparsable = []
         for i in reversed(range(len(data))):
             try:
                 data[i] = DictionaryEntry(**data[i])  # type: ignore
-            except ValidationError:
+            except ValidationError as err:
+                logger.debug(
+                    "Failed to create DictionaryEntry from data {data}: {err}",
+                    data=data[i],
+                    err=err,
+                )
                 unparsable.append(data[i])
                 del data[i]
                 continue
@@ -127,5 +133,10 @@ def parse(data_source: DataSource):
         filetype_module = importlib.import_module(rel_module, "mothertongues.parsers")
     except ImportError as e:
         raise UnsupportedFiletypeError(data_source.manifest.file_type.name) from e
+    logger.debug(
+        "Parsing {resource} with {module}",
+        resource=data_source.resource,
+        module=filetype_module,
+    )
     parser = filetype_module.Parser(data_source)
     return parser.parse()

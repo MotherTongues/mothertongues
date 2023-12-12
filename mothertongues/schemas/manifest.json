@@ -1,1 +1,410 @@
-{"title": "ResourceManifest", "type": "object", "properties": {"file_type": {"default": "none", "allOf": [{"$ref": "#/definitions/ParserEnum"}]}, "name": {"title": "Name", "default": "YourData", "type": "string"}, "skip_header": {"title": "Skip Header", "default": false, "type": "boolean"}, "transducers": {"title": "Transducers", "default": [], "type": "array", "items": {"$ref": "#/definitions/Transducer"}}, "audio_path": {"title": "Audio Path", "minLength": 1, "maxLength": 2083, "format": "uri", "type": "string"}, "img_path": {"title": "Img Path", "minLength": 1, "maxLength": 2083, "format": "uri", "type": "string"}, "targets": {"$ref": "#/definitions/ParserTargets"}, "sheet_name": {"title": "Sheet Name", "type": "string"}, "json_parser_entrypoint": {"title": "Json Parser Entrypoint", "type": "string"}}, "additionalProperties": false, "definitions": {"ParserEnum": {"title": "ParserEnum", "description": "An enumeration.", "enum": ["json", "csv", "psv", "tsv", "xlsx", "custom", "none"]}, "Transducer": {"title": "Transducer", "type": "object", "properties": {"input_field": {"title": "Input Field", "type": "string"}, "output_field": {"title": "Output Field", "type": "string"}}, "required": ["input_field", "output_field"], "additionalProperties": false}, "Audio": {"title": "Audio", "type": "object", "properties": {"description": {"title": "Description", "type": "string"}, "filename": {"title": "Filename", "type": "string"}}, "required": ["filename"], "additionalProperties": false}, "ParserTargets": {"title": "ParserTargets", "description": "Your ParserTargets define how to parse your data into a list of DictionaryEntry objects", "type": "object", "properties": {"word": {"title": "Word", "type": "string"}, "definition": {"title": "Definition", "type": "string"}, "entryID": {"title": "Entryid", "type": "string"}, "theme": {"title": "Theme", "type": "string"}, "secondary_theme": {"title": "Secondary Theme", "type": "string"}, "img": {"title": "Img", "type": "string"}, "source": {"title": "Source", "default": "", "type": "string"}, "audio": {"title": "Audio", "anyOf": [{"type": "array", "items": {"$ref": "#/definitions/Audio"}}, {"type": "object"}]}, "definition_audio": {"title": "Definition Audio", "anyOf": [{"type": "array", "items": {"$ref": "#/definitions/Audio"}}, {"type": "object"}]}, "example_sentence": {"title": "Example Sentence", "anyOf": [{"type": "array", "items": {"type": "string"}}, {"type": "object"}]}, "example_sentence_definition": {"title": "Example Sentence Definition", "anyOf": [{"type": "array", "items": {"type": "string"}}, {"type": "object"}]}, "example_sentence_audio": {"title": "Example Sentence Audio", "anyOf": [{"type": "array", "items": {"$ref": "#/definitions/Audio"}}, {"type": "object"}]}, "example_sentence_definition_audio": {"title": "Example Sentence Definition Audio", "anyOf": [{"type": "array", "items": {"$ref": "#/definitions/Audio"}}, {"type": "object"}]}, "optional": {"title": "Optional", "type": "object", "additionalProperties": {"type": "string"}}}, "required": ["word", "definition"], "additionalProperties": false}}}
+{
+    "$defs": {
+        "ArbitraryFieldRestrictedTransducer": {
+            "additionalProperties": false,
+            "properties": {
+                "lower": {
+                    "default": true,
+                    "title": "Lower",
+                    "type": "boolean"
+                },
+                "unicode_normalization": {
+                    "allOf": [
+                        {
+                            "$ref": "#/$defs/NormalizationEnum"
+                        }
+                    ],
+                    "default": "NFC"
+                },
+                "remove_punctuation": {
+                    "default": "[.,/#!$%^&?*';:{}=\\-_`~()]",
+                    "title": "Remove Punctuation",
+                    "type": "string"
+                },
+                "remove_combining_characters": {
+                    "default": true,
+                    "title": "Remove Combining Characters",
+                    "type": "boolean"
+                },
+                "replace_rules": {
+                    "anyOf": [
+                        {
+                            "additionalProperties": {
+                                "type": "string"
+                            },
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Replace Rules"
+                },
+                "input_field": {
+                    "title": "Input Field",
+                    "type": "string"
+                },
+                "output_field": {
+                    "title": "Output Field",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "input_field",
+                "output_field"
+            ],
+            "title": "ArbitraryFieldRestrictedTransducer",
+            "type": "object"
+        },
+        "Audio": {
+            "additionalProperties": true,
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "filename": {
+                    "title": "Filename",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "filename"
+            ],
+            "title": "Audio",
+            "type": "object"
+        },
+        "NormalizationEnum": {
+            "enum": [
+                "NFC",
+                "NFD",
+                "NFKC",
+                "NKFD",
+                "none"
+            ],
+            "title": "NormalizationEnum",
+            "type": "string"
+        },
+        "ParserEnum": {
+            "enum": [
+                "json",
+                "csv",
+                "psv",
+                "tsv",
+                "xlsx",
+                "custom",
+                "none"
+            ],
+            "title": "ParserEnum",
+            "type": "string"
+        },
+        "ParserTargets": {
+            "additionalProperties": false,
+            "description": "Your ParserTargets define how to parse your data into a list of DictionaryEntry objects",
+            "properties": {
+                "word": {
+                    "title": "Word",
+                    "type": "string"
+                },
+                "definition": {
+                    "title": "Definition",
+                    "type": "string"
+                },
+                "entryID": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Entryid"
+                },
+                "theme": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Theme"
+                },
+                "secondary_theme": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Secondary Theme"
+                },
+                "img": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Img"
+                },
+                "source": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "",
+                    "title": "Source"
+                },
+                "audio": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/$defs/Audio"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Audio"
+                },
+                "definition_audio": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/$defs/Audio"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Definition Audio"
+                },
+                "example_sentence": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Example Sentence"
+                },
+                "example_sentence_definition": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Example Sentence Definition"
+                },
+                "example_sentence_audio": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/$defs/Audio"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Example Sentence Audio"
+                },
+                "example_sentence_definition_audio": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/$defs/Audio"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Example Sentence Definition Audio"
+                },
+                "optional": {
+                    "anyOf": [
+                        {
+                            "additionalProperties": {
+                                "type": "string"
+                            },
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Optional"
+                }
+            },
+            "required": [
+                "word",
+                "definition"
+            ],
+            "title": "ParserTargets",
+            "type": "object"
+        }
+    },
+    "additionalProperties": false,
+    "properties": {
+        "file_type": {
+            "allOf": [
+                {
+                    "$ref": "#/$defs/ParserEnum"
+                }
+            ],
+            "default": "none"
+        },
+        "name": {
+            "default": "YourData",
+            "title": "Name",
+            "type": "string"
+        },
+        "skip_header": {
+            "default": false,
+            "title": "Skip Header",
+            "type": "boolean"
+        },
+        "transducers": {
+            "default": [],
+            "items": {
+                "$ref": "#/$defs/ArbitraryFieldRestrictedTransducer"
+            },
+            "title": "Transducers",
+            "type": "array"
+        },
+        "audio_path": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "maxLength": 2083,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "title": "Audio Path"
+        },
+        "img_path": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "maxLength": 2083,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "title": "Img Path"
+        },
+        "targets": {
+            "anyOf": [
+                {
+                    "$ref": "#/$defs/ParserTargets"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null
+        },
+        "sheet_name": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "title": "Sheet Name"
+        },
+        "json_parser_entrypoint": {
+            "anyOf": [
+                {
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "title": "Json Parser Entrypoint"
+        }
+    },
+    "title": "ResourceManifest",
+    "type": "object"
+}
