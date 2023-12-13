@@ -92,7 +92,12 @@ class MTDictionary:
                 if not isinstance(entry, DictionaryEntry):
                     try:
                         entry = DictionaryEntry(**entry)
-                    except ValidationError:
+                    except ValidationError as err:
+                        logger.debug(
+                            "Failed to create DictionaryEntry from data {data}: {err}",
+                            data=entry,
+                            err=err,
+                        )
                         self.missing_data.append(
                             entry.get(
                                 CheckableParserTargetFieldNames.entryID.value,
