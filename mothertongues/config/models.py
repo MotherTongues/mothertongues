@@ -32,7 +32,8 @@ class BaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
-class Audio(BaseConfig, extra="allow"):
+class Audio(BaseConfig):
+    model_config = ConfigDict(extra="allow")
     description: Optional[str] = None
     """The location of the description of the audio (including speaker)"""
 
@@ -271,11 +272,12 @@ class ParserTargets(BaseConfig):
     #     return v
 
 
-class DictionaryEntry(BaseModel, extra="allow"):
+class DictionaryEntry(BaseModel):
     """There is a DictionaryEntry created for each entry in your dictionary.
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields.
     """
+    model_config = ConfigDict(extra="allow")
 
     word: str
     """The words in your dictionary"""
@@ -318,7 +320,6 @@ class DictionaryEntry(BaseModel, extra="allow"):
 
     source: Optional[str] = ""
     """The source of the entry"""
-    model_config = ConfigDict(extra="allow")
 
     @model_validator(mode="after")
     def entryID_to_str(self) -> "DictionaryEntry":
@@ -327,13 +328,14 @@ class DictionaryEntry(BaseModel, extra="allow"):
         return self
 
 
-class DictionaryEntryExportFormat(BaseModel, extra="allow"):
+class DictionaryEntryExportFormat(BaseModel):
     """There is a DictionaryEntry created for each entry in your dictionary.
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields. This is the same as DictionaryEntry except with
     some specifications for the output format (for example every exported entry will have)
     a value for entryID, and a sorting_form).
     """
+    model_config = ConfigDict(extra="allow")
 
     word: str
     """The words in your dictionary"""
