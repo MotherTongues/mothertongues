@@ -1,9 +1,9 @@
 site_name: Mother Tongues Dictionaries Documentation
 theme:
   name: material
-  favicon: favicon-32x32.png
+  favicon: images/favicon-32x32.png
   custom_dir: docs/overrides
-  logo: logo_no_text.png
+  logo: images/logo_no_text.png
   palette:
     primary: white
   features:
@@ -23,6 +23,8 @@ extra:
     provider: mike
     default: stable
 markdown_extensions:
+  - attr_list
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences
