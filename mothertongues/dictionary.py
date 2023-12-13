@@ -72,7 +72,9 @@ class MTDictionary:
             self.config.data = [self.config.data]
         # Process all data sources
         for i, data_source in enumerate(self.config.data):
-            logger.debug("Parsing data source {resource}", resource=data_source.resource)
+            logger.debug(
+                "Parsing data source {resource}", resource=data_source.resource
+            )
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
             else:

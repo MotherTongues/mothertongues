@@ -56,7 +56,9 @@ def run(
         "WARNING: This is a Development server and is not secure for production"
     )
     httpd = socketserver.TCPServer(("", port), Handler)
-    logger.info("Open http://localhost:{port} in your browser to see your dictionary", port=port)
+    logger.info(
+        "Open http://localhost:{port} in your browser to see your dictionary", port=port
+    )
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
@@ -90,7 +92,9 @@ def build_and_run(
         "WARNING: This is a Development server and is not secure for production"
     )
     httpd = socketserver.TCPServer(("", port), Handler)
-    logger.info("Open http://localhost:{port} in your browser to see your dictionary", port=port)
+    logger.info(
+        "Open http://localhost:{port} in your browser to see your dictionary", port=port
+    )
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
