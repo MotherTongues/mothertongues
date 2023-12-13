@@ -248,10 +248,14 @@ class ParserTargets(BaseConfig):
     example_sentence_definition: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[Union[List[Audio], Dict]] = None
+    example_sentence_audio: Optional[
+        Union[List[Union[Audio, List[Audio]]], Dict]
+    ] = None
     """The location of the audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[Union[List[Audio], Dict]] = None
+    example_sentence_definition_audio: Optional[
+        Union[List[Union[Audio, List[Audio]]], Dict]
+    ] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = None
