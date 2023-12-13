@@ -307,10 +307,10 @@ class DictionaryEntry(BaseModel, extra="allow"):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio|List[Audio]]] = []
+    example_sentence_audio: Optional[List[Union[Audio, List[Audio]]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio | List[Audio]]] = []
+    example_sentence_definition_audio: Optional[List[Union[Audio, List[Audio]]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}
@@ -368,10 +368,10 @@ class DictionaryEntryExportFormat(BaseModel, extra="allow"):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio|List[Audio]]] = []
+    example_sentence_audio: Optional[List[Union[Audio, List[Audio]]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio|List[Audio]]] = []
+    example_sentence_definition_audio: Optional[List[Union[Audio, List[Audio]]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}
