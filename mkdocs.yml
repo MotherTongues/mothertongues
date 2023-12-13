@@ -1,9 +1,9 @@
 site_name: Mother Tongues Dictionaries Documentation
 theme:
   name: material
-  favicon: favicon-32x32.png
+  favicon: images/favicon-32x32.png
   custom_dir: docs/overrides
-  logo: logo_no_text.png
+  logo: images/logo_no_text.png
   palette:
     primary: white
   features:
@@ -23,6 +23,8 @@ extra:
     provider: mike
     default: stable
 markdown_extensions:
+  - attr_list
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences
@@ -30,11 +32,15 @@ markdown_extensions:
       permalink: true
 nav:
   - Home: index.md
-  - Installation: install.md
-  - Quick Start: quickstart.md
-  - Guides:
-    - How to follow the guides: guides/index.md
-    - Preparing your data: guides/prepare.md
+  - Creating A Dictionary (No Code Guide): nocode/install.md
+  - Creating A Dictionary (Advanced Developer Guide):
+    - Installation: developer/prerequisites.md
+    - Quick Start: developer/quickstart.md
+    - Configuring your dictionary: guides/prepare.md
     - Building & publishing your dictionary: guides/build.md
-  - Advanced Guides:
-    - Configuring the approximate search algorithm: guides/search.md
+  - Preparing your data: guides/prepare.md
+  - Configuring the approximate search algorithm: guides/search.md
+  - Misc Developer Guides:
+    - Code Completion Tools: developer/vscode.md
+    - Running Unit Tests: developer/unittests.md
+    - Contributing: developer/Contributing.md

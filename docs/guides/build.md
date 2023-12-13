@@ -4,7 +4,7 @@ comments: true
 
 # Building & Publishing your Dictionary
 
-*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface), [Git](https://en.wikipedia.org/wiki/Git) and [NPM](https://en.wikipedia.org/wiki/Npm_(software)). You must have all of these installed on your machine. You are also strongly encouraged to have a [GitHub](https://github.com) account. You are encouraged to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/MotherTongues/mtd-starter) and follow along.*
+*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface) and [NPM](https://en.wikipedia.org/wiki/Npm_(software)).*
 
 ## Seeing your dictionary in action (i.e. Local Development)
 
@@ -24,10 +24,6 @@ Then run:
 
 And your dictionary will be served at [http://localhost:3636](http://localhost:3636)
 
-!!! tip
-    If you just edit the configuration file in your clone/fork of the [mtd-starter](https://github.com/MotherTongues/mtd-starter) repo and push the changes, the demo will be automatically built and available at `https://YOUR_GITHUB_USERNAME.github.io/mtd-starter/`. Note that you will have to [enable GitHub Actions](https://docs.github.com/en/github/administering-a-repository/disabling-or-limiting-github-actions-for-a-repository#managing-github-actions-permissions-for-your-repository) on your MTD starter for the automatic builds to work.
-
-
 ## Exporting your data
 
 First, you need to export the dictionary data required by any MTD UI.
@@ -39,33 +35,26 @@ First, you need to export the dictionary data required by any MTD UI.
 `mothertongues export <path_to_mtd.config.json> <output_folder>`
 
 
-This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI.
+This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI in the next section.
 
-!!! tip
-    By simply changing the `dictionary_data.json` file in your MTD Starter, GitHub will automatically build your dictionary using the [MTD
-    mobile UI](https://github.com/MotherTongues/mothertongues-ui). Note that you will have to [enable GitHub Actions](https://docs.github.com/en/github/administering-a-repository/disabling-or-limiting-github-actions-for-a-repository#managing-github-actions-permissions-for-your-repository) on your MTD starter for the automatic builds to work.
 
-## Local Development (Advanced)
+## Mobile/UI Development
 
 Here are the steps for creating a mobile dictionary on your machine.
 
 !!! note
-    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine]() or [exporting your data]() and [publishing to GitHub]()
+    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine](#seeing-your-dictionary-in-action-ie-local-development) or [exporting your data](#exporting-your-data) and [publishing to GitHub]()
 
-1. Fork the repository in GitHub
-
-2. Follow the [local installation instructions](../install.md#local-development)
-
-3. Change into the UI directory:
+1. Change into the UI directory:
 
     `cd mothertongues-UI`
 
-4. Install dependencies:
+2. Install dependencies:
 
     `npm install`
 
-5. Move your [exported data](#exporting-your-data) to `mothertongues-UI/packages/mtd-mobile-ui/src/assets/dictionary_data.json`
+3. Move your [exported data](#exporting-your-data) to `mothertongues-UI/packages/mtd-mobile-ui/src/assets/dictionary_data.json`
 
-6. Serve your dictionary:
+4. Serve your dictionary:
 
     `npx nx serve mtd-mobile-ui`

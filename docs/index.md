@@ -39,28 +39,28 @@ Each front end tool must accept the Mother Tongues data format. The schema for t
 Making a Dictionary
 -------------------
 
-To make a dictionary from your data, you need to do the following three
-things:
+Mother Tongues Dictionaries are intentionally designed with different communities and users in mind. To that end, we offer different paths you can take to create your dictionary.
 
-1.  Install mothertongues, see [installation](install.md).
-2.  Write a valid Mother Tongues Language configuration file. See
-    [guides](guides/index.md)
-3.  Write valid Mother Tongues data resource configuration files. See
-    [guides](guides/index.md)
+### Option 1: No-Code Option (Fastest)
+If any of the following describe you, then the no-code path may be right for you:
 
-Then, build with the command line:
+- I'm not overly comfortable with coding
+- I want my dictionary running as quickly as possible with the least effort
+- I want to try out-of-the-box MTD "as-is" (in other words, you don't need to make major code customizations right now)
 
-```bash
-mothertongues build-and-run <path_to_language_configuration>
-```
+See docs here: [No Code Installation](nocode/install.md)
 
-And open your browser at `localhost:3636` to see your dictionary.
+!!! Tip
+    If you're not sure which option is right for you, start with Option 1.
 
-Exporting a Dictionary
-----------------------
+    You can always switch to the more advanced option later if needed.
 
-Finally, you can export your dictionaries to JSON to be used with an MTD frontend using the command line:
+### Option 2: Advanced Developer Option
+If any of the following describe you, then the advanced developer path may be right for you:
 
-```bash
-mothertongues export <path_to_language_configuration> <output_dir>
-```
+- I want to run the dictionary locally on my computer before deploying
+- I want to heavily customize the MTD-UI
+- I want to use the MTD tool without the MTD-UI
+- I want to contribute to MTD source code
+
+See docs here: [Advanced Developer Installation](developer/install.md)

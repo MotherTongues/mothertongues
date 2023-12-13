@@ -4,7 +4,7 @@ comments: true
 
 # Preparing your data
 
-*These guides assume you are comfortable with the [Command Line](https://en.wikipedia.org/wiki/Command-line_interface), [Git](https://en.wikipedia.org/wiki/Git) and [Python](https://en.wikipedia.org/wiki/Python_(programming_language)). You must have all of these installed on your machine. You are also strongly encouraged to have a [GitHub](https://github.com) account. You are encouraged to fork or clone the [Mother Tongues Dictionary Starter](https://github.com/MotherTongues/mtd-starter) and follow along.*
+*This guide is required for anyone creating a Mother Tongues Dictionary, regardless of which path they take ([no code](../nocode/install.md) or [advanced developer](../developer/prerequisites.md)).*
 
 The most time-intensive part of building your dictionary, depending on how you want to publish it, is preparing your data.
 
