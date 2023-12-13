@@ -277,6 +277,7 @@ class DictionaryEntry(BaseModel):
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields.
     """
+
     model_config = ConfigDict(extra="allow")
 
     word: str
@@ -335,6 +336,7 @@ class DictionaryEntryExportFormat(BaseModel):
     some specifications for the output format (for example every exported entry will have)
     a value for entryID, and a sorting_form).
     """
+
     model_config = ConfigDict(extra="allow")
 
     word: str

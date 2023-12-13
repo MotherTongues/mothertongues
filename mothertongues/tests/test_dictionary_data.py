@@ -1,14 +1,15 @@
 from contextlib import contextmanager
 from copy import deepcopy
+
 from loguru import logger
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
     LanguageConfiguration,
     MTDConfiguration,
-    ResourceManifest,
     ParserEnum,
     ParserTargets,
+    ResourceManifest,
 )
 from mothertongues.dictionary import DataSource, MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
@@ -39,8 +40,7 @@ class DictionaryDataTest(BasicTestCase):
 
     def test_validation_error(self):
         bad_data = DataSource(
-            manifest=ResourceManifest(),
-            resource=[{"word": "foo", "definition": 42}]
+            manifest=ResourceManifest(), resource=[{"word": "foo", "definition": 42}]
         )
         config = MTDConfiguration(
             config=LanguageConfiguration(sorting_field="word"), data=bad_data
