@@ -220,15 +220,15 @@ def new_project(
     resource_path = outdir / "data.xlsx"
     config_path = outdir / "config.mtd.json"
     if resource_path.exists() and not overwrite:
-        logger.warning(
+        logger.error(
             f"Tried to generate sample data at {resource_path} but it already exists. Please choose another location or re-run with the --overwrite flag"
         )
-        exit()
+        exit(1)
     if config_path.exists() and not overwrite:
-        logger.warning(
+        logger.error(
             f"Tried to generate configuration file at {config_path} but it already exists. Please choose another location or re-run with the --overwrite flag"
         )
-        exit()
+        exit(1)
     # Create and write the sample data
     wb = Workbook()
     ws = wb.active

@@ -184,3 +184,12 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
             f"Cannot find method '{function}' in module '{module}'"
         ) from exc
     return function
+
+
+@contextmanager
+def capture_logs(level="INFO", format="{level}:{name}:{message}"):
+    """Capture loguru-based logs. Particularly useful for unit testing"""
+    output = []
+    handler_id = logger.add(output.append, level=level, format=format)
+    yield output
+    logger.remove(handler_id)
