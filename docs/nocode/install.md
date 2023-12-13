@@ -40,9 +40,9 @@ Remember: Getting dictionary data together can take a long time. You can always 
 
 !!! Important
 
-    Do you have permission? Uploading data.csv will result in the data being published to your public github page. You must have permission to make the data you are using public first. If you do not want public access to your dictionary, you must follow the [advanced developer guide](/developer/prerequisites).
+    Do you have permission? Uploading data.csv will result in the data being published to your public github page. You must have permission to make the data you are using public first. If you do not want public access to your dictionary, you must follow the [advanced developer guide](../developer/prerequisites.md).
 
-For more details on preparing your dictionary data, see [Preparing Your Data](/guides/prepare)
+For more details on preparing your dictionary data, see [Preparing Your Data](../guides/prepare.md)
 
 ### Step 5: See your dictionary!
 

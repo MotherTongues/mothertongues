@@ -17,7 +17,7 @@ of the Oxford Research Encyclopedia of Linguistics.
 
 MTD is unique in a number of ways:
 
-1.  Approximate search comes out of the box, and the algorithm can be easily customized. See [guides](guides/index.md)
+1.  Approximate search comes out of the box, and the algorithm can be customized for specific languages. See [guides](guides/search.md)
 2.  Free & open source. As of version 1.0 MTD is licensed by the MIT License.
 3.  Multiple platforms. MTD has a number of front ends that it is compatible with, including for the Web, iOS and Android.
 
@@ -63,4 +63,4 @@ If any of the following describe you, then the advanced developer path may be ri
 - I want to use the MTD tool without the MTD-UI
 - I want to contribute to MTD source code
 
-See docs here: [Advanced Developer Installation](developer/install.md)
+See docs here: [Advanced Developer Installation](developer/prerequisites.md)
