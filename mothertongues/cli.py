@@ -169,6 +169,9 @@ def export(
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
     if not dictionary.data:
+        logger.error(
+            "The 'data' value in your json config is empty. Cannot proceed with export."
+        )
         print(
             Padding(
                 Panel(
@@ -179,7 +182,7 @@ def export(
                 (2, 4),
             )
         )
-        return
+        exit(1)
     output = dictionary.export()
     if include_info:
         dictionary.print_info()
