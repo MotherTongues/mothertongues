@@ -1,0 +1,37 @@
+{
+    "file_type": "csv",
+    "skip_header": true,
+    "name": "words",
+    "transducers": [{
+        "input_field": "word",
+        "output_field": "sort_form",
+        "lower": true
+    }],
+    "targets": {
+        "entryID": "0",
+        "definition": "1",
+        "word": "2",
+        "audio": [{
+            "description": "3",
+            "filename": "4"
+        }],
+        "theme": "5",
+        "optional": {
+            "Part of Speech": "6"
+        },
+        "example_sentence": ["7"],
+        "example_sentence_definition": ["8"],
+        "example_sentence_audio": [
+            [
+                {
+                    "description": "9",
+                    "filename": "10"
+                },
+                {
+                    "description": "11",
+                    "filename": "12"
+                }
+            ]
+        ]
+    }
+}

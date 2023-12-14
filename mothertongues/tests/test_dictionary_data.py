@@ -117,6 +117,40 @@ class DictionaryDataTest(BasicTestCase):
         # The second entry from the second data source (entry override of source label 'test3')
         self.assertEqual(dictionary.data[2]["entryID"], "test311")
 
+    def test_multiple_example_audio(self):
+        language_config_path = self.data_dir / "config_csv_multi.json"
+        config = load_mtd_configuration(language_config_path)
+        mtd_config = MTDConfiguration(**config)
+        dictionary = MTDictionary(mtd_config)
+        self.assertEqual(len(dictionary), 1)
+        entry = dictionary.data[0]
+        self.assertEqual(
+            entry,
+            {
+                "word": "træ",
+                "definition": "tree",
+                "entryID": "1",
+                "theme": "plants",
+                "secondary_theme": "",
+                "img": "",
+                "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "definition_audio": [],
+                "example_sentence": ["Har du røde øjne?"],
+                "example_sentence_definition": ["Do you have red eyes?"],
+                "example_sentence_audio": [
+                    [
+                        {"description": "Aidan Pine", "filename": "rode1.mp3"},
+                        {"description": "Aidan Pine", "filename": "rode2.mp3"},
+                    ]
+                ],
+                "example_sentence_definition_audio": [],
+                "optional": {"Part of Speech": "noun"},
+                "source": "words",
+                "sort_form": "træ",
+                "sorting_form": [19, 17, 26],
+            },
+        )
+
     def test_missing_chars(self):
         self.read_data_check()
         self.assertIn("😀", self.dictionary.sorter.oovs)
