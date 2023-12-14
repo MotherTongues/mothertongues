@@ -100,6 +100,20 @@ class CommandLineTest(BasicTestCase):
         self.assertIn("Invalid value for 'OUTPUT_DIRECTORY'", result.stdout)
         self.assertIn("does not exist", result.stdout)
 
+    def test_export_config_empty(self):
+        with capture_logs() as logs:
+            result = self.runner.invoke(
+                app,
+                [
+                    "export",
+                    str(self.data_dir / "config_empty.json"),
+                    str(self.tempdir),
+                ],
+            )
+
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("'data' value in your json config is empty", logs[0])
+
     def test_export_validate_happyPath(self):
         result = self.runner.invoke(
             app,
