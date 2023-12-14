@@ -190,6 +190,18 @@ class ConfigurationTest(BasicTestCase):
 
         self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["!", "'", "´", "."])
 
+    def test_alphabet_is_empty_txt(self):
+        alphabet_text_path = self.data_dir / "alphabet_empty.txt"
+        txt_lc = LanguageConfiguration(alphabet=alphabet_text_path)
+
+        self.assertEqual(txt_lc.alphabet, [])
+
+    def test_alphabet_is_empty_json(self):
+        alphabet_json_path = self.data_dir / "alphabet_empty.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, [])
+
     # endregion
 
     def test_build_identifier(self):
