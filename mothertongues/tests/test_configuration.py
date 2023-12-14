@@ -139,6 +139,8 @@ class ConfigurationTest(BasicTestCase):
             self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
         )
 
+    # region Alphabet Tests
+
     def test_lev_weights_num_too_big(self):
         weights_config_path = self.data_dir / "weights_num_too_big.csv"
 
@@ -169,6 +171,26 @@ class ConfigurationTest(BasicTestCase):
         # Bad File type
         with self.assertRaises(ValidationError):
             LanguageConfiguration(alphabet="path/to/foo/bar.xlsx")
+
+    def test_alphabet_contains_numbers_strings(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_numbers_string.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["1", "0"])
+
+    def test_alphabet_contains_numbers_numeric(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_numbers_numeric.json"
+
+        with self.assertRaises(ValidationError):
+            LanguageConfiguration(alphabet=alphabet_json_path)
+
+    def test_alphabet_contains_punctuation(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_punctuation.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["!", "'", "´", "."])
+
+    # endregion
 
     def test_build_identifier(self):
         # Default
