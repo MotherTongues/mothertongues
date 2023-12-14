@@ -10,7 +10,7 @@ from mothertongues.config.models import (
     MTDExportFormat,
 )
 from mothertongues.tests.base_test_case import BasicTestCase
-from mothertongues.utils import capture_logs
+from mothertongues.tests.utils import capture_logs
 
 
 class CommandLineTest(BasicTestCase):

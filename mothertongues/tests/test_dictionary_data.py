@@ -1,7 +1,4 @@
-from contextlib import contextmanager
 from copy import deepcopy
-
-from loguru import logger
 
 from mothertongues.config.models import (
     CheckableParserTargetFieldNames,
@@ -13,17 +10,8 @@ from mothertongues.config.models import (
 )
 from mothertongues.dictionary import DataSource, MTDictionary
 from mothertongues.tests.base_test_case import BasicTestCase
+from mothertongues.tests.utils import capture_logs
 from mothertongues.utils import load_mtd_configuration
-
-
-# See https://loguru.readthedocs.io/en/latest/resources/migration.html#replacing-assertlogs-method-from-unittest-library
-@contextmanager
-def capture_logs(level="INFO", format="{level}:{name}:{message}"):
-    """Capture loguru-based logs."""
-    output = []
-    handler_id = logger.add(output.append, level=level, format=format)
-    yield output
-    logger.remove(handler_id)
 
 
 class DictionaryDataTest(BasicTestCase):
@@ -31,6 +19,31 @@ class DictionaryDataTest(BasicTestCase):
 
     def setUp(self):
         super().setUp()
+
+    def read_data_check(self):
+        language_config_path = self.data_dir / "config_data_check.json"
+        config = load_mtd_configuration(language_config_path)
+        self.mtd_config = MTDConfiguration(**config)
+        self.dictionary = MTDictionary(self.mtd_config)
+
+    def test_extra_fields(self):
+        ds1 = DataSource(
+            manifest=ResourceManifest(),
+            resource=[
+                {"word": "test1", "definition": "test1", "foo": "bar"},
+                {"word": "test2", "definition": "test2", "bar": "foo"},
+            ],
+        )
+        config = MTDConfiguration(
+            config=LanguageConfiguration(sorting_field="word"), data=[ds1]
+        )
+        dictionary = MTDictionary(config)
+        self.assertEqual(len(dictionary), 2)
+        self.assertEqual(dictionary[0]["foo"], "bar")
+        self.assertEqual(dictionary[1]["bar"], "foo")
+        # Extra fields aren't guaranteed to be on every entry
+        with self.assertRaises(KeyError):
+            dictionary[0]["bar"]
 
     def test_no_data(self):
         empty_data = DataSource(manifest=ResourceManifest(), resource=[])
@@ -103,12 +116,6 @@ class DictionaryDataTest(BasicTestCase):
         self.assertEqual(dictionary.data[1]["entryID"], "YourData10")
         # The second entry from the second data source (entry override of source label 'test3')
         self.assertEqual(dictionary.data[2]["entryID"], "test311")
-
-    def read_data_check(self):
-        language_config_path = self.data_dir / "config_data_check.json"
-        config = load_mtd_configuration(language_config_path)
-        self.mtd_config = MTDConfiguration(**config)
-        self.dictionary = MTDictionary(self.mtd_config)
 
     def test_missing_chars(self):
         self.read_data_check()
