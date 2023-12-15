@@ -72,6 +72,9 @@ class MTDictionary:
             self.config.data = [self.config.data]
         # Process all data sources
         for i, data_source in enumerate(self.config.data):
+            logger.debug(
+                "Parsing data source {resource}", resource=data_source.resource
+            )
             if data_source.manifest.file_type == ParserEnum.none:
                 data = data_source.resource
             else:
@@ -81,6 +84,7 @@ class MTDictionary:
                     logger.debug(
                         f"Tried parsing {data_source.resource} but there were {len(unparsable)} unparsable entries."
                     )
+            logger.debug("Found {n} entries", n=len(data))
             # create new list so that we only append valid
             # DictionaryEntry objects
             initialized_data = []
@@ -88,7 +92,12 @@ class MTDictionary:
                 if not isinstance(entry, DictionaryEntry):
                     try:
                         entry = DictionaryEntry(**entry)
-                    except ValidationError:
+                    except ValidationError as err:
+                        logger.debug(
+                            "Failed to create DictionaryEntry from data {data}: {err}",
+                            data=entry,
+                            err=err,
+                        )
                         self.missing_data.append(
                             entry.get(
                                 CheckableParserTargetFieldNames.entryID.value,

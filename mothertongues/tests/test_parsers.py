@@ -169,7 +169,16 @@ class DictionaryParserTest(BasicTestCase):
                     "Do you have red eyes?",
                     "Dead, red, red-eyed, rotten, smoked trout.",
                 ],
-                "example_sentence_audio": [],
+                "example_sentence_audio": [
+                    [
+                        {"description": "AP", "filename": "ap_sent1.mp3"},
+                        {"description": "AR", "filename": "ar_sent1.mp3"},
+                    ],
+                    [
+                        {"description": "AP", "filename": "ap_sent2.mp3"},
+                        {"description": "AR", "filename": "ar_sent2.mp3"},
+                    ],
+                ],
                 "example_sentence_definition_audio": [],
                 "optional": {"Part of Speech": "noun"},
                 "source": "words",
@@ -187,6 +196,9 @@ class DictionaryParserTest(BasicTestCase):
         self.maxDiff = None
         self.assertEqual(dictionary.data[0]["word"], "farvel")
         self.assertEqual(dictionary.data[3]["word"], "træ")
+        self.assertEqual(len(dictionary.data[3]["example_sentence"]), 2)
+        self.assertEqual(len(dictionary.data[3]["example_sentence_audio"]), 2)
+        self.assertEqual(len(dictionary.data[3]["example_sentence_audio"][0]), 2)
         self.assertCountEqual(dictionary.data, self.parsed_data)
 
     def test_basic_tabular_parsers(self):
@@ -200,6 +212,9 @@ class DictionaryParserTest(BasicTestCase):
             self.assertEqual(dictionary.data[3]["word"], "træ")
             data = self._correct_data(dictionary.data)
             self.assertCountEqual(data, self.parsed_data)
+            mtd_config.data[0].manifest.skip_header = True
+            dictionary = MTDictionary(mtd_config)
+            self.assertEqual(len(dictionary.data), len(self.parsed_data) - 1)
 
     def test_xlsx_specifics(self):
         language_config_path = self.data_dir / "config_xlsx.json"
@@ -267,6 +282,9 @@ class DictionaryParserTest(BasicTestCase):
         data[3]["example_sentence"] = self.parsed_data[3]["example_sentence"]
         data[3]["example_sentence_definition"] = self.parsed_data[3][
             "example_sentence_definition"
+        ]
+        data[3]["example_sentence_audio"] = self.parsed_data[3][
+            "example_sentence_audio"
         ]
         return data
 

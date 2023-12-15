@@ -16,3 +16,4 @@ dist
 site
 mothertongues/ui
 venv
+*~

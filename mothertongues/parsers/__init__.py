@@ -67,20 +67,20 @@ class BaseTabularParser:
             :param function convert_function: A function that takes an entry and a path and returns the "filled in" object
         """
         new_lemma = {}
-
         for k, v in entry_template.items():
             if isinstance(v, dict):
                 new_lemma[k] = self.fill_entry_template(v, entry, convert_function)
             elif isinstance(v, list):
-                new_v = []
+                new_lemma[k] = []  # type: ignore
                 for x in v:
-                    new_v += list(
-                        self.fill_entry_template(
-                            {k: x}, entry, convert_function
-                        ).values()
-                    )
-                # don't add items that only have empty values
-                new_lemma[k] = [x for x in new_v if any(x.values())]  # type: ignore
+                    values = self.fill_entry_template(
+                        {k: x}, entry, convert_function
+                    ).values()
+                    for y in values:
+                        # don't add dictionaries that only have empty values
+                        if isinstance(y, dict) and not any(y.values()):
+                            continue
+                        new_lemma[k].append(y)  # type: ignore
             elif isinstance(v, str):
                 if v == "":
                     new_lemma[k] = ""  # type: ignore
@@ -109,11 +109,17 @@ class BaseTabularParser:
 
     def parse(self) -> Tuple[List[dict], List[dict]]:
         data = self.resolve_targets()
+        logger.debug("Resolved {n} targets", n=len(data))
         unparsable = []
         for i in reversed(range(len(data))):
             try:
                 data[i] = DictionaryEntry(**data[i])  # type: ignore
-            except ValidationError:
+            except ValidationError as err:
+                logger.debug(
+                    "Failed to create DictionaryEntry from data {data}: {err}",
+                    data=data[i],
+                    err=err,
+                )
                 unparsable.append(data[i])
                 del data[i]
                 continue
@@ -127,5 +133,10 @@ def parse(data_source: DataSource):
         filetype_module = importlib.import_module(rel_module, "mothertongues.parsers")
     except ImportError as e:
         raise UnsupportedFiletypeError(data_source.manifest.file_type.name) from e
+    logger.debug(
+        "Parsing {resource} with {module}",
+        resource=data_source.resource,
+        module=filetype_module,
+    )
     parser = filetype_module.Parser(data_source)
     return parser.parse()

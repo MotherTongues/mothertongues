@@ -12,4 +12,6 @@ class Parser(BaseTabularParser):
     def get_data(self):
         with open(self.resource_path, encoding="utf8") as f:
             reader = csv.reader(f, delimiter=",")
+            if self.manifest.skip_header:
+                _ = next(reader)
             return list(reader)

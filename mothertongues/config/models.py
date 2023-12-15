@@ -33,6 +33,7 @@ class BaseConfig(BaseModel):
 
 
 class Audio(BaseConfig):
+    model_config = ConfigDict(extra="allow")
     description: Optional[str] = None
     """The location of the description of the audio (including speaker)"""
 
@@ -238,19 +239,26 @@ class ParserTargets(BaseConfig):
     audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the entry."""
 
+    # Dict is used in case of json listof parser syntax
     definition_audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the definition of the entry."""
 
+    # Dict is used in case of json listof parser syntax
     example_sentence: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentences associated with the entry"""
 
+    # Dict is used in case of json listof parser syntax
     example_sentence_definition: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[Union[List[Audio], Dict]] = None
+    # Dict is used in case of json listof parser syntax
+    example_sentence_audio: Optional[Union[List[Union[List[Audio], Dict]], Dict]] = None
     """The location of the audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[Union[List[Audio], Dict]] = None
+    # Dict is used in case of json listof parser syntax
+    example_sentence_definition_audio: Optional[
+        Union[List[Union[List[Audio], Dict]], Dict]
+    ] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = None
@@ -276,6 +284,8 @@ class DictionaryEntry(BaseModel):
     It intentionally shares the same data structure as the ParserTargets,
     but allows for extra fields.
     """
+
+    model_config = ConfigDict(extra="allow")
 
     word: str
     """The words in your dictionary"""
@@ -307,10 +317,10 @@ class DictionaryEntry(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio]] = []
+    example_sentence_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio]] = []
+    example_sentence_definition_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}
@@ -318,7 +328,6 @@ class DictionaryEntry(BaseModel):
 
     source: Optional[str] = ""
     """The source of the entry"""
-    model_config = ConfigDict(extra="allow")
 
     @model_validator(mode="after")
     def entryID_to_str(self) -> "DictionaryEntry":
@@ -334,6 +343,8 @@ class DictionaryEntryExportFormat(BaseModel):
     some specifications for the output format (for example every exported entry will have)
     a value for entryID, and a sorting_form).
     """
+
+    model_config = ConfigDict(extra="allow")
 
     word: str
     """The words in your dictionary"""
@@ -368,10 +379,10 @@ class DictionaryEntryExportFormat(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Audio]] = []
+    example_sentence_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Audio]] = []
+    example_sentence_definition_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}

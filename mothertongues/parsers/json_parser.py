@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from jsonpath_ng import jsonpath
 from jsonpath_ng import parse as json_parse
 from jsonpointer import resolve_pointer
+from loguru import logger
 from tqdm import tqdm
 
 from mothertongues.config.models import DataSource
@@ -38,8 +39,7 @@ class Parser(BaseTabularParser):
         if not path:
             return path
         jsonpath_expr = self.get_matcher(path)
-        result = jsonpath_expr.find(entry) or ""
-        return result
+        return jsonpath_expr.find(entry)
 
     def not_empty(self, value):
         if isinstance(value, dict):
