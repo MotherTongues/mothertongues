@@ -239,22 +239,25 @@ class ParserTargets(BaseConfig):
     audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the entry."""
 
+    # Dict is used in case of json listof parser syntax
     definition_audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the definition of the entry."""
 
+    # Dict is used in case of json listof parser syntax
     example_sentence: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentences associated with the entry"""
 
+    # Dict is used in case of json listof parser syntax
     example_sentence_definition: Optional[Union[List[str], Dict]] = None
     """The location(s) of any example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[
-        Union[List[Union[Audio, List[Audio]]], Dict]
-    ] = None
+    # Dict is used in case of json listof parser syntax
+    example_sentence_audio: Optional[Union[List[Union[List[Audio], Dict]], Dict]] = None
     """The location of the audio associated with the example sentences of the entry."""
 
+    # Dict is used in case of json listof parser syntax
     example_sentence_definition_audio: Optional[
-        Union[List[Union[Audio, List[Audio]]], Dict]
+        Union[List[Union[List[Audio], Dict]], Dict]
     ] = None
     """The location of the audio associated with the example sentence definitions of the entry."""
 
@@ -314,10 +317,10 @@ class DictionaryEntry(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Union[Audio, List[Audio]]]] = []
+    example_sentence_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Union[Audio, List[Audio]]]] = []
+    example_sentence_definition_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}
@@ -376,10 +379,10 @@ class DictionaryEntryExportFormat(BaseModel):
     example_sentence_definition: Optional[List[str]] = []
     """The example sentence definitions associated with the entry"""
 
-    example_sentence_audio: Optional[List[Union[Audio, List[Audio]]]] = []
+    example_sentence_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentences of the entry."""
 
-    example_sentence_definition_audio: Optional[List[Union[Audio, List[Audio]]]] = []
+    example_sentence_definition_audio: Optional[List[List[Audio]]] = []
     """The audio associated with the example sentence definitions of the entry."""
 
     optional: Optional[Dict[str, str]] = {}

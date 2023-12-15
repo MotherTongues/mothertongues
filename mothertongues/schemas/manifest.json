@@ -255,7 +255,17 @@
                     "anyOf": [
                         {
                             "items": {
-                                "$ref": "#/$defs/Audio"
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "$ref": "#/$defs/Audio"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },
@@ -273,7 +283,17 @@
                     "anyOf": [
                         {
                             "items": {
-                                "$ref": "#/$defs/Audio"
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "$ref": "#/$defs/Audio"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },

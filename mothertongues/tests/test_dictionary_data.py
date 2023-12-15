@@ -118,10 +118,38 @@ class DictionaryDataTest(BasicTestCase):
         self.assertEqual(dictionary.data[2]["entryID"], "test311")
 
     def test_multiple_example_audio(self):
-        language_config_path = self.data_dir / "config_csv_multi.json"
-        config = load_mtd_configuration(language_config_path)
-        mtd_config = MTDConfiguration(**config)
-        dictionary = MTDictionary(mtd_config)
+        dictionary = self.create_test_dictionary_from_config("config_csv_multi.json")
+        self.assertEqual(len(dictionary), 1)
+        entry = dictionary.data[0]
+        self.assertEqual(
+            entry,
+            {
+                "word": "træ",
+                "definition": "tree",
+                "entryID": "1",
+                "theme": "plants",
+                "secondary_theme": "",
+                "img": "",
+                "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "definition_audio": [],
+                "example_sentence": ["Har du røde øjne?"],
+                "example_sentence_definition": ["Do you have red eyes?"],
+                "example_sentence_audio": [
+                    [
+                        {"description": "Aidan Pine", "filename": "rode1.mp3"},
+                        {"description": "Aidan Pine", "filename": "rode2.mp3"},
+                    ]
+                ],
+                "example_sentence_definition_audio": [],
+                "optional": {"Part of Speech": "noun"},
+                "source": "words",
+                "sort_form": "træ",
+                "sorting_form": [19, 17, 26],
+            },
+        )
+
+    def test_multiple_sentences(self):
+        dictionary = self.create_test_dictionary_from_config("config_csv_multi.json")
         self.assertEqual(len(dictionary), 1)
         entry = dictionary.data[0]
         self.assertEqual(
@@ -164,11 +192,14 @@ class DictionaryDataTest(BasicTestCase):
         self.assertEqual(self.dictionary[0]["entryID"], "5")
 
     def test_minimal(self):
-        config_path = self.data_dir / "config_minimal.json"
-        config = load_mtd_configuration(config_path)
-        mtd_config = MTDConfiguration(**config)
-        dictionary = MTDictionary(mtd_config)
+        dictionary = self.create_test_dictionary_from_config("config_minimal.json")
         self.assertEqual(dictionary.data[0]["entryID"], "words00")
+
+    def create_test_dictionary_from_config(self, config):
+        language_config_path = self.data_dir / config
+        config = load_mtd_configuration(language_config_path)
+        mtd_config = MTDConfiguration(**config)
+        return MTDictionary(mtd_config)
 
     def test_missing_required_fields(self):
         self.read_data_check()

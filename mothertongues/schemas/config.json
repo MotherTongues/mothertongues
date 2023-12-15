@@ -287,17 +287,10 @@
                     "anyOf": [
                         {
                             "items": {
-                                "anyOf": [
-                                    {
-                                        "$ref": "#/$defs/Audio"
-                                    },
-                                    {
-                                        "items": {
-                                            "$ref": "#/$defs/Audio"
-                                        },
-                                        "type": "array"
-                                    }
-                                ]
+                                "items": {
+                                    "$ref": "#/$defs/Audio"
+                                },
+                                "type": "array"
                             },
                             "type": "array"
                         },
@@ -312,17 +305,10 @@
                     "anyOf": [
                         {
                             "items": {
-                                "anyOf": [
-                                    {
-                                        "$ref": "#/$defs/Audio"
-                                    },
-                                    {
-                                        "items": {
-                                            "$ref": "#/$defs/Audio"
-                                        },
-                                        "type": "array"
-                                    }
-                                ]
+                                "items": {
+                                    "$ref": "#/$defs/Audio"
+                                },
+                                "type": "array"
                             },
                             "type": "array"
                         },
@@ -773,7 +759,17 @@
                     "anyOf": [
                         {
                             "items": {
-                                "$ref": "#/$defs/Audio"
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "$ref": "#/$defs/Audio"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },
@@ -791,7 +787,17 @@
                     "anyOf": [
                         {
                             "items": {
-                                "$ref": "#/$defs/Audio"
+                                "anyOf": [
+                                    {
+                                        "items": {
+                                            "$ref": "#/$defs/Audio"
+                                        },
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "object"
+                                    }
+                                ]
                             },
                             "type": "array"
                         },

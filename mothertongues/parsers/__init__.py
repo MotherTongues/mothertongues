@@ -71,7 +71,7 @@ class BaseTabularParser:
             if isinstance(v, dict):
                 new_lemma[k] = self.fill_entry_template(v, entry, convert_function)
             elif isinstance(v, list):
-                new_lemma[k] = []
+                new_lemma[k] = []  # type: ignore
                 for x in v:
                     values = self.fill_entry_template(
                         {k: x}, entry, convert_function
@@ -80,7 +80,7 @@ class BaseTabularParser:
                         # don't add dictionaries that only have empty values
                         if isinstance(y, dict) and not any(y.values()):
                             continue
-                        new_lemma[k].append(y)
+                        new_lemma[k].append(y)  # type: ignore
             elif isinstance(v, str):
                 if v == "":
                     new_lemma[k] = ""  # type: ignore
