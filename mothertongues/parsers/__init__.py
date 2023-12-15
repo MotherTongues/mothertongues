@@ -78,8 +78,9 @@ class BaseTabularParser:
                     ).values()
                     for y in values:
                         # don't add dictionaries that only have empty values
-                        if not isinstance(y, dict) or any(y.values()):
-                            new_lemma[k].append(y)
+                        if isinstance(y, dict) and not any(y.values()):
+                            continue
+                        new_lemma[k].append(y)
             elif isinstance(v, str):
                 if v == "":
                     new_lemma[k] = ""  # type: ignore
