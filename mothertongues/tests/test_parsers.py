@@ -200,6 +200,9 @@ class DictionaryParserTest(BasicTestCase):
             self.assertEqual(dictionary.data[3]["word"], "træ")
             data = self._correct_data(dictionary.data)
             self.assertCountEqual(data, self.parsed_data)
+            mtd_config.data[0].manifest.skip_header = True
+            dictionary = MTDictionary(mtd_config)
+            self.assertEqual(len(dictionary.data), len(self.parsed_data) - 1)
 
     def test_xlsx_specifics(self):
         language_config_path = self.data_dir / "config_xlsx.json"
