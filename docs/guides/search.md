@@ -204,5 +204,39 @@ Maybe we want to include information that `kat` is a bit closer to `cat` than `m
 ...
 ```
 
+### A complex example
+
+If you would like to provide many weights, you have the option of creating a separate "weights" file to read from. Your config would look like this:
+
+```json hl_lines="1 7-11"
+"l1_search_strategy": "weighted_levenstein",
+"l1_search_config": {
+    "insertionCost": 1,
+    "deletionCost": 1,
+    "insertionAtBeginningCost": 1,
+    "deletionAtEndCost": 1,
+    "substitutionCostsPath": "filepath_to_my_weights.csv",
+    "defaultSubstitutionCost": 1
+},
+...
+```
+
+A sample `weights.csv`` file might be:
+
+```
+c,k,0.5
+c,s,0.75
+c,t,0.9
+```
+
+The *weights* file can be one of several formats
+- .json
+- .xslx
+- .csv using a delimiter of `,`
+- .psv using a delimter of `|`
+- .tsv using a tab delimiter
+
+
+
 !!! important
     This will **only** work when our search strategy is set to "weighted_levenstein". The other search strategy is faster, but does not allow for weighted edit distance calculations.
