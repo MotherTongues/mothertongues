@@ -137,6 +137,12 @@ class ConfigurationTest(BasicTestCase):
         with self.assertRaises(IndexError):
             WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
 
+    def test_lev_weights_num_too_big(self):
+        weights_config_path = self.data_dir / "weights_num_too_big.csv"
+
+        with self.assertRaises(IndexError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
     def test_lev_weights_subCostsPath_unsupported_filetype(self):
         """
         Test validates that nothing happens if weights filetype is unsupported.
