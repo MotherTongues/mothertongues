@@ -12,6 +12,7 @@ from mothertongues.config.models import (
     LanguageConfiguration,
     MTDConfiguration,
     ResourceManifest,
+    WeightedLevensteinConfig,
 )
 from mothertongues.dictionary import MTDictionary
 from mothertongues.exceptions import (
@@ -124,7 +125,31 @@ class ConfigurationTest(BasicTestCase):
         self.dictionary = MTDictionary(self.mtd_config)
         self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 2000)
 
-    def test_lev_weights(self):
+    # region Lev Weight Tests
+    def test_lev_weights_subCostsPath_does_not_exist(self):
+        weights_config_path = self.data_dir / "doesnt_exist.psv"
+        with self.assertRaises(ValidationError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+    def test_lev_weights_subCostsPath_unsupported_delimiter(self):
+        weights_config_path = self.data_dir / "weights_bad_delimiter.psv"
+
+        with self.assertRaises(IndexError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+    def test_lev_weights_subCostsPath_unsupported_filetype(self):
+        """
+        Test validates that nothing happens if weights filetype is unsupported.
+        """
+        weights_config_path = self.data_dir / "weights_unsupported_filetype.txt"
+        search_config = WeightedLevensteinConfig(
+            substitutionCostsPath=weights_config_path
+        )
+        lang_config = LanguageConfiguration(l1_search_config=search_config)
+
+        self.assertEqual(lang_config.l1_search_config.substitutionCosts, {})
+
+    def test_lev_weights_happy_path(self):
         self.assertEqual(
             self.mtd_config.config.l1_search_config.insertionAtBeginningCost, 1.0
         )
@@ -137,6 +162,21 @@ class ConfigurationTest(BasicTestCase):
         self.assertEqual(
             self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
         )
+
+    def test_lev_weights_sub_both_dirs(self):
+        """
+        Test validates that a single subsitution in a 'weights' file weights correctly in both directions
+        """
+        weights_config_path = self.data_dir / "weights2.psv"
+        search_config = WeightedLevensteinConfig(
+            substitutionCostsPath=weights_config_path
+        )
+
+        lang_config = LanguageConfiguration(l1_search_config=search_config)
+        self.assertEqual(lang_config.l1_search_config.substitutionCosts["c"]["k"], 0.01)
+        self.assertEqual(lang_config.l1_search_config.substitutionCosts["k"]["c"], 0.01)
+
+    # endregion
 
     # region Alphabet Tests
 

@@ -107,7 +107,7 @@ class WeightedLevensteinConfig(BaseConfig):
                     )
             except IndexError as e:
                 raise IndexError(
-                    f"The file at {v_path} is not formatted properly. For each entry you must have two charactesr and a number between 0.0 and 1.0. Please check your file again."
+                    f"The file at {v_path} is not formatted properly. For each entry you must have two characters and a number between 0.0 and 1.0. They must be separated by a supported delimiter. Please check your file again."
                 ) from e
         return values
 
