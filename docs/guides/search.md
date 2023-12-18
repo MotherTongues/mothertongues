@@ -183,6 +183,8 @@ What about if I type 'kat' though? We might not expect a user to type 'kat' unle
 
 The Mother Tongues approximate search algorithm works by calculating the edit distance between the query and the [terms in your inverted index](#which-keys-get-indexed). The edit distance is how many insertions, deletions, or subsitutions it takes to get from one string to another: `kat` and `cat` have an edit distance of `1.0` by default for example since the default cost for substitutions is `1.0`.
 
+The greater the distance, the more different the word. So a word the has a `1.0` distance (say 'cat' and 'mat') is more different than a word that has a `0.5` distance (such as 'cat' and 'kat').
+
 ### A simple example
 
 Maybe we want to include information that `kat` is a bit closer to `cat` than `mat`. To do that, we will *weight* the substitution between `k` and `c` differently in our algorithm. We can do this by providing custom substitution costs:
