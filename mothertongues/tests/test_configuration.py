@@ -12,6 +12,7 @@ from mothertongues.config.models import (
     LanguageConfiguration,
     MTDConfiguration,
     ResourceManifest,
+    WeightedLevensteinConfig,
 )
 from mothertongues.dictionary import MTDictionary
 from mothertongues.exceptions import (
@@ -137,6 +138,12 @@ class ConfigurationTest(BasicTestCase):
         self.assertEqual(
             self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
         )
+
+    def test_lev_weights_num_too_big(self):
+        weights_config_path = self.data_dir / "weights_num_too_big.csv"
+
+        with self.assertRaises(ValueError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
 
     def test_alphabet(self):
         # Plain
