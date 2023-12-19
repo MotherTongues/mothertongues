@@ -148,12 +148,11 @@ class ConfigurationTest(BasicTestCase):
         Test validates that nothing happens if weights filetype is unsupported.
         """
         weights_config_path = self.data_dir / "weights_unsupported_filetype.txt"
-        search_config = WeightedLevensteinConfig(
-            substitutionCostsPath=weights_config_path
-        )
-        lang_config = LanguageConfiguration(l1_search_config=search_config)
 
-        self.assertEqual(lang_config.l1_search_config.substitutionCosts, {})
+        with self.assertRaises(UnsupportedFiletypeError) as err:
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+        self.assertIn("Supported filetypes include", err.exception.msg)
 
     def test_lev_weights_happy_path(self):
         self.assertEqual(
