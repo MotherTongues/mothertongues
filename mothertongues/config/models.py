@@ -6,7 +6,17 @@ from enum import Enum
 from functools import partial
 from pathlib import Path
 from string import ascii_letters
-from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import (
+    Annotated,
+    Any,
+    Callable,
+    Dict,
+    List,
+    NamedTuple,
+    Optional,
+    Tuple,
+    Union,
+)
 from unicodedata import normalize
 from uuid import UUID
 
@@ -54,14 +64,17 @@ class SearchAlgorithms(str, Enum):
     liblevenstein_automata = "liblevenstein_automata"
 
 
+WeightValue = Annotated[float, Field(ge=0.0, le=1.0)]
+
+
 class WeightedLevensteinConfig(BaseConfig):
-    insertionCost: float = 1.0
-    deletionCost: float = 1.0
-    insertionAtBeginningCost: float = 1.0
-    deletionAtEndCost: float = 1.0
-    substitutionCosts: Dict[str, Dict[str, float]] = {}
+    insertionCost: WeightValue = 1.0
+    deletionCost: WeightValue = 1.0
+    insertionAtBeginningCost: WeightValue = 1.0
+    deletionAtEndCost: WeightValue = 1.0
+    substitutionCosts: Dict[str, Dict[str, WeightValue]] = {}
     substitutionCostsPath: Optional[FilePath] = None
-    defaultSubstitutionCost: float = 1.0
+    defaultSubstitutionCost: WeightValue = 1.0
 
     def _convert_list_to_sub_costs(self, data: List[Tuple[str, str, float]]):
         sub_costs: Dict[str, Dict[str, float]] = defaultdict(dict)
