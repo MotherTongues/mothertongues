@@ -19,8 +19,12 @@ class ConfigurationError(Exception):
 class UnsupportedFiletypeError(Exception):
     """Raise when unable to import parser for filetype"""
 
-    def __init__(self, path):
+    def __init__(self, path, msg=""):
         self.path = path
+        self.msg = msg
 
     def __str__(self):
+        if self.msg:
+            return self.msg
+
         return f"Filetype at {self.path} is unsupported."
