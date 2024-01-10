@@ -179,13 +179,14 @@ Sometimes it's convenient to just remove all accents/diacritics. For example, in
 
 ## Adding weights
 
-What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners of English to be using our dictionary, that might be appropriate!
+What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners to be using our dictionary, that might be appropriate!
 
 The Mother Tongues approximate search algorithm works by calculating the edit distance between the query and the [terms in your inverted index](#which-keys-get-indexed). The edit distance is how many insertions, deletions, or subsitutions it takes to get from one string to another: `kat` and `cat` have an edit distance of `1.0` by default for example since the default cost for substitutions is `1.0`.
 
-The greater the distance, the more different the word. So a word the has a `1.0` distance (say 'cat' and 'mat') is more different than a word that has a `0.5` distance (such as 'cat' and 'kat').
+The greater the distance, the more different the word. So a word the has a `1.0` distance is more different than a word that has a `0.5` distance. MTD gives you the option to edit distances to make search results more helpful for learners. Check out the example below!
 
-### A simple example
+
+### A simple distance example
 
 Maybe we want to include information that `kat` is a bit closer to `cat` than `mat`. To do that, we will *weight* the substitution between `k` and `c` differently in our algorithm. We can do this by providing custom substitution costs:
 
@@ -206,7 +207,9 @@ Maybe we want to include information that `kat` is a bit closer to `cat` than `m
 ...
 ```
 
-### A complex example
+That way `k` and `c` get a `0.5` distance. Whereas `c` and all other letters will get the `1.0` weight specified in the `defaultSubstitutionCost` value.
+
+### A complex distance example
 
 If you would like to provide many weights, you have the option of creating a separate "weights" file to read from. Your config would look like this:
 
