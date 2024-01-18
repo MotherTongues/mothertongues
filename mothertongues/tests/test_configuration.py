@@ -83,6 +83,7 @@ class ConfigurationTest(BasicTestCase):
         except AttributeError:
             del resource_schema["$defs"]["ArbitraryFieldRestrictedTransducer"]
             del resource_schema["properties"]["transducers"]
+            del resource_schema["$defs"]["ParserTargets"]["properties"]["video"]
             manifest_faker = JSF(resource_schema)
         logger.remove()
         logger.add(sys.stderr, level="INFO")

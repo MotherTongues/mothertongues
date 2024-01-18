@@ -1,2 +1,2 @@
-entryID,definition,word,audio1_description,audio1_filename,theme,pos,example_sentence1,example_definition1,example1_audio1_description,example1_audio1_filename,example1_audio2_description,example1_audio2_filename
-1,tree,træ,Aidan Pine,tree.mp3,plants,noun,Har du røde øjne?,Do you have red eyes?,Aidan Pine,rode1.mp3,Aidan Pine,rode2.mp3
+entryID,definition,word,audio1_description,audio1_filename,video1_description,video1_filename,theme,pos,example_sentence1,example_definition1,example1_audio1_description,example1_audio1_filename,example1_audio2_description,example1_audio2_filename
+1,tree,træ,Aidan Pine,tree.mp3,Nolan Van Hell,snowfall.mp4,plants,noun,Har du røde øjne?,Do you have red eyes?,Aidan Pine,rode1.mp3,Aidan Pine,rode2.mp3

@@ -33,6 +33,10 @@
         "audio": [{
             "speaker": "Aidan Pine",
             "filename": "tree.mp3"
+        }],
+        "video": [{
+            "description": "Nolan Van Hell",
+            "filename": "snowfall.mp4"
         }]
     },
     {
@@ -46,6 +50,10 @@
         "audio": [{
             "speaker": "Aidan Pine",
             "filename": "ord.mp3"
+        }],
+        "video": [{
+            "description": "Nolan Van Hell",
+            "filename": "snowfall.mp4"
         }]
     },
     {
@@ -59,6 +67,10 @@
         "audio": [{
             "speaker": "Aidan Pine",
             "filename": "hej.mp3"
+        }],
+        "video": [{
+            "description": "Nolan Van Hell",
+            "filename": "snowfall.mp4"
         }]
     },
     {
@@ -69,6 +81,7 @@
         "optional": {
             "Part of Speech": "interjection"
         },
-        "audio": []
+        "audio": [],
+        "video": []
     }
 ]

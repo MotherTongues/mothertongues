@@ -131,6 +131,9 @@ class DictionaryDataTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "definition_audio": [],
                 "example_sentence": ["Har du røde øjne?"],
                 "example_sentence_definition": ["Do you have red eyes?"],
@@ -162,6 +165,9 @@ class DictionaryDataTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "definition_audio": [],
                 "example_sentence": ["Har du røde øjne?"],
                 "example_sentence_definition": ["Do you have red eyes?"],
