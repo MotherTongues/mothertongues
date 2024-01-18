@@ -51,6 +51,15 @@ class Audio(BaseConfig):
     """The location of the audio filename. Path is prepended with ResourceManifest.audio_path"""
 
 
+class Video(BaseConfig):
+    model_config = ConfigDict(extra="allow")
+    description: Optional[str] = None
+    """The location of the description of the video"""
+
+    filename: str
+    """The location of the video filename. Path is prepended with ResourceManifest.video_path"""
+
+
 class NormalizationEnum(str, Enum):
     nfc = "NFC"
     nfd = "NFD"
@@ -221,6 +230,7 @@ class CheckableParserTargetFieldNames(Enum):
     secondary_theme = "secondary_theme"
     img = "img"
     audio = "audio"
+    video = "video"
     definition_audio = "definition_audio"
     example_sentence = "example_sentence"
     example_sentence_definition = "example_sentence_definition"
@@ -256,6 +266,10 @@ class ParserTargets(BaseConfig):
     # Dict is used in case of json listof parser syntax
     audio: Optional[Union[List[Audio], Dict]] = None
     """The location of the audio associated with the entry."""
+
+    # Dict is used in case of json listof parser syntax
+    video: Optional[Union[List[Video], Dict]] = None
+    """The location of the video associated with the entry."""
 
     # Dict is used in case of json listof parser syntax
     definition_audio: Optional[Union[List[Audio], Dict]] = None
@@ -326,6 +340,9 @@ class DictionaryEntry(BaseModel):
     audio: Optional[List[Audio]] = []
     """The audio associated with the entry."""
 
+    video: Optional[List[Video]] = []
+    """The video associated with the entry."""
+
     definition_audio: Optional[List[Audio]] = []
     """The audio associated with the definition of the entry."""
 
@@ -388,6 +405,9 @@ class DictionaryEntryExportFormat(BaseModel):
     audio: Optional[List[Audio]] = []
     """The audio associated with the entry."""
 
+    video: Optional[List[Video]] = []
+    """The video associated with the entry."""
+
     definition_audio: Optional[List[Audio]] = []
     """The audio associated with the definition of the entry."""
 
@@ -426,6 +446,9 @@ class ResourceManifest(BaseConfig):
 
     audio_path: Optional[HttpUrl] = None
     """This is a path to your audio files that will be pre-pended to each audio path"""
+
+    video_path: Optional[HttpUrl] = None
+    """This is a path to your video files that will be pre-pended to each video path"""
 
     img_path: Optional[HttpUrl] = None
     """This is a path to your image files that will be pre-pended to each image path"""

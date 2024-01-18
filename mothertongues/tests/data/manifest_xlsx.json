@@ -14,9 +14,13 @@
             "description": "D",
             "filename": "E"
         }],
-        "theme": "F",
+        "video": [{
+            "description": "F",
+            "filename": "G"
+        }],
+        "theme": "H",
         "optional": {
-            "Part of Speech": "G"
+            "Part of Speech": "I"
         }
     }
 }

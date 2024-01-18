@@ -40,12 +40,19 @@ def _custom_parser(data_source: DataSource) -> Tuple[List[DictionaryEntry], List
                     "filename": row[6][1:-1],
                 }
             ]
-            record["theme"] = row[7][1:-1]
-            record["optional"] = {"Part of Speech": row[8][1:-1]}
+            record["video"] = [
+                {
+                    "description": f"{row[7][1:]} {row[8]} {row[9][:-1]}",
+                    "filename": row[10][1:-1],
+                }
+            ]
+            record["theme"] = row[11][1:-1]
+            record["optional"] = {"Part of Speech": row[12][1:-1]}
         else:
             record["audio"] = []
-            record["theme"] = row[6][1:-1]
-            record["optional"] = {"Part of Speech": row[7][1:-1]}
+            record["video"] = []
+            record["theme"] = row[8][1:-1]
+            record["optional"] = {"Part of Speech": row[9][1:-1]}
         try:
             records.append(DictionaryEntry(**record))  # type: ignore
         except ValidationError:
@@ -65,6 +72,7 @@ class DictionaryParserTest(BasicTestCase):
                 "definition": "goodbye",
                 "word": "farvel",
                 "audio": [],
+                "video": [],
                 "theme": "greetings",
                 "optional": {"Part of Speech": "interjection"},
                 "sort_form": "farvel",
@@ -74,6 +82,9 @@ class DictionaryParserTest(BasicTestCase):
                 "definition": "hello",
                 "word": "hej",
                 "audio": [{"description": "Aidan Pine", "filename": "hej.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "theme": "greetings",
                 "optional": {"Part of Speech": "interjection"},
                 "sort_form": "hej",
@@ -83,6 +94,9 @@ class DictionaryParserTest(BasicTestCase):
                 "definition": "word",
                 "word": "ord",
                 "audio": [{"description": "Aidan Pine", "filename": "ord.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "theme": "abstract",
                 "optional": {"Part of Speech": "noun"},
                 "sort_form": "ord",
@@ -92,6 +106,9 @@ class DictionaryParserTest(BasicTestCase):
                 "definition": "tree",
                 "word": "træ",
                 "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "theme": "plants",
                 "optional": {"Part of Speech": "noun"},
                 "sort_form": "træ",
@@ -106,6 +123,7 @@ class DictionaryParserTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [],
+                "video": [],
                 "definition_audio": [],
                 "example_sentence": [],
                 "example_sentence_definition": [],
@@ -124,6 +142,9 @@ class DictionaryParserTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [{"description": "Aidan Pine", "filename": "hej.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "definition_audio": [],
                 "example_sentence": [],
                 "example_sentence_definition": [],
@@ -142,6 +163,9 @@ class DictionaryParserTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [{"description": "Aidan Pine", "filename": "ord.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "definition_audio": [],
                 "example_sentence": [],
                 "example_sentence_definition": [],
@@ -160,6 +184,9 @@ class DictionaryParserTest(BasicTestCase):
                 "secondary_theme": "",
                 "img": "",
                 "audio": [{"description": "Aidan Pine", "filename": "tree.mp3"}],
+                "video": [
+                    {"description": "Nolan Van Hell", "filename": "snowfall.mp4"}
+                ],
                 "definition_audio": [],
                 "example_sentence": [
                     "Har du røde øjne?",
@@ -314,6 +341,7 @@ class DictionaryParserTest(BasicTestCase):
             manifest=ResourceManifest(
                 img_path="http://bar.foo//",
                 audio_path="https://foo.bar",
+                video_path="https://foobar.bar",
             ),
             resource=data_plus_img,
         )
@@ -322,6 +350,9 @@ class DictionaryParserTest(BasicTestCase):
         data = dictionary.data
         self.assertEqual(data[1]["audio"][0]["filename"], "https://foo.bar/hej.mp3")
         self.assertEqual(data[0]["img"], "http://bar.foo/test.jpg")
+        self.assertEqual(
+            data[1]["video"][0]["filename"], "https://foobar.bar/snowfall.mp4"
+        )
 
 
 if __name__ == "__main__":

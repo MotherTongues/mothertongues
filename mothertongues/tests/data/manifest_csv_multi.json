@@ -15,21 +15,25 @@
             "description": "3",
             "filename": "4"
         }],
-        "theme": "5",
+        "video": [{
+            "description": "5",
+            "filename": "6"
+        }],
+        "theme": "7",
         "optional": {
-            "Part of Speech": "6"
+            "Part of Speech": "8"
         },
-        "example_sentence": ["7"],
-        "example_sentence_definition": ["8"],
+        "example_sentence": ["9"],
+        "example_sentence_definition": ["10"],
         "example_sentence_audio": [
             [
                 {
-                    "description": "9",
-                    "filename": "10"
-                },
-                {
                     "description": "11",
                     "filename": "12"
+                },
+                {
+                    "description": "13",
+                    "filename": "14"
                 }
             ]
         ]

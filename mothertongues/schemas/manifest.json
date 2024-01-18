@@ -83,6 +83,32 @@
             "title": "Audio",
             "type": "object"
         },
+        "Video": {
+            "additionalProperties": true,
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "filename": {
+                    "title": "Filename",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "filename"
+            ],
+            "title": "Video",
+            "type": "object"
+        },
         "NormalizationEnum": {
             "enum": [
                 "NFC",
@@ -196,6 +222,24 @@
                     ],
                     "default": null,
                     "title": "Audio"
+                },
+                "video": {
+                    "anyOf": [
+                        {
+                            "items": {
+                                "$ref": "#/$defs/Video"
+                            },
+                            "type": "array"
+                        },
+                        {
+                            "type": "object"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Video"
                 },
                 "definition_audio": {
                     "anyOf": [
@@ -373,6 +417,21 @@
             ],
             "default": null,
             "title": "Audio Path"
+        },
+        "video_path": {
+            "anyOf": [
+                {
+                    "format": "uri",
+                    "maxLength": 2083,
+                    "minLength": 1,
+                    "type": "string"
+                },
+                {
+                    "type": "null"
+                }
+            ],
+            "default": null,
+            "title": "Video Path"
         },
         "img_path": {
             "anyOf": [

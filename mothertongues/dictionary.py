@@ -105,19 +105,10 @@ class MTDictionary:
                             )
                         )
                         continue
-                # Prepend image path
-                if data_source.manifest.img_path and entry.img:
-                    entry.img = urljoin(
-                        str(data_source.manifest.img_path), str(entry.img)
-                    )
 
-                # Prepend audio paths
-                if data_source.manifest.audio_path and entry.audio:
-                    for audio_i in range(len(entry.audio)):
-                        entry.audio[audio_i].filename = urljoin(
-                            str(data_source.manifest.audio_path),
-                            str(entry.audio[audio_i].filename),
-                        )
+                # Prepend media paths
+                self.prepend_media_paths(data_source, entry)
+
                 # Add the source
                 if not entry.source:
                     entry.source = data_source.manifest.name
@@ -149,6 +140,26 @@ class MTDictionary:
                     f"Sorry, the key '{self.config.config.sorting_field}' is not found in your data, please change the sorting_field to a field name that exists in your data. Your data fieldnames are: {self.data[0].keys()}"
                 ) from e
             self.check_data()
+
+    @staticmethod
+    def prepend_media_paths(data_source, entry):
+        # Prepend image path
+        if data_source.manifest.img_path and entry.img:
+            entry.img = urljoin(str(data_source.manifest.img_path), str(entry.img))
+        # Prepend audio paths
+        if data_source.manifest.audio_path and entry.audio:
+            for audio_i in range(len(entry.audio)):
+                entry.audio[audio_i].filename = urljoin(
+                    str(data_source.manifest.audio_path),
+                    str(entry.audio[audio_i].filename),
+                )
+        # Prepend video paths
+        if data_source.manifest.video_path and entry.video:
+            for video_i in range(len(entry.video)):
+                entry.video[video_i].filename = urljoin(
+                    str(data_source.manifest.video_path),
+                    str(entry.video[video_i].filename),
+                )
 
     def custom_parse_method(
         self, data_source: DataSource
