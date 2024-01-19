@@ -475,8 +475,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a-simple-example" class="md-nav__link">
-    A simple example
+  <a href="#a-simple-distance-example" class="md-nav__link">
+    A simple distance example
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-complex-distance-example" class="md-nav__link">
+    A complex distance example
   </a>
   
 </li>
@@ -688,8 +695,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#a-simple-example" class="md-nav__link">
-    A simple example
+  <a href="#a-simple-distance-example" class="md-nav__link">
+    A simple distance example
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-complex-distance-example" class="md-nav__link">
+    A complex distance example
   </a>
   
 </li>
@@ -854,9 +868,10 @@ further discussion.</p>
 <span class="err">...</span>
 </code></pre></div>
 <h2 id="adding-weights">Adding weights<a class="headerlink" href="#adding-weights" title="Permanent link">&para;</a></h2>
-<p>What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners of English to be using our dictionary, that might be appropriate!</p>
+<p>What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners to be using our dictionary, that might be appropriate!</p>
 <p>The Mother Tongues approximate search algorithm works by calculating the edit distance between the query and the <a href="#which-keys-get-indexed">terms in your inverted index</a>. The edit distance is how many insertions, deletions, or subsitutions it takes to get from one string to another: <code>kat</code> and <code>cat</code> have an edit distance of <code>1.0</code> by default for example since the default cost for substitutions is <code>1.0</code>.</p>
-<h3 id="a-simple-example">A simple example<a class="headerlink" href="#a-simple-example" title="Permanent link">&para;</a></h3>
+<p>The greater the distance, the more different the word. So a word the has a <code>1.0</code> distance is more different than a word that has a <code>0.5</code> distance. MTD gives you the option to edit distances to make search results more helpful for learners. Check out the example below!</p>
+<h3 id="a-simple-distance-example">A simple distance example<a class="headerlink" href="#a-simple-distance-example" title="Permanent link">&para;</a></h3>
 <p>Maybe we want to include information that <code>kat</code> is a bit closer to <code>cat</code> than <code>mat</code>. To do that, we will <em>weight</em> the substitution between <code>k</code> and <code>c</code> differently in our algorithm. We can do this by providing custom substitution costs:</p>
 <div class="highlight"><pre><span></span><code><span class="hll"><span class="nt">&quot;l1_search_strategy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;weighted_levenstein&quot;</span><span class="p">,</span>
 </span><span class="nt">&quot;l1_search_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -873,6 +888,31 @@ further discussion.</p>
 <span class="p">},</span>
 <span class="err">...</span>
 </code></pre></div>
+<p>That way <code>k</code> and <code>c</code> get a <code>0.5</code> distance. Whereas <code>c</code> and all other letters will get the <code>1.0</code> weight specified in the <code>defaultSubstitutionCost</code> value.</p>
+<h3 id="a-complex-distance-example">A complex distance example<a class="headerlink" href="#a-complex-distance-example" title="Permanent link">&para;</a></h3>
+<p>If you would like to provide many weights, you have the option of creating a separate "weights" file to read from. Your config would look like this:</p>
+<div class="highlight"><pre><span></span><code><span class="hll"><span class="nt">&quot;l1_search_strategy&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;weighted_levenstein&quot;</span><span class="p">,</span>
+</span><span class="nt">&quot;l1_search_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;insertionCost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;deletionCost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;insertionAtBeginningCost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;deletionAtEndCost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="hll"><span class="w">    </span><span class="nt">&quot;substitutionCostsPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;filepath_to_my_weights.csv&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="w">    </span><span class="nt">&quot;defaultSubstitutionCost&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+</span><span class="hll"><span class="p">},</span>
+</span><span class="hll"><span class="err">...</span>
+</span></code></pre></div>
+<p>A sample `weights.csv`` file might be:</p>
+<div class="highlight"><pre><span></span><code>c,k,0.5
+c,s,0.75
+c,t,0.9
+</code></pre></div>
+<p>The <em>weights</em> file can be one of several formats
+- .json
+- .xslx
+- .csv using a delimiter of <code>,</code>
+- .psv using a delimter of <code>|</code>
+- .tsv using a tab delimiter</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>This will <strong>only</strong> work when our search strategy is set to "weighted_levenstein". The other search strategy is faster, but does not allow for weighted edit distance calculations.</p>
