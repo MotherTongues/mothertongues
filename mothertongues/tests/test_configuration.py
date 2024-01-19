@@ -125,7 +125,36 @@ class ConfigurationTest(BasicTestCase):
         self.dictionary = MTDictionary(self.mtd_config)
         self.assertEqual(len(self.dictionary) + len(self.dictionary.duplicates), 2000)
 
-    def test_lev_weights(self):
+    # region Lev Weight Tests
+    def test_lev_weights_subCostsPath_does_not_exist(self):
+        weights_config_path = self.data_dir / "doesnt_exist.psv"
+        with self.assertRaises(ValidationError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+    def test_lev_weights_subCostsPath_unsupported_delimiter(self):
+        weights_config_path = self.data_dir / "weights_bad_delimiter.psv"
+
+        with self.assertRaises(IndexError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+    def test_lev_weights_num_too_big(self):
+        weights_config_path = self.data_dir / "weights_num_too_big.csv"
+
+        with self.assertRaises(ValueError):
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+    def test_lev_weights_subCostsPath_unsupported_filetype(self):
+        """
+        Test validates that nothing happens if weights filetype is unsupported.
+        """
+        weights_config_path = self.data_dir / "weights_unsupported_filetype.txt"
+
+        with self.assertRaises(UnsupportedFiletypeError) as err:
+            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+
+        self.assertIn("Supported filetypes include", err.exception.msg)
+
+    def test_lev_weights_happy_path(self):
         self.assertEqual(
             self.mtd_config.config.l1_search_config.insertionAtBeginningCost, 1.0
         )
@@ -139,11 +168,22 @@ class ConfigurationTest(BasicTestCase):
             self.mtd_config.config.l1_search_config.substitutionCosts["c"]["d"], 1.0
         )
 
-    def test_lev_weights_num_too_big(self):
-        weights_config_path = self.data_dir / "weights_num_too_big.csv"
+    def test_lev_weights_sub_both_dirs(self):
+        """
+        Test validates that a single subsitution in a 'weights' file weights correctly in both directions
+        """
+        weights_config_path = self.data_dir / "weights2.psv"
+        search_config = WeightedLevensteinConfig(
+            substitutionCostsPath=weights_config_path
+        )
 
-        with self.assertRaises(ValueError):
-            WeightedLevensteinConfig(substitutionCostsPath=weights_config_path)
+        lang_config = LanguageConfiguration(l1_search_config=search_config)
+        self.assertEqual(lang_config.l1_search_config.substitutionCosts["c"]["k"], 0.01)
+        self.assertEqual(lang_config.l1_search_config.substitutionCosts["k"]["c"], 0.01)
+
+    # endregion
+
+    # region Alphabet Tests
 
     def test_alphabet(self):
         # Plain
@@ -169,6 +209,38 @@ class ConfigurationTest(BasicTestCase):
         # Bad File type
         with self.assertRaises(ValidationError):
             LanguageConfiguration(alphabet="path/to/foo/bar.xlsx")
+
+    def test_alphabet_contains_numbers_strings(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_numbers_string.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["1", "0"])
+
+    def test_alphabet_contains_numbers_numeric(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_numbers_numeric.json"
+
+        with self.assertRaises(ValidationError):
+            LanguageConfiguration(alphabet=alphabet_json_path)
+
+    def test_alphabet_contains_punctuation(self):
+        alphabet_json_path = self.data_dir / "alphabet_with_punctuation.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, list(ascii_lowercase) + ["!", "'", "´", "."])
+
+    def test_alphabet_is_empty_txt(self):
+        alphabet_text_path = self.data_dir / "alphabet_empty.txt"
+        txt_lc = LanguageConfiguration(alphabet=alphabet_text_path)
+
+        self.assertEqual(txt_lc.alphabet, [])
+
+    def test_alphabet_is_empty_json(self):
+        alphabet_json_path = self.data_dir / "alphabet_empty.json"
+        json_lc = LanguageConfiguration(alphabet=alphabet_json_path)
+
+        self.assertEqual(json_lc.alphabet, [])
+
+    # endregion
 
     def test_build_identifier(self):
         # Default

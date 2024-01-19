@@ -32,7 +32,7 @@ from pydantic import (  # type: ignore
 from typing_extensions import TypedDict
 
 from mothertongues import __file__ as mtd_dir
-from mothertongues.exceptions import ConfigurationError
+from mothertongues.exceptions import ConfigurationError, UnsupportedFiletypeError
 from mothertongues.utils import string_to_callable
 
 SCHEMA_DIR = Path(mtd_dir).parent / "schemas"
@@ -96,10 +96,10 @@ class WeightedLevensteinConfig(BaseConfig):
             if v_path.suffix == ".json":
                 with open(v_path, encoding="utf8") as f:
                     data = json.load(f)
-            if v_path.suffix == ".xlsx":
+            elif v_path.suffix == ".xlsx":
                 with open(v_path, encoding="utf8") as f:
                     data = json.load(f)
-            if v_path.suffix.endswith("sv"):
+            elif v_path.suffix.endswith("sv"):
                 delimiter = None
                 if v_path.suffix == ".csv":
                     delimiter = ","
@@ -113,6 +113,11 @@ class WeightedLevensteinConfig(BaseConfig):
                 with open(v_path, encoding="utf8") as f:
                     reader = csv.reader(f, delimiter=delimiter)
                     data = list(reader)
+            else:
+                raise UnsupportedFiletypeError(
+                    v_path,
+                    f"The file {v_path} is not a supported filetype for weights or substitution costs. Supported filetypes include json, xlsx, csv, psv, and tsv. Please fix and try again.",
+                )
             try:
                 if data:
                     values["substitutionCosts"] = cls._convert_list_to_sub_costs(
@@ -120,7 +125,7 @@ class WeightedLevensteinConfig(BaseConfig):
                     )
             except IndexError as e:
                 raise IndexError(
-                    f"The file at {v_path} is not formatted properly. For each entry you must have two charactesr and a number between 0.0 and 1.0. Please check your file again."
+                    f"The file at {v_path} is not formatted properly. For each entry you must have two characters and a number between 0.0 and 1.0. They must be separated by a supported delimiter. Please check your file again."
                 ) from e
         return values
 

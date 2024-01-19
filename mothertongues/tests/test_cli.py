@@ -48,9 +48,7 @@ class CommandLineTest(BasicTestCase):
             data = json.load(f)
         self.assertDictEqual(data, DictionaryEntryExportFormat.schema())
 
-    ################
-    #### export ####
-    ################
+    # region Export Tests
     def test_export_help(self):
         result = self.runner.invoke(
             app,
@@ -136,9 +134,9 @@ class CommandLineTest(BasicTestCase):
             data = json.load(f)
         self.assertTrue(MTDExportFormat.validate(data))
 
-    ###################
-    ### new-project ###
-    ###################
+    # endregion
+
+    # region New-project Tests
     def test_new_project_help(self):
         result = self.runner.invoke(
             app,
@@ -241,3 +239,5 @@ class CommandLineTest(BasicTestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "data.xlsx")))
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
+
+    # endregion
