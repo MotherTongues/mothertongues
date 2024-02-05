@@ -7,6 +7,7 @@ This repo follows the [Contributor Covenant](http://contributor-covenant.org/ver
 
 This repo uses automated tools to standardize the formatting of code, text files and
 commits.
+
  - [Pre-commit hooks](#pre-commit-hooks) validate and automatically apply code
    formatting rules.
  - [gitlint](#enforced-commit-message-formatting) is used as a commit message hook to validate that
@@ -15,6 +16,7 @@ commits.
 ## Set up Pre-commit Hooks
 
 You will need to pip install these packages in each environment:
+
 - [pre-commit](https://pre-commit.com/)
 - [gitlint](https://jorisroovers.com/gitlint/)
 
@@ -47,6 +49,7 @@ Convential commits look like this:
     optional footer
 
 Valid types: (these are the default, which we're using as is for now)
+
  - build: commits for the build system
  - chore: maintain the repo, not the code itself
  - ci: commits for the continuous integration system
@@ -60,6 +63,7 @@ Valid types: (these are the default, which we're using as is for now)
  - test: commits for testing code
 
 Valid scopes: the scope is optional and usually refers to which module is being changed.
+
  - TBD - for now not validated, should be just one word ideally
 
 Valid subject: short, free form, what the commit is about in less than 50 or 60 characters
@@ -74,6 +78,7 @@ lists reference (e.g.: "Closes #12" "Ref #24") or warns of breaking changes (e.g
 "BREAKING CHANGE: explanation").
 
 These rules are inspired by these commit formatting guides:
+
  - [Conventional Commits](https://www.conventionalcommits.org/)
  - [Bluejava commit guide](https://github.com/bluejava/git-commit-guide)
  - [develar's commit message format](https://gist.github.com/develar/273e2eb938792cf5f86451fbac2bcd51)
