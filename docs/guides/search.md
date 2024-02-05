@@ -235,6 +235,7 @@ c,t,0.9
 ```
 
 The *weights* file can be one of several formats
+
 - .json
 - .xslx
 - .csv using a delimiter of `,`
