@@ -609,15 +609,19 @@
 <p>Feel free to dive in! <a href="https://github.com/MotherTongues/mothertongues/issues/new">Open an issue</a> or submit PRs.</p>
 <p>This repo follows the <a href="http://contributor-covenant.org/version/1/3/0/">Contributor Covenant</a> Code of Conduct.</p>
 <p>This repo uses automated tools to standardize the formatting of code, text files and
-commits.
- - <a href="#pre-commit-hooks">Pre-commit hooks</a> validate and automatically apply code
-   formatting rules.
- - <a href="#enforced-commit-message-formatting">gitlint</a> is used as a commit message hook to validate that
-   commit messages follow the convention.</p>
+commits.</p>
+<ul>
+<li><a href="#pre-commit-hooks">Pre-commit hooks</a> validate and automatically apply code
+   formatting rules.</li>
+<li><a href="#enforced-commit-message-formatting">gitlint</a> is used as a commit message hook to validate that
+   commit messages follow the convention.</li>
+</ul>
 <h2 id="set-up-pre-commit-hooks">Set up Pre-commit Hooks<a class="headerlink" href="#set-up-pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>You will need to pip install these packages in each environment:
-- <a href="https://pre-commit.com/">pre-commit</a>
-- <a href="https://jorisroovers.com/gitlint/">gitlint</a></p>
+<p>You will need to pip install these packages in each environment:</p>
+<ul>
+<li><a href="https://pre-commit.com/">pre-commit</a></li>
+<li><a href="https://jorisroovers.com/gitlint/">gitlint</a></li>
+</ul>
 <p>Then run the following commands in each of your python environments to enable our pre-commit hooks and commitlint:</p>
 <div class="highlight"><pre><span></span><code>pre-commit<span class="w"> </span>install
 gitlint<span class="w"> </span>install-hook
@@ -639,20 +643,24 @@ optional body, which is free form
 
 optional footer
 </code></pre>
-<p>Valid types: (these are the default, which we're using as is for now)
- - build: commits for the build system
- - chore: maintain the repo, not the code itself
- - ci: commits for the continuous integration system
- - docs: adding and changing documentation
- - feat: adding a new feature
- - fix: fixing something
- - perf: improving performance
- - refactor: refactor code
- - revert: undo a previous change
- - style: working only on code or documentation style
- - test: commits for testing code</p>
-<p>Valid scopes: the scope is optional and usually refers to which module is being changed.
- - TBD - for now not validated, should be just one word ideally</p>
+<p>Valid types: (these are the default, which we're using as is for now)</p>
+<ul>
+<li>build: commits for the build system</li>
+<li>chore: maintain the repo, not the code itself</li>
+<li>ci: commits for the continuous integration system</li>
+<li>docs: adding and changing documentation</li>
+<li>feat: adding a new feature</li>
+<li>fix: fixing something</li>
+<li>perf: improving performance</li>
+<li>refactor: refactor code</li>
+<li>revert: undo a previous change</li>
+<li>style: working only on code or documentation style</li>
+<li>test: commits for testing code</li>
+</ul>
+<p>Valid scopes: the scope is optional and usually refers to which module is being changed.</p>
+<ul>
+<li>TBD - for now not validated, should be just one word ideally</li>
+</ul>
 <p>Valid subject: short, free form, what the commit is about in less than 50 or 60 characters
 (not strictly enforced, but it's best to keep it short)</p>
 <p>Optional body: this is where you put all the verbose details you want about the commit, or
@@ -661,11 +669,13 @@ the subject. Explain what the changes are, why you're doing them, etc, as necess
 <p>Optional footer: separated from the body (or subject if body is empty) by a blank line,
 lists reference (e.g.: "Closes #12" "Ref #24") or warns of breaking changes (e.g.,
 "BREAKING CHANGE: explanation").</p>
-<p>These rules are inspired by these commit formatting guides:
- - <a href="https://www.conventionalcommits.org/">Conventional Commits</a>
- - <a href="https://github.com/bluejava/git-commit-guide">Bluejava commit guide</a>
- - <a href="https://gist.github.com/develar/273e2eb938792cf5f86451fbac2bcd51">develar's commit message format</a>
- - <a href="https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y">AngularJS Git Commit Message Conventions</a>.</p>
+<p>These rules are inspired by these commit formatting guides:</p>
+<ul>
+<li><a href="https://www.conventionalcommits.org/">Conventional Commits</a></li>
+<li><a href="https://github.com/bluejava/git-commit-guide">Bluejava commit guide</a></li>
+<li><a href="https://gist.github.com/develar/273e2eb938792cf5f86451fbac2bcd51">develar's commit message format</a></li>
+<li><a href="https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y">AngularJS Git Commit Message Conventions</a>.</li>
+</ul>
 <h2 id="more-info-about-the-pre-commit-hooks">More Info About the Pre-commit Hooks<a class="headerlink" href="#more-info-about-the-pre-commit-hooks" title="Permanent link">&para;</a></h2>
 <p>We systematically use a number of pre-commit hooks to
 normalize formatting of code. <a href="#set-up-pre-commit-hooks">Follow the installation steps above</a> to have these used automatically when you do your own commits.</p>
