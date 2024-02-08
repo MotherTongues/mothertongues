@@ -535,16 +535,27 @@ To run unit tests locally, do the following.</p>
 <h2 id="run-tests">Run Tests<a class="headerlink" href="#run-tests" title="Permanent link">&para;</a></h2>
 <h3 id="run-all-tests">Run all tests<a class="headerlink" href="#run-all-tests" title="Permanent link">&para;</a></h3>
 <p>If poetry is active, run</p>
-<p><code>python run.py dev</code></p>
+<pre><code>python run.py dev
+</code></pre>
 <p>If not in poetry, run</p>
-<p><code>poetry run python run.py dev</code></p>
+<pre><code>poetry run python run.py dev
+</code></pre>
 <h3 id="run-specific-tests">Run specific tests<a class="headerlink" href="#run-specific-tests" title="Permanent link">&para;</a></h3>
 <p>You can run individual test files like so:</p>
-<p><code>poetry run python -m unittest test_cli.py</code></p>
-<p>You can also run individual tests by providing the path to the test method
-<code>poetry run python -m unittest test_sorter.SorterTest.test_sort_formats</code></p>
+<pre><code>poetry run python -m unittest test_cli.py
+</code></pre>
+<p>You can also run individual tests by providing the path to the test method</p>
+<pre><code>poetry run python -m unittest test_sorter.SorterTest.test_sort_formats
+</code></pre>
 <h1 id="mothertongues-ui-unit-tests">MotherTongues-UI Unit Tests<a class="headerlink" href="#mothertongues-ui-unit-tests" title="Permanent link">&para;</a></h1>
-<p>TBD</p>
+<p>Front end tests are run using <code>nx</code> within the <em>mothertongues-UI</em> directory</p>
+<pre><code>cd mothertongues-UI
+npx nx test mtd-mobile-ui
+</code></pre>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The above command assumes you have already installed the mtd-mobile-ui package. If not, first run <code>npm install</code> command</p>
+</div>
 
 
 
