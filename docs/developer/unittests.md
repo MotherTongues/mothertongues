@@ -34,6 +34,7 @@ You can also run individual tests by providing the path to the test method
 
 Front end tests are run using `nx` within the *mothertongues-UI* directory
 
+    cd mothertongues-UI
     npx nx test mtd-mobile-ui
 
 !!! Note
