@@ -28,7 +28,7 @@ Turn on GitHub Actions which will do the automatic building of your site. To do 
 
 ### Step 3 Activate GitHub Pages
 
-You'll need to turn on GitHub Pages so that your site will be displayed publicly. By default it will be shown at https://<YourGitHubUserName>.github.io/mtd-starter  To activate GitHub Pages, go to "Settings", then "Pages" and turn it on as shown below:
+You'll need to turn on GitHub Pages so that your site will be displayed publicly. By default it will be shown at `https://<YourGitHubUserName>.github.io/mtd-starter`  To activate GitHub Pages, go to "Settings", then "Pages" and turn it on as shown below:
 
 ![Activating GitHub Pages](../images/pages.png)
 
@@ -46,7 +46,7 @@ For more details on preparing your dictionary data, see [Preparing Your Data](..
 
 ### Step 5: See your dictionary!
 
-When your dictionary is finished building, you will see a green checkmark as shown below. Then you can visit your dictionary at https://<YourGitHubUserName>.github.io/mtd-starter
+When your dictionary is finished building, you will see a green checkmark as shown below. Then you can visit your dictionary at `https://<YourGitHubUserName>.github.io/mtd-starter`
 
 
 ![Successfully built dictionary](../images/success.png)
