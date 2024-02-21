@@ -1,0 +1,4 @@
+graft mothertongues/ui
+graft mothertongues/schemas
+prune mothertongues/tests
+

@@ -1,6 +1,6 @@
 [project]
 name = "mothertongues"
-version = "1.0.20231019"
+version = "1.0.20240222"
 description = "Build a dictionary for your language with MotherTongues Dictionaries"
 authors = [
   {name = "Aidan Pine", email = "hello@aidanpine.ca"}
@@ -34,8 +34,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.isort]
 profile = "black"
-known_first_party = mothertongues
+known_first_party = "mothertongues"
 
 [tool.mypy]
-ignore_missing_imports = True
-
+ignore_missing_imports = true
