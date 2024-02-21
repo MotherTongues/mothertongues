@@ -1,43 +1,41 @@
-[tool.poetry]
+[project]
 name = "mothertongues"
 version = "1.0.20231019"
-description = ""
-authors = ["roedoejet <hello@aidanpine.ca>"]
+description = "Build a dictionary for your language with MotherTongues Dictionaries"
+authors = [
+  {name = "Aidan Pine", email = "hello@aidanpine.ca"}
+]
 readme = "README.md"
-include = ["mothertongues/ui", "mothertongues/ui/*", "mothertongues/ui/*/*", "mothertongues/schemas"]
+requires-python = ">= 3.8"
+dependencies = [
+             "fastapi", "loguru", "typer[all]",
+             "httpx", "gitlint", "pydantic",
+             "openpyxl", "jsonpath-ng", "jsonpointer",
+             "nltk", "rank-bm25", "jsf", "questionary"
+]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-fastapi = "^0.104.0"
-loguru = "^0.6.0"
-typer = {version = "0.9.0", extras = ["all"]}
-httpx = "^0.23.1"
-gitlint = "^0.19.0"
-pydantic = "^2.4.2"
-openpyxl = "^3.1.2"
-jsonpath-ng = "^1.5.3"
-jsonpointer = "^2.3"
-nltk = "^3.8.1"
-rank-bm25 = "^0.2.2"
-jsf = "^0.8.0"
-questionary = "^2.0.0"
+[project.optional-dependencies]
+dev = [ "isort", "black", "mypy", "pre-commit"]
+docs = [ "mkdocs-material", "mkdocstrings" ]
 
-[tool.poetry.scripts]
+[project.urls]
+Homepage = "https://github.com/MotherTongues/mothertongues"
+Documentation = "https://mothertongues.github.io/mothertongues/latest"
+Repository = "https://github.com/MotherTongues/mothertongues"
+Issues = "https://github.com/MotherTongues/mothertongues/issues"
+
+[project.scripts]
 mothertongues = "mothertongues.cli:app"
 mtd = "mothertongues.cli:app"
 
-[tool.poetry.group.dev.dependencies]
-isort = "^5.10.1"
-black = "^22.12.0"
-mypy = "^1.4.1"
-pre-commit = "^2.20.0"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = "^1.5.2"
-mkdocs-material = "^9.2.5"
-mkdocstrings = {extras = ["python"], version = "^0.22.0"}
-mike = "^1.1.2"
-
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.isort]
+profile = "black"
+known_first_party = mothertongues
+
+[tool.mypy]
+ignore_missing_imports = True
+
