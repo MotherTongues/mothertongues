@@ -29,10 +29,12 @@ Before setting up Mother Tongues, you need the following installed on your machi
 
 Installing Mother Tongues
 ----------------------------
-The simplest way to install `mothertongues` is with pip:
+The simplest way to install `mothertongues` is with pip. Eventually we will publish this version on PyPi, but for now, please clone and install locally:
 
 ```bash
-pip install mothertongues
+# Clone repo and UI submodule
+git clone https://github.com/MotherTongues/mothertongues.git --recursive
+cd mothertongues && pip install --editable .
 ```
 
 
@@ -42,7 +44,7 @@ If you plan on modifying MTD code, run the following commands to install the git
 
 
 ```bash
-# Clone repo and UI submodule
+# Clone repo and UI submodule (if you haven't already from the above command)
 git clone https://github.com/MotherTongues/mothertongues.git --recursive
 
 # Build the UI:
