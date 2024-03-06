@@ -637,12 +637,14 @@
 <li><a href="https://nodejs.org/en/download">Node JS 16+</a> - required for the UI</li>
 </ul>
 <h2 id="installing-mother-tongues">Installing Mother Tongues<a class="headerlink" href="#installing-mother-tongues" title="Permanent link">&para;</a></h2>
-<p>The simplest way to install <code>mothertongues</code> is with pip:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>mothertongues
+<p>The simplest way to install <code>mothertongues</code> is with pip. Eventually we will publish this version on PyPi, but for now, please clone and install locally:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clone repo and UI submodule</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/MotherTongues/mothertongues.git<span class="w"> </span>--recursive
+<span class="nb">cd</span><span class="w"> </span>mothertongues<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--editable<span class="w"> </span>.
 </code></pre></div>
 <h2 id="planning-on-customizing-mother-tongues">Planning on Customizing Mother Tongues?<a class="headerlink" href="#planning-on-customizing-mother-tongues" title="Permanent link">&para;</a></h2>
 <p>If you plan on modifying MTD code, run the following commands to install the git repos locally.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Clone repo and UI submodule</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clone repo and UI submodule (if you haven&#39;t already from the above command)</span>
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/MotherTongues/mothertongues.git<span class="w"> </span>--recursive
 
 <span class="c1"># Build the UI:</span>
