@@ -43,7 +43,7 @@ class Parser(BaseTabularParser):
     def parse_fn(self, entry: Tuple[Cell, ...], col: str) -> str:
         """Given a tuple of OpenPyxl cells, return the value of the cell matching the column value for col"""
         if self.fieldnames is not None and col in self.fieldnames:
-            columns = [self.fieldnames[col], col2int(col)]
+            columns = [self.fieldnames[col], col, col2int(col)]
         else:
             columns = [col, col2int(col)]
         for c in entry:
