@@ -160,7 +160,7 @@ def export(
         help="The path to your dictionary's language configuration file.",
     ),  # type: ignore
     output_directory: Path = typer.Argument(
-        exists=False,
+        exists=True,
         file_okay=False,
         dir_okay=True,
         help="The output directory to write to.",
@@ -189,7 +189,6 @@ def export(
             )
         )
         exit(1)
-    output_directory.mkdir(parents=True, exist_ok=True)
     output = dictionary.export()
     if include_info:
         dictionary.print_info()
