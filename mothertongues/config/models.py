@@ -441,6 +441,9 @@ class ResourceManifest(BaseConfig):
     skip_header: bool = False
     """Whether to skip the header when parsing. Applies to spreadsheet formats"""
 
+    use_header: bool = False
+    """Whether to use the header to name columns. Applies to spreadsheet formats"""
+
     transducers: List[ArbitraryFieldRestrictedTransducer] = []
     """A list of Transducers to apply to your data"""
 

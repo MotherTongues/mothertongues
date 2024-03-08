@@ -243,6 +243,43 @@ class DictionaryParserTest(BasicTestCase):
             dictionary = MTDictionary(mtd_config)
             self.assertEqual(len(dictionary.data), len(self.parsed_data) - 1)
 
+    def test_basic_tabular_parsers_use_header(self):
+        for format in [ParserEnum.csv, ParserEnum.tsv, ParserEnum.psv, ParserEnum.xlsx]:
+            language_config_path = self.data_dir / f"config_{format.name}.json"
+            config = load_mtd_configuration(language_config_path)
+            mtd_config = MTDConfiguration(**config)
+            # First try with numeric column IDs, which should still work
+            mtd_config.data[0].manifest.use_header = True
+            mtd_config.data[0].resource = mtd_config.data[0].resource.with_stem(
+                "data_header"
+            )
+            dictionary = MTDictionary(mtd_config)
+            self.maxDiff = None
+            self.assertEqual(dictionary.data[0]["word"], "farvel")
+            self.assertEqual(dictionary.data[3]["word"], "træ")
+            data = self._correct_data(dictionary.data)
+            self.assertCountEqual(data, self.parsed_data)
+            # Now try with text column IDs, which should also work
+            targets = {
+                "entryID": "0",
+                "definition": "English",
+                "word": "Danish",
+                "audio": [{"description": "Speaker", "filename": "Audio"}],
+                "video": [{"description": "Video Speaker", "filename": "Video"}],
+                "theme": "Category",
+                "optional": {"Part of Speech": "POS"},
+            }
+            # Frob for Excel
+            if format == ParserEnum.xlsx:
+                targets["entryID"] = "A"
+            mtd_config.data[0].manifest.targets = ParserTargets.model_validate(targets)
+            dictionary = MTDictionary(mtd_config)
+            self.maxDiff = None
+            self.assertEqual(dictionary.data[0]["word"], "farvel")
+            self.assertEqual(dictionary.data[3]["word"], "træ")
+            data = self._correct_data(dictionary.data)
+            self.assertCountEqual(data, self.parsed_data)
+
     def test_xlsx_specifics(self):
         language_config_path = self.data_dir / "config_xlsx.json"
         config = load_mtd_configuration(language_config_path)
