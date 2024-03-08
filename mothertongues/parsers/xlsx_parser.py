@@ -32,6 +32,7 @@ class Parser(BaseTabularParser):
             self.fieldnames = {
                 c.value: c.column
                 for (c,) in work_sheet.iter_cols(min_row=1, max_row=1)
+                if c.value
             }
             min_row = 2
         elif self.manifest.skip_header:
