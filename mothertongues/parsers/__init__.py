@@ -1,5 +1,6 @@
+import csv
 import importlib
-from typing import List, Tuple, Type, Union, no_type_check
+from typing import Any, Dict, List, Tuple, Type, Union, no_type_check
 
 from jsonpath_ng import jsonpath
 from loguru import logger
@@ -10,6 +11,15 @@ from mothertongues.config.models import DataSource, DictionaryEntry
 from mothertongues.exceptions import UnsupportedFiletypeError
 
 
+def get_tabular_item(x: Union[List, Dict], y: Any):
+    """Basic function for getting items from tabular data either by index
+    or by column name."""
+    if isinstance(x, dict):
+        return x[y]
+    else:
+        return x[int(y)]
+
+
 class BaseTabularParser:
     """
     Parse data for MTD.
@@ -18,7 +28,17 @@ class BaseTabularParser:
     def __init__(self, data_source: DataSource):
         self.resource_path = data_source.resource
         self.manifest = data_source.manifest
-        self.parse_fn = lambda x, y: x[int(y)]
+        self.parse_fn = get_tabular_item
+
+    def read_xsv(self, delimiter=",", encoding="utf8"):
+        with open(self.resource_path, encoding=encoding) as f:
+            if self.manifest.use_header:
+                reader = csv.DictReader(f, delimiter=delimiter)
+            else:
+                reader = csv.reader(f, delimiter=delimiter)
+                if self.manifest.skip_header:
+                    next(reader)
+            return list(reader)
 
     def return_manifest_key_type(
         self, key: str, manifest: dict
