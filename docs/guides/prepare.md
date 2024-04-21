@@ -10,18 +10,18 @@ The most time-intensive part of building your dictionary, depending on how you w
 
 ## Project folder structure
 
-To generate a sample project that you can edit to suit your needs, use the `mothertongues new-project` command. For example `mothertongues new-project --outdir . --name 'DanishDictionary'` will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a [MTD configuration file](#mtd-language-configuration-file) ('mtd.config.json').
+To generate a sample project that you can edit to suit your needs, use the `mothertongues new-project` command. For example `mothertongues new-project --outdir . --name 'DanishDictionary'` will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a [MTD configuration file](#mtd-language-configuration-file) ('config.mtd.json').
 
 ```raw
 📦DanishDictionary
  ┣ 📜data.xlsx
- ┗ 📜mtd.config.json
+ ┗ 📜config.mtd.json
 ```
 
 ## MTD Configuration file
 
 !!! tip
-    In the [starter](https://github.com/MotherTongues/mtd-starter), the language configuration file is found here: `mtd-starter/mtd.config.json`
+    In the [starter](https://github.com/MotherTongues/mtd-starter), the language configuration file is found here: `mtd-starter/config.mtd.json`
 
 
 Every dictionary must have a configuration file, which helps define which data belongs to your dictionary and meta data like your dictionary's [alphabet](#customized-alphabet)

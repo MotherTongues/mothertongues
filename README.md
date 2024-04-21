@@ -41,7 +41,7 @@ pip install mothertongues
 If you just want to try something out you can use the mothertongues command line to create a configuration and some sample data:
 
 1. `poetry run python3 cli.py new-project`
-2. Then run your dictionary: `poetry run python3 cli.py build-and-run <YourDictionaryConfigDirPath>/mtd.config.json`
+2. Then run your dictionary: `poetry run python3 cli.py build-and-run <YourDictionaryConfigDirPath>/config.mtd.json`
 
 ### Local Install
 

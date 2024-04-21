@@ -20,7 +20,7 @@ structure similar to the one [described in this guide](#file-structure).
 
 Then run:
 
-`mothertongues build-and-run <path_to_mtd.config.json>`
+`mothertongues build-and-run <path_to_config.mtd.json>`
 
 And your dictionary will be served at [http://localhost:3636](http://localhost:3636)
 
@@ -32,7 +32,7 @@ First, you need to export the dictionary data required by any MTD UI.
 2.  Then, build the dictionary using the `mothertongues export` command to create
     necessary data:
 
-`mothertongues export <path_to_mtd.config.json> <output_folder>`
+`mothertongues export <path_to_config.mtd.json> <output_folder>`
 
 
 This will create a file called `dictionary_data.json` which is the file you will need to transfer to your MTD UI in the next section.
