@@ -101,7 +101,7 @@ def build_and_run(
         httpd.server_close()
 
 
-@app.command()
+@app.command(hidden=True)
 def schema(
     type: SchemaTypes = typer.Argument(
         default=SchemaTypes.main_format,
