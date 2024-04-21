@@ -8,6 +8,10 @@ include = ["mothertongues/ui", "mothertongues/ui/*", "mothertongues/ui/*/*", "mo
 
 [tool.poetry.dependencies]
 python = "^3.8"
+numpy = [
+      {version = "^1.24.4", python = "<3.12"},
+      {version = "^1.26.4", python = ">=3.12"},
+]      
 fastapi = "^0.104.0"
 loguru = "^0.6.0"
 typer = {version = "0.9.0", extras = ["all"]}
