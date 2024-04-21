@@ -756,15 +756,15 @@
 <p><em>This guide is required for anyone creating a Mother Tongues Dictionary, regardless of which path they take (<a href="../../nocode/install/">no code</a> or <a href="../../developer/prerequisites/">advanced developer</a>).</em></p>
 <p>The most time-intensive part of building your dictionary, depending on how you want to publish it, is preparing your data.</p>
 <h2 id="project-folder-structure">Project folder structure<a class="headerlink" href="#project-folder-structure" title="Permanent link">&para;</a></h2>
-<p>To generate a sample project that you can edit to suit your needs, use the <code>mothertongues new-project</code> command. For example <code>mothertongues new-project --outdir . --name 'DanishDictionary'</code> will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a <a href="#mtd-language-configuration-file">MTD configuration file</a> ('mtd.config.json').</p>
+<p>To generate a sample project that you can edit to suit your needs, use the <code>mothertongues new-project</code> command. For example <code>mothertongues new-project --outdir . --name 'DanishDictionary'</code> will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a <a href="#mtd-language-configuration-file">MTD configuration file</a> ('config.mtd.json').</p>
 <div class="highlight"><pre><span></span><code>📦DanishDictionary
  ┣ 📜data.xlsx
- ┗ 📜mtd.config.json
+ ┗ 📜config.mtd.json
 </code></pre></div>
 <h2 id="mtd-configuration-file">MTD Configuration file<a class="headerlink" href="#mtd-configuration-file" title="Permanent link">&para;</a></h2>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>In the <a href="https://github.com/MotherTongues/mtd-starter">starter</a>, the language configuration file is found here: <code>mtd-starter/mtd.config.json</code></p>
+<p>In the <a href="https://github.com/MotherTongues/mtd-starter">starter</a>, the language configuration file is found here: <code>mtd-starter/config.mtd.json</code></p>
 </div>
 <p>Every dictionary must have a configuration file, which helps define which data belongs to your dictionary and meta data like your dictionary's <a href="#customized-alphabet">alphabet</a></p>
 <h2 id="sorting-your-data">Sorting your data<a class="headerlink" href="#sorting-your-data" title="Permanent link">&para;</a></h2>

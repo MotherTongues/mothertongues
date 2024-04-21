@@ -618,7 +618,7 @@
 <p>This guide assumes that you have worked through the steps to create a valid <a href="#mtd-language-configuration-file">Language Configuration file</a> and <a href="#mtd-data-resource-configuration-file">Data Resource Configuration files</a> for each unique source of data. It also assumes you have a directory
 structure similar to the one <a href="#file-structure">described in this guide</a>.</p>
 <p>Then run:</p>
-<p><code>mothertongues build-and-run &lt;path_to_mtd.config.json&gt;</code></p>
+<p><code>mothertongues build-and-run &lt;path_to_config.mtd.json&gt;</code></p>
 <p>And your dictionary will be served at <a href="http://localhost:3636">http://localhost:3636</a></p>
 <h2 id="exporting-your-data">Exporting your data<a class="headerlink" href="#exporting-your-data" title="Permanent link">&para;</a></h2>
 <p>First, you need to export the dictionary data required by any MTD UI.</p>
@@ -627,7 +627,7 @@ structure similar to the one <a href="#file-structure">described in this guide</
 <li>Then, build the dictionary using the <code>mothertongues export</code> command to create
     necessary data:</li>
 </ol>
-<p><code>mothertongues export &lt;path_to_mtd.config.json&gt; &lt;output_folder&gt;</code></p>
+<p><code>mothertongues export &lt;path_to_config.mtd.json&gt; &lt;output_folder&gt;</code></p>
 <p>This will create a file called <code>dictionary_data.json</code> which is the file you will need to transfer to your MTD UI in the next section.</p>
 <h2 id="mobileui-development">Mobile/UI Development<a class="headerlink" href="#mobileui-development" title="Permanent link">&para;</a></h2>
 <p>Here are the steps for creating a mobile dictionary on your machine.</p>
