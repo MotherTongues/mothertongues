@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 from mothertongues.config.models import DataSource, DictionaryEntry
 from mothertongues.exceptions import UnsupportedFiletypeError
+from mothertongues.parsers.utils import col2int
 
 
 class BaseTabularParser:
@@ -28,9 +29,9 @@ class BaseTabularParser:
             if y in x:
                 return x[y]
             else:
-                return x[self.fieldnames[int(y)]]
+                return x[self.fieldnames[col2int(y, base0=True)]]
         else:
-            return x[int(y)]
+            return x[col2int(y, base0=True)]
 
     def read_xsv(self, delimiter=",", encoding="utf8"):
         with open(self.resource_path, encoding=encoding) as f:

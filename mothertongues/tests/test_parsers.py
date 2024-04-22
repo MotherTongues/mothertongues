@@ -269,9 +269,8 @@ class DictionaryParserTest(BasicTestCase):
                 "theme": "Category",
                 "optional": {"Part of Speech": "POS"},
             }
-            # Frob for Excel
-            if format == ParserEnum.xlsx:
-                targets["entryID"] = "A"
+            # Verify that letters as column IDs minimally work
+            targets["entryID"] = "A"
             mtd_config.data[0].manifest.targets = ParserTargets.model_validate(targets)
             dictionary = MTDictionary(mtd_config)
             self.maxDiff = None
