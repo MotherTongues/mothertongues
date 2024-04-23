@@ -900,14 +900,14 @@ example for an Excel spreadsheet with image filenames in column "D":</p>
 </code></pre></div>
 <h4 id="audio">Audio<a class="headerlink" href="#audio" title="Permanent link">&para;</a></h4>
 <p>For audio, you minimally have to add the filename, but you can also add
-a speaker name. You can also choose between <code>audio</code> for audio files in
+a description for the audio (such as a speaker name). You can also choose between <code>audio</code> for audio files in
 the target language, <code>definition_audio</code> for audio files of the
 definition, <code>example_sentence_audio</code> for audio files corresponding to an
 example sentence and <code>example_sentence_definition_audio</code> for audio files
 corresponding to the definitions of example sentences.</p>
 <p>Take the following example for an Excel spreadsheet with audio in
 columns "B" &amp; "C" and example sentence audio in column "D". The
-speaker names for audio files are in columns "E", "F", and "G"
+descriptions for audio files are in columns "E", "F", and "G"
 respectively.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="nt">&quot;manifest&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -921,18 +921,18 @@ respectively.</p>
 <span class="hll"><span class="w">            </span><span class="nt">&quot;audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 </span><span class="hll"><span class="w">                </span><span class="p">{</span>
 </span><span class="hll"><span class="w">                    </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B&quot;</span><span class="p">,</span>
-</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;speaker&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;E&quot;</span>
+</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;E&quot;</span>
 </span><span class="hll"><span class="w">                </span><span class="p">},</span>
 </span><span class="hll"><span class="w">                </span><span class="p">{</span>
 </span><span class="hll"><span class="w">                    </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
-</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;speaker&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;F&quot;</span>
+</span><span class="hll"><span class="w">                    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;F&quot;</span>
 </span><span class="hll"><span class="w">                </span><span class="p">}</span>
 </span><span class="hll"><span class="w">            </span><span class="p">],</span>
 </span><span class="hll"><span class="w">            </span><span class="nt">&quot;example_sentence_audio&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 </span><span class="hll"><span class="w">                </span><span class="p">[</span>
 </span><span class="hll"><span class="w">                    </span><span class="p">{</span>
 </span><span class="hll"><span class="w">                        </span><span class="nt">&quot;filename&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;D&quot;</span><span class="p">,</span>
-</span><span class="hll"><span class="w">                        </span><span class="nt">&quot;speaker&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;G&quot;</span>
+</span><span class="hll"><span class="w">                        </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;G&quot;</span>
 </span><span class="hll"><span class="w">                    </span><span class="p">}</span>
 </span><span class="hll"><span class="w">                </span><span class="p">]</span>
 </span><span class="hll"><span class="w">            </span><span class="p">]</span>
