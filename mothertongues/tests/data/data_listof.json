@@ -6,20 +6,20 @@
         "example_sentences": ["Har du røde øjne?", "Døde røde rødøjede rådne røgede ørreder."],
         "example_sentence_audio": [
             [{
-                    "speaker": "AP",
+                    "description": "AP",
                     "filename": "ap_sent1.mp3"
                 },
                 {
-                    "speaker": "AR",
+                    "description": "AR",
                     "filename": "ar_sent1.mp3"
                 }
             ],
             [{
-                    "speaker": "AP",
+                    "description": "AP",
                     "filename": "ap_sent2.mp3"
                 },
                 {
-                    "speaker": "AR",
+                    "description": "AR",
                     "filename": "ar_sent2.mp3"
                 }
             ]
@@ -29,7 +29,7 @@
             "Part of Speech": "noun"
         },
         "audio": [{
-            "speaker": "Aidan Pine",
+            "description": "Aidan Pine",
             "filename": "tree.mp3"
         }]
     },
@@ -42,7 +42,7 @@
             "Part of Speech": "noun"
         },
         "audio": [{
-            "speaker": "Aidan Pine",
+            "description": "Aidan Pine",
             "filename": "ord.mp3"
         }]
     },
@@ -55,7 +55,7 @@
             "Part of Speech": "interjection"
         },
         "audio": [{
-            "speaker": "Aidan Pine",
+            "description": "Aidan Pine",
             "filename": "hej.mp3"
         }]
     },

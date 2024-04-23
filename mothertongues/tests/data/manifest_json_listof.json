@@ -15,7 +15,7 @@
         "audio": {
             "listof": "audio",
             "value": {
-                "description": "speaker",
+                "description": "description",
                 "filename": "filename"
             }
         },

@@ -4,7 +4,6 @@ from typing import Any, Dict, List
 from jsonpath_ng import jsonpath
 from jsonpath_ng import parse as json_parse
 from jsonpointer import resolve_pointer
-from loguru import logger
 from tqdm import tqdm
 
 from mothertongues.config.models import DataSource
@@ -143,19 +142,19 @@ class Parser(BaseTabularParser):
 
             {
                 "audio": {
-                     "speaker": "Eric Idle",
+                     "description": "Eric Idle",
                      "filename": "spam.mp3"
                 },
                 "examples": [ "spam", "spam", "eggs", "spam" ],
                 "example_audio": [
-                     { "speaker": "Viking 1" },
-                     { "speaker": "Viking 2" },
-                     { "speaker": "Viking 3" },
-                     { "speaker": "Viking 4" }
+                     { "description": "Viking 1" },
+                     { "description": "Viking 2" },
+                     { "description": "Viking 3" },
+                     { "description": "Viking 4" }
                 ]
             }
 
-        Then a value in the manifest like "audio.speaker" will yield
+        Then a value in the manifest like "audio.description" will yield
         the string "Eric Idle".
 
         If you want to create a list of a fixed length, or a
@@ -181,7 +180,7 @@ class Parser(BaseTabularParser):
         output is then constructed by running the query in "value" on
         *each item in* that list.  So, for instance:
 
-            "vikings": { "listof": "example_audio", "value": "speaker" }
+            "vikings": { "listof": "example_audio", "value": "description" }
 
         should give you a list of Vikings.  If you don't want to
         actually run any query on the items (e.g., they are just
@@ -199,23 +198,23 @@ class Parser(BaseTabularParser):
         as the second-level "listof" query, e.g. if your JSON has:
 
             "example_audio2": [
-                [ { "speaker": "Viking 1", "filename": "spam1.mp3" },
-                  { "speaker": "Viking 2", "filename": "spam2.mp3" },
+                [ { "description": "Viking 1", "filename": "spam1.mp3" },
+                  { "description": "Viking 2", "filename": "spam2.mp3" },
                  ],
                 [
-                    { "speaker": "Viking 3", "filename": "spam3.mp3" },
-                    { "speaker": "Viking 4", "filename": "spam4.mp3" },
+                    { "description": "Viking 3", "filename": "spam3.mp3" },
+                    { "description": "Viking 4", "filename": "spam4.mp3" },
                 ]
             ]
 
-        Then you could use this to extract the "speaker" value:
+        Then you could use this to extract the "description" value:
 
             "vikings2": {
                 "listof": "example_audio2",
                 "value": {
                     "listof": "$",
                     "value": {
-                        "speaker": "speaker",
+                        "description": "description",
                         "filename": "filename"
                     }
                 }

@@ -193,7 +193,7 @@ example for an Excel spreadsheet with image filenames in column "D":
 #### Audio
 
 For audio, you minimally have to add the filename, but you can also add
-a speaker name. You can also choose between `audio` for audio files in
+a description for the audio (such as a speaker name). You can also choose between `audio` for audio files in
 the target language, `definition_audio` for audio files of the
 definition, `example_sentence_audio` for audio files corresponding to an
 example sentence and `example_sentence_definition_audio` for audio files
@@ -201,7 +201,7 @@ corresponding to the definitions of example sentences.
 
 Take the following example for an Excel spreadsheet with audio in
 columns "B" & "C" and example sentence audio in column "D". The
-speaker names for audio files are in columns "E", "F", and "G"
+descriptions for audio files are in columns "E", "F", and "G"
 respectively.
 
 ```json hl_lines="10-27"
@@ -217,18 +217,18 @@ respectively.
             "audio": [
                 {
                     "filename": "B",
-                    "speaker": "E"
+                    "description": "E"
                 },
                 {
                     "filename": "C",
-                    "speaker": "F"
+                    "description": "F"
                 }
             ],
             "example_sentence_audio": [
                 [
                     {
                         "filename": "D",
-                        "speaker": "G"
+                        "description": "G"
                     }
                 ]
             ]

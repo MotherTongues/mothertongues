@@ -13,7 +13,7 @@
         "audio": {
             "listof": "audio",
             "value": {
-                "description": "speaker",
+                "description": "description",
                 "filename": "filename"
             }
         },
@@ -30,7 +30,7 @@
             "value": {
                 "listof": "$",
                 "value": {
-                    "description": "speaker",
+                    "description": "description",
                     "filename": "filename"
                 }
             }
