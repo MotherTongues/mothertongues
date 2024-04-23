@@ -242,6 +242,8 @@ class CheckableParserTargetFieldNames(Enum):
 class ParserTargets(BaseConfig):
     """Your ParserTargets define how to parse your data into a list of DictionaryEntry objects"""
 
+    model_config = ConfigDict(extra="allow")
+
     word: str
     """The location of the words in your dictionary"""
 
