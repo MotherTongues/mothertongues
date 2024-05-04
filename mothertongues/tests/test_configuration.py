@@ -54,10 +54,9 @@ class ConfigurationTest(BasicTestCase):
             return "this is a test"
 
         self.assertEqual(string_to_callable(test), test)
-        # Pass a lambda function
-        # TODO: maybe remove this legacy code for security reasons
-        lambda_test = string_to_callable("lambda x: x.lower()")
-        self.assertEqual(lambda_test("TEST"), "test")
+        # Pass a lambda function which doesn't work anymore due to security reasons
+        with self.assertRaises(ValueError):
+            string_to_callable("lambda x: x.lower()")
         with self.assertRaises(ValueError):
             string_to_callable("lambda could just be a word in a string")
         # Pass a dot notation import

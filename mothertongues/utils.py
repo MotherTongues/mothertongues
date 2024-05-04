@@ -151,7 +151,6 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
     Callable strings can either be :
 
     - Callable, in which case they are returned
-    - start with "lambda" in which case they are eval'ed
     - dot notation import, like "mothertongues.utils.get_current_time"
 
     """
@@ -159,12 +158,9 @@ def string_to_callable(string: Union[Callable, str]) -> Union[str, Callable]:
         return string
     string = str(string)
     if string.startswith("lambda"):
-        try:
-            return eval(string)
-        except SyntaxError as e:
-            raise ValueError(
-                f"Expected a callable, and was provided something that looked like a lambda function but was invalid: {type(string)}"
-            ) from e
+        raise ValueError(
+            "Sorry, lambda functions are not allowed anymore due to security risks. Please augment your data before passing to MTD or use a RestrictedTransducer instead for common operations (lowercasing, unicode normalization, basic find/replace rules etc.)"
+        )
     if "." not in string:
         logger.debug(
             f"String must be in the format <module>.<function>. If {string} is actually a string, you can ignore this."
