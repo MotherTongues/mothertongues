@@ -4,9 +4,7 @@
     "transducers": [{
         "input_field": "word",
         "output_field": "sort_form",
-        "functions": [
-            "lambda x: x.lower()"
-        ]
+        "lower": true
     }],
     "targets": {
         "entryID": "entryID",

@@ -82,7 +82,7 @@ You can also reference a file that contains a csv of your alphabet:
 
 ### Custom Sort Form (Advanced)
 
-It's possible that you want to sort based on a form other than the `word` or display form by changing the word in some way. To do this, you must adjust the [configuration for your data](#parsing-your-data) to include a transducer. In this example, we are adding a `sort_form` which is just a lowercased version of the `word` and then defining that as the field to sort.
+It's possible that you want to sort based on a form other than the `word` or display form by changing the word in some way. To do this, you must adjust the [configuration for your data](#parsing-your-data) to include a transducer. In this example, we are adding a `sort_form` which is just a lowercased version of the `word` and then defining that as the field to sort. You can apply any of the operations from the "RestrictedTransducer" class if you need to do more than just lowercase. See [here](./search.md#index-changing-which-fields-get-searched) for more details.
 
 
 ```json hl_lines="5 13-21"
@@ -102,9 +102,7 @@ It's possible that you want to sort based on a form other than the `word` or dis
           {
             "input_field": "word",
             "output_field": "sort_form",
-            "functions": [
-              "lambda x: x.lower()"
-            ]
+            "lower": true
           }
         ],
         "targets": {
