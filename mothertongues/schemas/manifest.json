@@ -83,32 +83,6 @@
             "title": "Audio",
             "type": "object"
         },
-        "Video": {
-            "additionalProperties": true,
-            "properties": {
-                "description": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Description"
-                },
-                "filename": {
-                    "title": "Filename",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "filename"
-            ],
-            "title": "Video",
-            "type": "object"
-        },
         "NormalizationEnum": {
             "enum": [
                 "NFC",
@@ -134,7 +108,7 @@
             "type": "string"
         },
         "ParserTargets": {
-            "additionalProperties": false,
+            "additionalProperties": true,
             "description": "Your ParserTargets define how to parse your data into a list of DictionaryEntry objects",
             "properties": {
                 "word": {
@@ -372,6 +346,32 @@
                 "definition"
             ],
             "title": "ParserTargets",
+            "type": "object"
+        },
+        "Video": {
+            "additionalProperties": true,
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "filename": {
+                    "title": "Filename",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "filename"
+            ],
+            "title": "Video",
             "type": "object"
         }
     },

@@ -83,32 +83,6 @@
             "title": "Audio",
             "type": "object"
         },
-        "Video": {
-            "additionalProperties": true,
-            "properties": {
-                "description": {
-                    "anyOf": [
-                        {
-                            "type": "string"
-                        },
-                        {
-                            "type": "null"
-                        }
-                    ],
-                    "default": null,
-                    "title": "Description"
-                },
-                "filename": {
-                    "title": "Filename",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "filename"
-            ],
-            "title": "Video",
-            "type": "object"
-        },
         "CheckableParserTargetFieldNames": {
             "enum": [
                 "word",
@@ -557,6 +531,32 @@
                     "default": null,
                     "title": "Credits"
                 },
+                "aboutPageImg": {
+                    "anyOf": [
+                        {
+                            "format": "uri",
+                            "minLength": 1,
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "https://placehold.co/600x400",
+                    "title": "Aboutpageimg"
+                },
+                "aboutPageDescription": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": "Please change this text to describe your dictionary in a bit more detail.",
+                    "title": "Aboutpagedescription"
+                },
                 "build": {
                     "default": "mothertongues.utils.get_current_time",
                     "title": "Build",
@@ -654,7 +654,7 @@
             "type": "string"
         },
         "ParserTargets": {
-            "additionalProperties": false,
+            "additionalProperties": true,
             "description": "Your ParserTargets define how to parse your data into a list of DictionaryEntry objects",
             "properties": {
                 "word": {
@@ -1068,32 +1068,68 @@
             "title": "StemmerEnum",
             "type": "string"
         },
+        "Video": {
+            "additionalProperties": true,
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "default": null,
+                    "title": "Description"
+                },
+                "filename": {
+                    "title": "Filename",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "filename"
+            ],
+            "title": "Video",
+            "type": "object"
+        },
         "WeightedLevensteinConfig": {
             "additionalProperties": false,
             "properties": {
                 "insertionCost": {
                     "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
                     "title": "Insertioncost",
                     "type": "number"
                 },
                 "deletionCost": {
                     "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
                     "title": "Deletioncost",
                     "type": "number"
                 },
                 "insertionAtBeginningCost": {
                     "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
                     "title": "Insertionatbeginningcost",
                     "type": "number"
                 },
                 "deletionAtEndCost": {
                     "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
                     "title": "Deletionatendcost",
                     "type": "number"
                 },
                 "substitutionCosts": {
                     "additionalProperties": {
                         "additionalProperties": {
+                            "maximum": 1.0,
+                            "minimum": 0.0,
                             "type": "number"
                         },
                         "type": "object"
@@ -1117,6 +1153,8 @@
                 },
                 "defaultSubstitutionCost": {
                     "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
                     "title": "Defaultsubstitutioncost",
                     "type": "number"
                 }

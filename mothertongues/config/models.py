@@ -21,6 +21,7 @@ from unicodedata import normalize
 from uuid import UUID
 
 from pydantic import (  # type: ignore
+    AnyHttpUrl,
     BaseModel,
     ConfigDict,
     Field,
@@ -28,6 +29,7 @@ from pydantic import (  # type: ignore
     HttpUrl,
     field_validator,
     model_validator,
+    parse_obj_as,
 )
 from typing_extensions import TypedDict
 
@@ -521,6 +523,16 @@ class LanguageConfigurationExportFormat(BaseModel):
     credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
 
+    aboutPageImg: Optional[AnyHttpUrl] = parse_obj_as(
+        AnyHttpUrl, "https://placehold.co/600x400"
+    )
+    """The path to an image for the about page"""
+
+    aboutPageDescription: Optional[
+        str
+    ] = "Please change this text to describe your dictionary in a bit more detail."
+    """A description of your dictionary project to go in the about page"""
+
     build: str
     """The build identifier for your dictionary build"""
 
@@ -590,6 +602,16 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
 
     credits: Optional[List[Contributor]] = None
     """Add a list of contributors to this project"""
+
+    aboutPageImg: Optional[AnyHttpUrl] = parse_obj_as(
+        AnyHttpUrl, "https://placehold.co/600x400"
+    )
+    """The path to an image for the about page"""
+
+    aboutPageDescription: Optional[
+        str
+    ] = "Please change this text to describe your dictionary in a bit more detail."
+    """A description of your dictionary project to go in the about page"""
 
     build: str = Field(
         default="mothertongues.utils.get_current_time", validate_default=True
