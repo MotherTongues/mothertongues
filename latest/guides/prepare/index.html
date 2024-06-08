@@ -514,6 +514,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#adding-information-to-the-about-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Information to the About Page
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -790,6 +799,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#adding-information-to-the-about-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      Adding Information to the About Page
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1015,6 +1033,20 @@ congfiguration file would have to add the following targets:</p>
 </span><span class="w">        </span><span class="p">}</span>
 <span class="w">    </span><span class="p">},</span>
 <span class="w">    </span><span class="nt">&quot;resource&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;data.xlsx&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="adding-information-to-the-about-page">Adding Information to the About Page<a class="headerlink" href="#adding-information-to-the-about-page" title="Permanent link">&para;</a></h2>
+<p>To populate the About Page in a Mother Tongues UI, you can add an image by providing a URL to an image in <code>aboutPageImg</code>, and you can also provide a description of your dictionary as seen below. The description can be plain text or HTML.</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:{</span>
+<span class="w">        </span><span class="nt">&quot;L1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Danish&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;L2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="err">...</span>
+<span class="w">        </span><span class="nt">&quot;alphabet&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;b&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;c&quot;</span><span class="p">],</span>
+<span class="hll"><span class="w">        </span><span class="nt">&quot;aboutPageImg&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://placehold.co/600x400&quot;</span><span class="p">,</span>
+</span><span class="hll"><span class="w">        </span><span class="nt">&quot;aboutPageDescription&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Here is a description of the dictionary. I can also use &lt;b&gt;HTML&lt;/b&gt; here.&quot;</span><span class="p">,</span>
+</span><span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="err">...</span>
 <span class="p">}</span>
 </code></pre></div>
 
