@@ -26,6 +26,7 @@ To generate a sample project that you can edit to suit your needs, use the `moth
 
 Every dictionary must have a configuration file, which helps define which data belongs to your dictionary and meta data like your dictionary's [alphabet](#customized-alphabet)
 
+
 ## Sorting your data
 
 Your data will get sorted based on your defined [alphabet](#customized-alphabet). By default, the sorting form is created from the "word" key from each entry and characters that aren't defined in your alphabet will be sorted at the end. If you want ignore certain characters from being sorted, or sort using different data, you can change this in the configuration:
@@ -263,5 +264,23 @@ congfiguration file would have to add the following targets:
         }
     },
     "resource": "data.xlsx"
+}
+```
+
+## Adding Information to the About Page
+
+To populate the About Page in a Mother Tongues UI, you can add an image by providing a URL to an image in `aboutPageImg`, and you can also provide a description of your dictionary as seen below. The description can be plain text or HTML.
+
+```json hl_lines="7-8"
+{
+    "config":{
+        "L1": "Danish",
+        "L2": "English",
+        ...
+        "alphabet": ["a", "b", "c"],
+        "aboutPageImg": "https://placehold.co/600x400",
+        "aboutPageDescription": "Here is a description of the dictionary. I can also use <b>HTML</b> here.",
+    },
+    ...
 }
 ```
