@@ -555,6 +555,8 @@ class LanguageConfigurationExportFormat(BaseModel):
                 "l1_normalization_transducer": True,
                 "l2_normalization_transducer": True,
                 "optional_field_name": True,
+                "aboutPageDescription": True,
+                "aboutPageImg": True,
             },
         )
 

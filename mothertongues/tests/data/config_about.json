@@ -1,0 +1,15 @@
+{
+    "config": {
+        "L1": "Danish",
+        "L2": "English",
+        "build": "mothertongues.utils.get_current_time",
+        "optional_field_name": "Optional Info",
+        "alphabet": "./alphabet.json",
+        "aboutPageDescription": "Foobar Test",
+        "aboutPageImg": "https://aidanpine.ca/static/cv/images/cv.png"
+    },
+    "data": [{
+        "manifest": "./manifest_csv.json",
+        "resource": "./data.csv"
+    }]
+}
