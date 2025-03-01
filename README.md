@@ -1,6 +1,6 @@
 # Mother Tongues Dictionaries (MTD)
 
-:construction: This repo is a near-complete re-write of the [legacy mothertongues](https://github.com/roedoejet/mothertongues) code and is set to replace it. It is under development however and is not complete yet. For a list of planned improvements see [this section](#improvements) :construction:
+:speech_balloon: This repo is a near-complete re-write of the [legacy mothertongues](https://github.com/roedoejet/mothertongues) code and is set to replace it. For a list of improvements see [this section](#improvements). For legacy documentation, please go [here](https://mothertongues.github.io/mothertongues-docs/) :speech_balloon:
 
 [![codecov](https://codecov.io/gh/MotherTongues/mothertongues/branch/main/graph/badge.svg?token=7JUKAAHZDV)](https://codecov.io/gh/MotherTongues/mothertongues)
 [![Documentation Status](https://img.shields.io/badge/-docs-blue)](https://docs.mothertongues.org)
