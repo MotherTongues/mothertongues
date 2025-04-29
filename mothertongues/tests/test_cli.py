@@ -2,6 +2,7 @@ import json
 import os
 
 from typer.testing import CliRunner
+from unittest import main
 
 from mothertongues.cli import app
 from mothertongues.config.models import (
@@ -241,3 +242,6 @@ class CommandLineTest(BasicTestCase):
         self.assertTrue(os.path.exists(os.path.join(self.tempdir, "config.mtd.json")))
 
     # endregion
+
+if __name__ == '__main__':
+    main()
