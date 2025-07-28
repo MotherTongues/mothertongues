@@ -11,11 +11,11 @@ python = "^3.8"
 numpy = [
       {version = "^1.24.4", python = "<3.12"},
       {version = "^1.26.4", python = ">=3.12"},
-]      
-fastapi = "^0.104.0"
+]
+fastapi = "^0.116.1"
 loguru = "^0.6.0"
 typer = {version = "0.9.0", extras = ["all"]}
-httpx = "^0.23.1"
+httpx = "^0.28.1"
 gitlint = "^0.19.0"
 pydantic = "^2.4.2"
 openpyxl = "^3.1.2"
@@ -25,6 +25,7 @@ nltk = "^3.8.1"
 rank-bm25 = "^0.2.2"
 jsf = "^0.8.0"
 questionary = "^2.0.0"
+httpcore = "^1.0.9"
 
 [tool.poetry.scripts]
 mothertongues = "mothertongues.cli:app"
