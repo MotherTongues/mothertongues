@@ -1,6 +1,6 @@
 import csv
 import importlib
-from typing import Any, Dict, List, Tuple, Type, Union, no_type_check
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, no_type_check
 
 from jsonpath_ng import jsonpath
 from loguru import logger
@@ -8,8 +8,17 @@ from pydantic import ValidationError
 from tqdm import tqdm
 
 from mothertongues.config.models import DataSource, DictionaryEntry
-from mothertongues.exceptions import UnsupportedFiletypeError
+from mothertongues.exceptions import ParserError, UnsupportedFiletypeError
 from mothertongues.parsers.utils import col2int
+
+
+def _check_no_duplicate_headers(fieldnames: List[str], resource_path) -> None:
+    duplicates = sorted({name for name in fieldnames if fieldnames.count(name) > 1})
+    if duplicates:
+        raise ParserError(
+            f"Duplicate column header(s) {duplicates} found in {resource_path}. "
+            "Column headers must be unique when 'use_header' is enabled."
+        )
 
 
 class BaseTabularParser:
@@ -20,11 +29,18 @@ class BaseTabularParser:
     def __init__(self, data_source: DataSource):
         self.resource_path = data_source.resource
         self.manifest = data_source.manifest
-        self.fieldnames = None
+        self.fieldnames: Optional[Union[List[str], Dict[str, Any]]] = None
 
     def parse_fn(self, x, y):
         """Basic function for getting items from tabular data either by index
-        or by column name."""
+        or by column name.
+
+        If ``y`` matches a key in ``x`` (i.e. a column header, when
+        ``manifest.use_header`` is enabled), that value is returned directly.
+        Otherwise, ``y`` is treated as a positional column reference: either a
+        plain 0-indexed number (e.g. "0", "1") or a spreadsheet-style column
+        letter (e.g. "A", "B") may be used, and both refer to the same column.
+        """
         if isinstance(x, dict):
             if y in x:
                 return x[y]
@@ -38,6 +54,7 @@ class BaseTabularParser:
             if self.manifest.use_header:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 self.fieldnames = reader.fieldnames
+                _check_no_duplicate_headers(self.fieldnames, self.resource_path)
             else:
                 reader = csv.reader(f, delimiter=delimiter)
                 if self.manifest.skip_header:

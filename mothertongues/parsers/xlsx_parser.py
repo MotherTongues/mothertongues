@@ -29,11 +29,20 @@ class Parser(BaseTabularParser):
             work_sheet = work_book.active
         self.fieldnames: Optional[Dict[str, Any]] = None
         if self.manifest.use_header:
-            self.fieldnames = {
-                c.value: c.column
-                for (c,) in work_sheet.iter_cols(min_row=1, max_row=1)
-                if c.value
-            }
+            header_cells = [
+                c for (c,) in work_sheet.iter_cols(min_row=1, max_row=1) if c.value
+            ]
+            header_values = [c.value for c in header_cells]
+            duplicates = sorted(
+                {v for v in header_values if header_values.count(v) > 1}
+            )
+            if duplicates:
+                raise ParserError(
+                    f"Duplicate column header(s) {duplicates} found in "
+                    f"{self.resource_path}. Column headers must be unique when "
+                    "'use_header' is enabled."
+                )
+            self.fieldnames = {c.value: c.column for c in header_cells}
             min_row = 2
         elif self.manifest.skip_header:
             min_row = 2
@@ -42,7 +51,15 @@ class Parser(BaseTabularParser):
         self.resource = work_sheet.iter_rows(min_row=min_row)
 
     def parse_fn(self, entry: Tuple[Cell, ...], col: str) -> str:
-        """Given a tuple of OpenPyxl cells, return the value of the cell matching the column value for col"""
+        """Given a tuple of OpenPyxl cells, return the value of the cell
+        matching the column value for col.
+
+        If ``col`` matches a header name (when ``manifest.use_header`` is
+        enabled), that column is used directly. Otherwise, ``col`` is treated
+        as a positional column reference: either a plain 0-indexed number
+        (e.g. "0", "1") or a spreadsheet-style column letter (e.g. "A", "B")
+        may be used, and both refer to the same column.
+        """
         if self.fieldnames is not None and col in self.fieldnames:
             columns = [self.fieldnames[col], col, col2int(col)]
         else:
