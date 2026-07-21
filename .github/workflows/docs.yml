@@ -10,7 +10,7 @@ jobs:
     # #no-ci in the commit log flags commit we don't want CI-validated
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # fetch all commits/branches
       - name: Set up Python
