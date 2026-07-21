@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List, Tuple
 from unittest import main
 
+from openpyxl import Workbook
 from pydantic import ValidationError
 
 from mothertongues.config.models import (
@@ -14,7 +15,7 @@ from mothertongues.config.models import (
     ResourceManifest,
 )
 from mothertongues.dictionary import MTDictionary
-from mothertongues.exceptions import ConfigurationError
+from mothertongues.exceptions import ConfigurationError, ParserError
 from mothertongues.tests.base_test_case import BasicTestCase
 from mothertongues.utils import load_mtd_configuration
 
@@ -242,6 +243,77 @@ class DictionaryParserTest(BasicTestCase):
             mtd_config.data[0].manifest.skip_header = True
             dictionary = MTDictionary(mtd_config)
             self.assertEqual(len(dictionary.data), len(self.parsed_data) - 1)
+
+    def test_basic_tabular_parsers_use_header(self):
+        for format in [ParserEnum.csv, ParserEnum.tsv, ParserEnum.psv, ParserEnum.xlsx]:
+            language_config_path = self.data_dir / f"config_{format.name}.json"
+            config = load_mtd_configuration(language_config_path)
+            mtd_config = MTDConfiguration(**config)
+            # First try with numeric column IDs, which should still work
+            mtd_config.data[0].manifest.use_header = True
+            mtd_config.data[0].resource = mtd_config.data[0].resource.with_stem(
+                "data_header"
+            )
+            dictionary = MTDictionary(mtd_config)
+            self.maxDiff = None
+            self.assertEqual(dictionary.data[0]["word"], "farvel")
+            self.assertEqual(dictionary.data[3]["word"], "træ")
+            data = self._correct_data(dictionary.data)
+            self.assertCountEqual(data, self.parsed_data)
+            # Now try with text column IDs, which should also work
+            targets = {
+                "entryID": "0",
+                "definition": "English",
+                "word": "Danish",
+                "audio": [{"description": "Speaker", "filename": "Audio"}],
+                "video": [{"description": "Video Speaker", "filename": "Video"}],
+                "theme": "Category",
+                "optional": {"Part of Speech": "POS"},
+            }
+            # Verify that letters as column IDs minimally work
+            targets["entryID"] = "A"
+            mtd_config.data[0].manifest.targets = ParserTargets.model_validate(targets)
+            dictionary = MTDictionary(mtd_config)
+            self.maxDiff = None
+            self.assertEqual(dictionary.data[0]["word"], "farvel")
+            self.assertEqual(dictionary.data[3]["word"], "træ")
+            data = self._correct_data(dictionary.data)
+            self.assertCountEqual(data, self.parsed_data)
+
+    def test_duplicate_headers_raise(self):
+        delimiters = {
+            ParserEnum.csv: ",",
+            ParserEnum.tsv: "\t",
+            ParserEnum.psv: "|",
+        }
+        for format, delimiter in delimiters.items():
+            language_config_path = self.data_dir / f"config_{format.name}.json"
+            config = load_mtd_configuration(language_config_path)
+            mtd_config = MTDConfiguration(**config)
+            mtd_config.data[0].manifest.use_header = True
+            duplicate_resource = self.tempdir / f"data_duplicate_header.{format.name}"
+            header = delimiter.join(["ID", "English", "Danish", "English"])
+            row = delimiter.join(["1", "tree", "træ", "tree"])
+            with open(duplicate_resource, "w", encoding="utf8") as f:
+                f.write(header + "\n" + row + "\n")
+            mtd_config.data[0].resource = duplicate_resource
+            with self.assertRaises(ParserError):
+                MTDictionary(mtd_config)
+
+        # xlsx has its own header-reading code path, so test it separately
+        language_config_path = self.data_dir / "config_xlsx.json"
+        config = load_mtd_configuration(language_config_path)
+        mtd_config = MTDConfiguration(**config)
+        mtd_config.data[0].manifest.use_header = True
+        wb = Workbook()
+        ws = wb.active
+        ws.append(["ID", "English", "Danish", "English"])
+        ws.append([1, "tree", "træ", "tree"])
+        duplicate_xlsx_resource = self.tempdir / "data_duplicate_header.xlsx"
+        wb.save(duplicate_xlsx_resource)
+        mtd_config.data[0].resource = duplicate_xlsx_resource
+        with self.assertRaises(ParserError):
+            MTDictionary(mtd_config)
 
     def test_xlsx_specifics(self):
         language_config_path = self.data_dir / "config_xlsx.json"

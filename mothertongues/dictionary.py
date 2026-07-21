@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 from urllib.parse import urljoin
 
 from loguru import logger
@@ -47,7 +47,7 @@ class MTDictionary:
         self.missing_data: List[str] = []
         self.duplicates: List[str] = []
         self.unparsable_entries: int = 0
-        self.data = None
+        self.data: Optional[List[DictionaryEntry]] = None
         self.l1_index = None
         self.l2_index = None
         self.sort_data = sort_data

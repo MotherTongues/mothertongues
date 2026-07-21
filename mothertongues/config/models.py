@@ -445,6 +445,16 @@ class ResourceManifest(BaseConfig):
     skip_header: bool = False
     """Whether to skip the header when parsing. Applies to spreadsheet formats"""
 
+    use_header: bool = False
+    """Whether to use the header row to name columns. Applies to spreadsheet formats.
+    When enabled, ParserTargets values are first matched against header names.
+    If a value doesn't match any header, it falls back to being treated as a
+    positional column reference, which may be given either as a plain
+    0-indexed number (e.g. "0", "1") or as a spreadsheet-style column letter
+    (e.g. "A", "B") -- both styles are accepted and refer to the same column.
+    Header names must be unique; a manifest with duplicate headers will raise
+    a ParserError."""
+
     transducers: List[ArbitraryFieldRestrictedTransducer] = []
     """A list of Transducers to apply to your data"""
 
