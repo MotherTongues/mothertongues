@@ -50,7 +50,7 @@ dev = [
     # update-plan.md phase 6 rather than folded into this migration.
     "black>=22.12.0,<23.0",
     "mypy>=1.4.1,<1.5.0",
-    "pre-commit>=3.5.0",
+    "pre-commit>=4.6.1",
 ]
 docs = [
     "mkdocs>=1.6.1",
