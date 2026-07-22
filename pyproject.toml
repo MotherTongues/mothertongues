@@ -48,7 +48,7 @@ dev = [
     # changed) and mypy 1.5+ surfaces 2 pre-existing type errors in
     # dictionary.py that 1.4.1 doesn't catch -- both deferred to
     # update-plan.md phase 6 rather than folded into this migration.
-    "black>=22.12.0,<23.0",
+    "black>=26.5.1,<27.0",
     "mypy>=1.4.1,<1.5.0",
     "pre-commit>=3.5.0",
 ]
