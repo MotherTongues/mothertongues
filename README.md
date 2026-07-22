@@ -45,7 +45,7 @@ If you just want to try something out you can use the mothertongues command line
 
 ### Local Install
 
-To install locally you will have to have Git, Python 3.11+, [uv](https://docs.astral.sh/uv/getting-started/installation/) and Node 16+ on your machine. You can then follow these steps:
+To install locally you will have to have Git, Python 3.11+, [uv](https://docs.astral.sh/uv/getting-started/installation/) and Node 22+ on your machine. You can then follow these steps:
 
 1. Clone repo and UI submodule `git clone https://github.com/MotherTongues/mothertongues.git --recursive`
 2. Build the UI: `cd mothertongues/mothertongues-UI && npm install`

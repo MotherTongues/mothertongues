@@ -25,7 +25,7 @@ Before setting up Mother Tongues, you need the following installed on your machi
 -  [Git](https://git-scm.com/downloads)
 - [Python 3.11+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) - python package/env manager
-- [Node JS 16+](https://nodejs.org/en/download) - required for the UI
+- [Node JS 22+](https://nodejs.org/en/download) - required for the UI
 
 Installing Mother Tongues
 ----------------------------
