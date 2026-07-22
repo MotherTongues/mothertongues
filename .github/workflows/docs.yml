@@ -6,29 +6,25 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     # #no-ci in the commit log flags commit we don't want CI-validated
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # fetch all commits/branches
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
         with:
-          python-version: "3.9"
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.3.0"
+          python-version: "3.11"
       - name: Install dependencies
         run: |
-          poetry install --with docs
+          uv sync --group docs
       - name: Setup doc deploy
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Deploy docs with mike 🚀
         run: |
-          poetry run mkdocs build
-          poetry run mike deploy --push --update-aliases latest
+          uv run mkdocs build
+          uv run mike deploy --push --update-aliases latest

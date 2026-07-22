@@ -11,8 +11,8 @@ This section is meant to get you set up with building your dictionary as quick a
     - Press ctrl+c to exit the server from your terminal.
 
     !!! Local-Development-Note
-        If you are customizing MTD code, and you want to see your changes deployed locally, you need to run the above commands within the `poetry` environment that was automatically setup for you upon local installation.
+        If you are customizing MTD code, and you want to see your changes deployed locally, you need to run the above commands within the `uv` environment that was automatically setup for you upon local installation.
 
-        This is can be done by including `poetry run` before all `mothertongues` commands or by activating your poetry env (`poetry shell`)
+        This can be done by prefixing all `mothertongues` commands with `uv run` (e.g. `uv run mothertongues new-project`) or by activating the environment directly (`source .venv/bin/activate`).
 
-        Check out [poetry documentation](https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment) for more details
+        Check out the [uv documentation](https://docs.astral.sh/uv/getting-started/features/#running-commands) for more details

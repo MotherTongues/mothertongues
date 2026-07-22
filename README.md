@@ -40,17 +40,17 @@ pip install mothertongues
 
 If you just want to try something out you can use the mothertongues command line to create a configuration and some sample data:
 
-1. `poetry run python3 cli.py new-project`
-2. Then run your dictionary: `poetry run python3 cli.py build-and-run <YourDictionaryConfigDirPath>/config.mtd.json`
+1. `mothertongues new-project`
+2. Then run your dictionary: `mothertongues build-and-run <YourDictionaryConfigDirPath>/config.mtd.json`
 
 ### Local Install
 
-To install locally you will have to have Git, Python 3.8+, [poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) and Node 16+ on your machine. You can then follow these steps:
+To install locally you will have to have Git, Python 3.11+, [uv](https://docs.astral.sh/uv/getting-started/installation/) and Node 16+ on your machine. You can then follow these steps:
 
 1. Clone repo and UI submodule `git clone https://github.com/MotherTongues/mothertongues.git --recursive`
 2. Build the UI: `cd mothertongues/mothertongues-UI && npm install`
 3. Build the Python Development version of the UI: `npx nx build mtd-mobile-ui --configuration=pydev`
-4. Install the Python package: `cd .. && poetry install`
+4. Install the Python package: `cd .. && uv sync`
 
 ## Usage
 

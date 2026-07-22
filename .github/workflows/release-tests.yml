@@ -6,68 +6,61 @@ jobs:
   pre-release-matrix-test:
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-latest, macos-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        poetry-version: ["1.3.0"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11", "3.12", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: ${{ matrix.poetry-version }}
       - name: Install dependencies
         run: |
-          poetry install
+          uv sync
       - name: Run tests
-        run: poetry run python mothertongues/tests/run.py dev
+        run: uv run python mothertongues/tests/run.py dev
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
           fetch-depth: 0 # fetch all commits/branches
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
         with:
-          python-version: '3.9'
+          python-version: "3.11"
       - name: Use Node.js 18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: "18"
       - name: Install & Build UI
         run: |
           # The default config is for the monorepo, while this is for standalone
           cd mothertongues-UI && npm install && npx nx build mtd-mobile-ui --configuration=pydev
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.3.0"
       - name: Install dependencies
         run: |
-          poetry install --with docs
-          pip install build twine
+          uv sync --group docs
+          uv pip install build twine
       - name: Build
+        env:
+          MTD_REQUIRE_UI_BUILD: "1"
         run: |
-          poetry build
+          uv build
       - name: Build and publish
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          twine upload dist/*
+          uv run twine upload dist/*
       - name: Determine tag
         id: determine_tag
         run: |
           echo "TAG_VERSION=$(ls dist/mothertongues-*.tar.gz | sed -e 's/.*mothertongues-//' -e 's/.tar.gz.*//')" >> $GITHUB_OUTPUT
       - name: Bump version and push tag
         id: tag_version
-        uses: mathieudutour/github-tag-action@v6.1
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.determine_tag.outputs.TAG_VERSION }}
@@ -84,5 +77,5 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Deploy docs with mike 🚀
         run: |
-          poetry run mkdocs build
-          poetry run mike deploy --push --update-aliases latest ${{ steps.tag_version.outputs.new_tag }} stable
+          uv run mkdocs build
+          uv run mike deploy --push --update-aliases latest ${{ steps.tag_version.outputs.new_tag }} stable
