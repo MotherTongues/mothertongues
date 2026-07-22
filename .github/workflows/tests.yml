@@ -4,29 +4,25 @@ on:
   - pull_request
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     # #no-ci in the commit log flags commit we don't want CI-validated
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v7
+      - name: Install uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9
         with:
-          python-version: "3.9"
-      - name: Run image
-        uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.3.0"
+          python-version: "3.11"
       - name: Install dependencies
         run: |
-          poetry install
-          poetry run pip install coverage
+          uv sync
+          uv pip install coverage
       - name: Run tests
         run: |
-          poetry run coverage run mothertongues/tests/run.py dev
-          poetry run coverage xml
+          uv run coverage run mothertongues/tests/run.py dev
+          uv run coverage xml
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"

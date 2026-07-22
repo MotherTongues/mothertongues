@@ -23,8 +23,8 @@ Prerequisites
 Before setting up Mother Tongues, you need the following installed on your machine
 
 -  [Git](https://git-scm.com/downloads)
-- [Python 3.8+](https://www.python.org/downloads/)
-- [poetry](https://python-poetry.org/docs/) - python package used for python env management
+- [Python 3.11+](https://www.python.org/downloads/)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) - python package/env manager
 - [Node JS 16+](https://nodejs.org/en/download) - required for the UI
 
 Installing Mother Tongues
@@ -54,5 +54,5 @@ cd mothertongues/mothertongues-UI && npm install
 npx nx build mtd-mobile-ui --configuration=pydev
 
 # Install the Python package:
-cd .. && poetry install --with dev,docs
+cd .. && uv sync --group dev --group docs
 ```
