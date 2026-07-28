@@ -20,7 +20,7 @@ dependencies = [
     # known typer/click incompatibility). uv.lock happens to already resolve
     # a safe click, but a plain `pip install` of the built wheel does not,
     # so this needs to be pinned explicitly rather than left implicit.
-    "click<8.1.4",
+    "click<8.4.3",
     "rich>=13.0.0",
     "httpx>=0.28.1",
     "pydantic>=2.10.6",
