@@ -32,7 +32,7 @@ dependencies = [
     # Pinned below 0.9: 0.9+ fixes a jsf bug (ghandic/jsf#80) that our fuzz
     # tests were incidentally relying on to avoid a real bug in
     # MTDictionary.transduce() -- see update-plan.md phase 6.
-    "jsf>=0.8.0,<0.9.0",
+    "jsf>=0.11.2,<0.12.0",
     "questionary>=2.1.0",
     "joblib>=1.3.0",
 ]
