@@ -13,7 +13,7 @@ dependencies = [
     # a different Click result attribute, wrapped in a panel, lowercased
     # parameter names), which breaks test_cli.py's output assertions --
     # see update-plan.md phase 6.
-    "typer[all]>=0.9.0,<0.10.0",
+    "typer[all]>=0.27.0,<0.28.0",
     # typer 0.9.x declares click>=7.1.1,<9.0.0, which is wide enough to admit
     # click 8.1.4+, but that combination crashes on startup with
     # "TypeError: Secondary flag is not valid for non-boolean flag." (a
