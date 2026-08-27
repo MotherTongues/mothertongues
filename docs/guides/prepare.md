@@ -64,7 +64,7 @@ key equal to an array containing the letters in your language's alphabet in alph
 }
 ```
 
-You can also reference a file that contains a csv of your alphabet:
+You can also reference a file that contains a txt or json file containing your alphabet:
 
 ```json hl_lines="6"
 {
@@ -72,14 +72,11 @@ You can also reference a file that contains a csv of your alphabet:
         "L1": "Danish",
         "L2": "English",
         ...
-        "alphabet": "../alphabet.csv"
+        "alphabet": "../alphabet.txt"
     },
     ...
 }
 ```
-
-!!! tip
-    In the [starter](https://github.com/MotherTongues/mtd-starter), an alphabet file is used at `mtd-starter/alphabet.csv`
 
 ### Custom Sort Form (Advanced)
 
