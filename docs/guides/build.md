@@ -15,8 +15,8 @@ Once you have properly configured your dictionary data, you can let `mothertongu
 
 This will parse all of the data according to your specifications, combine all of your sources of data, sort your data according to your alphabet, create an [inverted index](https://en.wikipedia.org/wiki/Inverted_index) for improved performance, [calculate BM25 scores for ranking search results](https://en.wikipedia.org/wiki/Okapi_BM25), and generate the code necessary for your approximate search to work.
 
-This guide assumes that you have worked through the steps to create a valid [Language Configuration file](#mtd-language-configuration-file) and [Data Resource Configuration files](#mtd-data-resource-configuration-file) for each unique source of data. It also assumes you have a directory
-structure similar to the one [described in this guide](#file-structure).
+This guide assumes that you have worked through the steps to create a valid [Language Configuration file](prepare.md#mtd-language-configuration-file) for each unique source of data. It also assumes you have a directory
+structure similar to the one [described in this guide](prepare.md#project-folder-structure).
 
 Then run:
 
@@ -43,7 +43,7 @@ This will create a file called `dictionary_data.json` which is the file you will
 Here are the steps for creating a mobile dictionary on your machine.
 
 !!! note
-    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine](#seeing-your-dictionary-in-action-ie-local-development) or [exporting your data](#exporting-your-data) and [publishing to GitHub]()
+    You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for [running on your machine](#seeing-your-dictionary-in-action-ie-local-development) or [publishing to GitHub](../nocode/install.md)
 
 1. Change into the UI directory:
 
