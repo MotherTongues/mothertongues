@@ -9,11 +9,7 @@
                     "type": "boolean"
                 },
                 "unicode_normalization": {
-                    "allOf": [
-                        {
-                            "$ref": "#/$defs/NormalizationEnum"
-                        }
-                    ],
+                    "$ref": "#/$defs/NormalizationEnum",
                     "default": "NFC"
                 },
                 "remove_punctuation": {
@@ -188,6 +184,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -206,6 +203,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -224,6 +222,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -242,6 +241,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -260,6 +260,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -281,6 +282,7 @@
                                         "type": "array"
                                     },
                                     {
+                                        "additionalProperties": true,
                                         "type": "object"
                                     }
                                 ]
@@ -288,6 +290,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -309,6 +312,7 @@
                                         "type": "array"
                                     },
                                     {
+                                        "additionalProperties": true,
                                         "type": "object"
                                     }
                                 ]
@@ -316,6 +320,7 @@
                             "type": "array"
                         },
                         {
+                            "additionalProperties": true,
                             "type": "object"
                         },
                         {
@@ -378,11 +383,7 @@
     "additionalProperties": false,
     "properties": {
         "file_type": {
-            "allOf": [
-                {
-                    "$ref": "#/$defs/ParserEnum"
-                }
-            ],
+            "$ref": "#/$defs/ParserEnum",
             "default": "none"
         },
         "name": {
@@ -393,6 +394,11 @@
         "skip_header": {
             "default": false,
             "title": "Skip Header",
+            "type": "boolean"
+        },
+        "use_header": {
+            "default": false,
+            "title": "Use Header",
             "type": "boolean"
         },
         "transducers": {
@@ -406,9 +412,6 @@
         "audio_path": {
             "anyOf": [
                 {
-                    "format": "uri",
-                    "maxLength": 2083,
-                    "minLength": 1,
                     "type": "string"
                 },
                 {
@@ -421,9 +424,6 @@
         "video_path": {
             "anyOf": [
                 {
-                    "format": "uri",
-                    "maxLength": 2083,
-                    "minLength": 1,
                     "type": "string"
                 },
                 {
@@ -436,9 +436,6 @@
         "img_path": {
             "anyOf": [
                 {
-                    "format": "uri",
-                    "maxLength": 2083,
-                    "minLength": 1,
                     "type": "string"
                 },
                 {

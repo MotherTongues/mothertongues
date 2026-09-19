@@ -18,6 +18,7 @@ from typing import (
     Union,
 )
 from unicodedata import normalize
+from urllib.parse import urlparse
 from uuid import UUID
 
 from pydantic import (  # type: ignore
@@ -26,7 +27,6 @@ from pydantic import (  # type: ignore
     ConfigDict,
     Field,
     FilePath,
-    HttpUrl,
     field_validator,
     model_validator,
     parse_obj_as,
@@ -458,14 +458,14 @@ class ResourceManifest(BaseConfig):
     transducers: List[ArbitraryFieldRestrictedTransducer] = []
     """A list of Transducers to apply to your data"""
 
-    audio_path: Optional[HttpUrl] = None
-    """This is a path to your audio files that will be pre-pended to each audio path"""
+    audio_path: Optional[str] = None
+    """This is a path to your audio files that will be pre-pended to each audio path. It can be an absolute URL (http/https) or a relative or root-relative path (e.g. '/assets/')"""
 
-    video_path: Optional[HttpUrl] = None
-    """This is a path to your video files that will be pre-pended to each video path"""
+    video_path: Optional[str] = None
+    """This is a path to your video files that will be pre-pended to each video path. It can be an absolute URL (http/https) or a relative or root-relative path (e.g. '/assets/')"""
 
-    img_path: Optional[HttpUrl] = None
-    """This is a path to your image files that will be pre-pended to each image path"""
+    img_path: Optional[str] = None
+    """This is a path to your image files that will be pre-pended to each image path. It can be an absolute URL (http/https) or a relative or root-relative path (e.g. '/assets/')"""
 
     targets: Optional[ParserTargets] = None
     """The ParserTargets for parsing the resource. They are optional if providing a custom parser method"""
@@ -493,10 +493,21 @@ class ResourceManifest(BaseConfig):
             )
         return values
 
-    @field_validator("audio_path", "img_path")
+    @field_validator("audio_path", "video_path", "img_path")
     @classmethod
-    def check_paths_are_pingable(cls, v):
-        return v
+    def normalize_media_paths(cls, v):
+        """Accept URLs or relative paths, and ensure a trailing slash so urljoin treats the path as a directory"""
+        if v is None:
+            return v
+        v = v.strip()
+        if not v:
+            raise ValueError("Media paths cannot be empty")
+        scheme = urlparse(v).scheme
+        if scheme and scheme not in ("http", "https"):
+            raise ValueError(
+                f"Media paths must be http(s) URLs or relative paths, not '{scheme}:'"
+            )
+        return v if v.endswith("/") else v + "/"
 
 
 class LanguageConfigurationExportFormat(BaseModel):
@@ -538,9 +549,9 @@ class LanguageConfigurationExportFormat(BaseModel):
     )
     """The path to an image for the about page"""
 
-    aboutPageDescription: Optional[
-        str
-    ] = "Please change this text to describe your dictionary in a bit more detail."
+    aboutPageDescription: Optional[str] = (
+        "Please change this text to describe your dictionary in a bit more detail."
+    )
     """A description of your dictionary project to go in the about page"""
 
     build: str
@@ -620,9 +631,9 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     )
     """The path to an image for the about page"""
 
-    aboutPageDescription: Optional[
-        str
-    ] = "Please change this text to describe your dictionary in a bit more detail."
+    aboutPageDescription: Optional[str] = (
+        "Please change this text to describe your dictionary in a bit more detail."
+    )
     """A description of your dictionary project to go in the about page"""
 
     build: str = Field(

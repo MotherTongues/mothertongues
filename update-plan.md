@@ -2,7 +2,7 @@
 
 Status: draft, based on a full-codebase health review on 2026-07-21. Both `mothertongues` (Python) and `mothertongues-UI` (Nx/Angular submodule) have had no substantive commits since June 2024. This plan sequences the work needed to bring both back to a maintainable, currently-supported state.
 
-**Suggested execution order:** 5 (done) → 2 (done) → 1 (done) → 6 (python half) → 3 → 4 → 6 (UI half). Dependabot is cheap and immediately surfaces the true dependency gap; PR #33 is easiest to land *before* the pyproject/tooling churn of step 1 touches the same files it touches; the Python code-smell cleanup pairs naturally with step 1 since you're already in `pyproject.toml`/CI; the UI code-smell cleanup pairs naturally with step 3/4 since you're already touching those components. The list below stays in the order requested, with cross-references to this sequencing.
+**Suggested execution order:** 5 (done) → 2 (done) → 1 (done) → 6 (python half) → 3 (done) → 4 → 6 (UI half). Dependabot is cheap and immediately surfaces the true dependency gap; PR #33 is easiest to land *before* the pyproject/tooling churn of step 1 touches the same files it touches; the Python code-smell cleanup pairs naturally with step 1 since you're already in `pyproject.toml`/CI; the UI code-smell cleanup pairs naturally with step 3/4 since you're already touching those components. The list below stays in the order requested, with cross-references to this sequencing.
 
 ---
 

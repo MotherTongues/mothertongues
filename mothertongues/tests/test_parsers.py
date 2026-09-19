@@ -426,6 +426,27 @@ class DictionaryParserTest(BasicTestCase):
             data[1]["video"][0]["filename"], "https://foobar.bar/snowfall.mp4"
         )
 
+    def test_relative_media_paths(self):
+        manifest = ResourceManifest(
+            audio_path="/assets", video_path="video/", img_path="https://foo.bar"
+        )
+        self.assertEqual(manifest.audio_path, "/assets/")
+        self.assertEqual(manifest.video_path, "video/")
+        self.assertEqual(manifest.img_path, "https://foo.bar/")
+        data_source = DataSource(manifest=manifest, resource=self.parsed_data)
+        dictionary = MTDictionary(
+            MTDConfiguration(config=LanguageConfiguration(), data=[data_source])
+        )
+        self.assertEqual(dictionary.data[1]["audio"][0]["filename"], "/assets/hej.mp3")
+        self.assertEqual(
+            dictionary.data[1]["video"][0]["filename"], "video/snowfall.mp4"
+        )
+
+    def test_invalid_media_paths(self):
+        for bad in ("", "  ", "ftp://foo.bar", "javascript:alert(1)"):
+            with self.assertRaises(ValueError):
+                ResourceManifest(audio_path=bad)
+
 
 if __name__ == "__main__":
     main()
