@@ -3,6 +3,7 @@ import os
 
 from typer.testing import CliRunner
 from unittest import main
+from unittest.mock import patch
 
 from mothertongues.cli import app
 from mothertongues.config.models import (
@@ -112,6 +113,18 @@ class CommandLineTest(BasicTestCase):
 
         self.assertEqual(result.exit_code, 1)
         self.assertIn("'data' value in your json config is empty", logs[0])
+
+    def test_build_and_run_missingUI(self):
+        with patch("mothertongues.cli.UI_DIR", self.tempdir / "ui"):
+            for command, path in [
+                ("build-and-run", self.data_dir / "config_data_check.json"),
+                ("run", self.data_dir / "config_data_check.json"),
+            ]:
+                with capture_logs() as logs:
+                    result = self.runner.invoke(app, [command, str(path)])
+                self.assertEqual(result.exit_code, 1)
+                self.assertIn("Mother Tongues UI was not found", logs[0])
+                self.assertIn("pip install mothertongues", logs[0])
 
     def test_export_validate_happyPath(self):
         result = self.runner.invoke(

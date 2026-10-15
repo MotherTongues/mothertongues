@@ -31,6 +31,24 @@ app = typer.Typer(rich_markup_mode="markdown")
 UI_DIR = Path(__file__).parent / "ui"
 
 
+def ensure_ui_built():
+    """Exit with a helpful message if the bundled UI is missing.
+
+    The UI is built separately from the mothertongues-UI submodule, so it is
+    absent from source checkouts and git installs until it has been built.
+    """
+    if not (UI_DIR / "assets").is_dir():
+        logger.error(
+            f"The Mother Tongues UI was not found at {UI_DIR}. "
+            "If you installed from source, build the UI first with "
+            "`cd mothertongues-UI && npm install && "
+            "npx nx build mtd-mobile-ui --configuration=pydev`. "
+            "Otherwise, install the released package from PyPI with "
+            "`pip install mothertongues`."
+        )
+        exit(1)
+
+
 @app.command()
 def run(
     dictionary_data: Path = typer.Argument(
@@ -50,6 +68,7 @@ def run(
 
     If you haven't generated your dictionary data yet, use the export command first or use the build-and-run command instead.
     """
+    ensure_ui_built()
     shutil.copy(dictionary_data, UI_DIR / "assets" / "dictionary_data.json")
     Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     logger.warning(
@@ -82,6 +101,7 @@ def build_and_run(
     This is helpful for debugging, just run this command and your dictionary will be available at [http://localhost:3636](http://localhots:3636)
     You can exit the server by pressing ctrl+c.
     """
+    ensure_ui_built()
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
     output = dictionary.export()
