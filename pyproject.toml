@@ -1,6 +1,6 @@
 [project]
 name = "mothertongues"
-version = "1.0.20250728"
+version = "2.0.0"
 description = ""
 authors = [{ name = "roedoejet", email = "hello@aidanpine.ca" }]
 readme = "README.md"

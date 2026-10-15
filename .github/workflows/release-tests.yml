@@ -1,8 +1,37 @@
-name: Run full matrix Tests before Releases
+name: Release
+# Opening a PR into `release` runs the full test matrix and checks the version is new.
+# Merging that PR (a push to `release`) runs the tests again and, only if they pass,
+# publishes to PyPI, tags the version, creates a GitHub release and deploys the docs.
 on:
   pull_request:
-    branches: [ release ]
+    branches: [release]
+  push:
+    branches: [release]
+
+# Never run two releases of the same ref at once
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the version has not been published yet
+        id: version
+        run: |
+          VERSION=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/mothertongues/$VERSION/json")
+          if [ "$STATUS" = "200" ]; then
+            echo "::error file=pyproject.toml::mothertongues $VERSION is already on PyPI. Bump the version in pyproject.toml."
+            exit 1
+          fi
+          echo "Releasing mothertongues $VERSION"
+
   pre-release-matrix-test:
     strategy:
       matrix:
@@ -20,13 +49,14 @@ jobs:
           uv sync
       - name: Run tests
         run: uv run python mothertongues/tests/run.py dev
-  publish:
+
+  build:
+    needs: [check-version, pre-release-matrix-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-          fetch-depth: 0 # fetch all commits/branches
       - name: Install uv
         uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
         with:
@@ -38,32 +68,47 @@ jobs:
       - name: Install & Build UI
         run: |
           # The default config is for the monorepo, while this is for standalone
-          cd mothertongues-UI && npm install && npx nx build mtd-mobile-ui --configuration=pydev
-      - name: Install dependencies
-        run: |
-          uv sync --group docs
-          uv pip install build twine
+          cd mothertongues-UI && npm ci && npx nx build mtd-mobile-ui --configuration=pydev
       - name: Build
         env:
           MTD_REQUIRE_UI_BUILD: "1"
         run: |
           uv build
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      - name: Check the built wheel includes the UI
         run: |
-          uv run twine upload dist/*
-      - name: Determine tag
-        id: determine_tag
-        run: |
-          echo "TAG_VERSION=$(ls dist/mothertongues-*.tar.gz | sed -e 's/.*mothertongues-//' -e 's/.tar.gz.*//')" >> $GITHUB_OUTPUT
+          python3 -m zipfile -l dist/*.whl | grep -q "mothertongues/ui/index.html"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    # Only publish once the release PR has been merged
+    if: github.event_name == 'push'
+    needs: [check-version, build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/mothertongues/${{ needs.check-version.outputs.version }}
+    permissions:
+      contents: write # tag, GitHub release and gh-pages docs
+      id-token: write # PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # fetch all commits/branches
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
       - name: Bump version and push tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          custom_tag: ${{ steps.determine_tag.outputs.TAG_VERSION }}
+          custom_tag: ${{ needs.check-version.outputs.version }}
           create_annotated_tag: true
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
@@ -71,6 +116,14 @@ jobs:
           tag: ${{ steps.tag_version.outputs.new_tag }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
           body: ${{ steps.tag_version.outputs.changelog }}
+          artifacts: dist/*
+      - name: Install uv
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884
+        with:
+          python-version: "3.11"
+      - name: Install docs dependencies
+        run: |
+          uv sync --group docs
       - name: Setup git config for doc deploy
         run: |
           git config user.name 'github-actions[bot]'
