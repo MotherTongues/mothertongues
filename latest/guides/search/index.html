@@ -582,6 +582,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#replace-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replace Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#adding-weights" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -892,6 +903,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#replace-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Replace Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#adding-weights" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1097,6 +1119,31 @@ further discussion.</p>
 </span><span class="w">        </span><span class="p">},</span>
 <span class="err">...</span>
 </code></pre></div>
+<h2 id="replace-rules">Replace Rules<a class="headerlink" href="#replace-rules" title="Permanent link">&para;</a></h2>
+<p>Sometimes the same word can be spelled in more than one way, and you want a search for one spelling to find the other. For example, Danish used to write "å" as "aa", so a user might search for "Aalborg" when your dictionary has "Ålborg". You can handle this with <code>replace_rules</code>, which replaces every match of a pattern with some other text:</p>
+<div class="highlight"><pre><span></span><code><span class="err">...</span>
+<span class="nt">&quot;l1_normalization_transducer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="nt">&quot;lower&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;unicode_normalization&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;remove_punctuation&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[.,/#!$%^&amp;?*&#39;;:{}=\\-_`~()]&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="nt">&quot;remove_combining_characters&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="hll"><span class="w">            </span><span class="nt">&quot;replace_rules&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">                </span><span class="nt">&quot;aa&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;a&quot;</span>
+</span><span class="hll"><span class="w">            </span><span class="p">}</span>
+</span><span class="w">        </span><span class="p">},</span>
+<span class="err">...</span>
+</code></pre></div>
+<p>Like all of the other settings in the normalization transducer, replace rules are applied both to the terms in your dictionary when it is built <em>and</em> to what the user types when they search. So, with the configuration above, "Ålborg", "Aalborg" and "alborg" are all normalized to <code>alborg</code>, and a search for any one of them will find the others.</p>
+<p>There are a few things to keep in mind when writing replace rules:</p>
+<ul>
+<li><strong>Replace rules are applied last</strong>, after lowercasing, Unicode normalization, removing punctuation and removing combining characters. Your rules need to match text that has <em>already</em> been through those steps. In the example above, <code>remove_combining_characters</code> has already turned "å" into "a", which is why the rule replaces "aa" with "a", not with "å". A rule of <code>"aa": "å"</code> would not work: "Aalborg" would become <code>ålborg</code>, but "Ålborg" would become <code>alborg</code>, so they would no longer match.</li>
+<li><strong>Rules are applied in the order they are listed</strong>, and each rule is applied to the result of the one before it.</li>
+<li><strong>Each pattern is a <a href="https://en.wikipedia.org/wiki/Regular_expression">regular expression</a>.</strong> Characters like <code>.</code>, <code>*</code>, <code>+</code>, <code>?</code>, <code>(</code>, <code>)</code>, <code>[</code> and <code>]</code> have special meanings, so put a backslash before them if you want to match them literally (and since the configuration is JSON, the backslash itself must be written as <code>\\</code>, for example <code>"\\."</code>). Rules are run in Python when your dictionary is built and in JavaScript in the browser, so stick to simple patterns, and don't refer to matched groups (like <code>\1</code> or <code>$1</code>) in the replacement text, since the two languages write these differently.</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This example is for L1 normalization - you can configure this for your L2 language as well.</p>
+</div>
 <h2 id="adding-weights">Adding weights<a class="headerlink" href="#adding-weights" title="Permanent link">&para;</a></h2>
 <p>What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners to be using our dictionary, that might be appropriate!</p>
 <p>The Mother Tongues approximate search algorithm works by calculating the edit distance between the query and the <a href="#which-keys-get-indexed">terms in your inverted index</a>. The edit distance is how many insertions, deletions, or subsitutions it takes to get from one string to another: <code>kat</code> and <code>cat</code> have an edit distance of <code>1.0</code> by default for example since the default cost for substitutions is <code>1.0</code>.</p>
