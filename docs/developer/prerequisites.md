@@ -29,30 +29,20 @@ Before setting up Mother Tongues, you need the following installed on your machi
 
 Installing Mother Tongues
 ----------------------------
-The simplest way to install `mothertongues` is with pip. Eventually we will publish this version on PyPi, but for now, please clone and install locally:
+You might want to clone and install mothertongues locally instead of through pip if you wish to customize the UI. To do so, run all of the following commands, in order. The UI must be built before installing the Python package, otherwise commands like `mothertongues build-and-run` will not be able to show your dictionary.
 
 ```bash
 # Clone repo and UI submodule
 git clone https://github.com/MotherTongues/mothertongues.git --recursive
-cd mothertongues && pip install --editable .
-```
 
-
-Planning on Customizing Mother Tongues?
----------------------------
-If you plan on modifying MTD code, run the following commands to install the git repos locally.
-
-
-```bash
-# Clone repo and UI submodule (if you haven't already from the above command)
-git clone https://github.com/MotherTongues/mothertongues.git --recursive
-
-# Build the UI:
+# Install the UI's dependencies:
 cd mothertongues/mothertongues-UI && npm install
 
 # Build the Python Development version of the UI:
 npx nx build mtd-mobile-ui --configuration=pydev
 
 # Install the Python package:
-cd .. && uv sync --group dev --group docs
+cd .. && uv sync --all-groups
 ```
+
+If you already cloned the repo without `--recursive`, run `git submodule update --init` from the `mothertongues` folder before building the UI. If you update the UI submodule later, re-run the build command above.
