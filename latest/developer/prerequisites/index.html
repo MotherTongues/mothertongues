@@ -382,17 +382,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#planning-on-customizing-mother-tongues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Planning on Customizing Mother Tongues?
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -744,17 +733,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#planning-on-customizing-mother-tongues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Planning on Customizing Mother Tongues?
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -789,25 +767,20 @@
 <li><a href="https://nodejs.org/en/download">Node JS 22+</a> - required for the UI</li>
 </ul>
 <h2 id="installing-mother-tongues">Installing Mother Tongues<a class="headerlink" href="#installing-mother-tongues" title="Permanent link">&para;</a></h2>
-<p>The simplest way to install <code>mothertongues</code> is with pip. Eventually we will publish this version on PyPi, but for now, please clone and install locally:</p>
+<p>You might want to clone and install mothertongues locally instead of through pip if you wish to customize the UI. To do so, run all of the following commands, in order. The UI must be built before installing the Python package, otherwise commands like <code>mothertongues build-and-run</code> will not be able to show your dictionary.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Clone repo and UI submodule</span>
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/MotherTongues/mothertongues.git<span class="w"> </span>--recursive
-<span class="nb">cd</span><span class="w"> </span>mothertongues<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--editable<span class="w"> </span>.
-</code></pre></div>
-<h2 id="planning-on-customizing-mother-tongues">Planning on Customizing Mother Tongues?<a class="headerlink" href="#planning-on-customizing-mother-tongues" title="Permanent link">&para;</a></h2>
-<p>If you plan on modifying MTD code, run the following commands to install the git repos locally.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Clone repo and UI submodule (if you haven&#39;t already from the above command)</span>
-git<span class="w"> </span>clone<span class="w"> </span>https://github.com/MotherTongues/mothertongues.git<span class="w"> </span>--recursive
 
-<span class="c1"># Build the UI:</span>
+<span class="c1"># Install the UI&#39;s dependencies:</span>
 <span class="nb">cd</span><span class="w"> </span>mothertongues/mothertongues-UI<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>npm<span class="w"> </span>install
 
 <span class="c1"># Build the Python Development version of the UI:</span>
 npx<span class="w"> </span>nx<span class="w"> </span>build<span class="w"> </span>mtd-mobile-ui<span class="w"> </span>--configuration<span class="o">=</span>pydev
 
 <span class="c1"># Install the Python package:</span>
-<span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev<span class="w"> </span>--group<span class="w"> </span>docs
+<span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>sync<span class="w"> </span>--all-groups
 </code></pre></div>
+<p>If you already cloned the repo without <code>--recursive</code>, run <code>git submodule update --init</code> from the <code>mothertongues</code> folder before building the UI. If you update the UI submodule later, re-run the build command above.</p>
 
 
 
