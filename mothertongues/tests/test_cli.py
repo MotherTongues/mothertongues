@@ -1,9 +1,9 @@
 import json
 import os
-
-from typer.testing import CliRunner
 from unittest import main
 from unittest.mock import patch
+
+from typer.testing import CliRunner
 
 from mothertongues.cli import app
 from mothertongues.config.models import (
@@ -125,6 +125,20 @@ class CommandLineTest(BasicTestCase):
                 self.assertEqual(result.exit_code, 1)
                 self.assertIn("Mother Tongues UI was not found", logs[0])
                 self.assertIn("pip install mothertongues", logs[0])
+
+    def test_dev_missingUIRepo(self):
+        with capture_logs() as logs:
+            result = self.runner.invoke(
+                app,
+                [
+                    "dev",
+                    str(self.data_dir / "config_data_check.json"),
+                    "--ui-repo",
+                    str(self.tempdir / "mothertongues-UI"),
+                ],
+            )
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("npm install", logs[0])
 
     def test_export_validate_happyPath(self):
         result = self.runner.invoke(
@@ -256,5 +270,6 @@ class CommandLineTest(BasicTestCase):
 
     # endregion
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

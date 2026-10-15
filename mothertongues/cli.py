@@ -1,8 +1,8 @@
 import json
+import os
 import shutil
-import socketserver
-from functools import partial
-from http.server import SimpleHTTPRequestHandler
+import signal
+import subprocess
 from pathlib import Path
 
 import nltk
@@ -24,11 +24,13 @@ from mothertongues.config.models import (
     ParserTargets,
     ResourceManifest,
 )
+from mothertongues.devserver import serve, watch_and_serve
 from mothertongues.dictionary import MTDictionary
 from mothertongues.utils import load_mtd_configuration
 
 app = typer.Typer(rich_markup_mode="markdown")
 UI_DIR = Path(__file__).parent / "ui"
+UI_REPO_DIR = Path(__file__).parent.parent / "mothertongues-UI"
 
 
 def ensure_ui_built():
@@ -70,18 +72,7 @@ def run(
     """
     ensure_ui_built()
     shutil.copy(dictionary_data, UI_DIR / "assets" / "dictionary_data.json")
-    Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
-    logger.warning(
-        "WARNING: This is a Development server and is not secure for production"
-    )
-    httpd = socketserver.TCPServer(("", port), Handler)
-    logger.info(
-        "Open http://localhost:{port} in your browser to see your dictionary", port=port
-    )
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        httpd.server_close()
+    serve(UI_DIR, port)
 
 
 @app.command()
@@ -94,31 +85,93 @@ def build_and_run(
         help="The path to your dictionary's language configuration file.",
     ),  # type: ignore
     port: int = 3636,
+    watch: bool = typer.Option(
+        default=False,
+        help="Rebuild your dictionary and reload the page whenever your configuration or data changes.",
+    ),
 ):
     """
     ## Build your dictionary and run it in your browser\
 
     This is helpful for debugging, just run this command and your dictionary will be available at [http://localhost:3636](http://localhots:3636)
+    Add `--watch` to rebuild your dictionary and refresh the page automatically whenever you change your configuration or data.
     You can exit the server by pressing ctrl+c.
     """
     ensure_ui_built()
+    if watch:
+        watch_and_serve(language_config_path, port, UI_DIR)
+        return
     config = MTDConfiguration(**load_mtd_configuration(language_config_path))
     dictionary = MTDictionary(config)
     output = dictionary.export()
-    Handler = partial(SimpleHTTPRequestHandler, directory=UI_DIR)
     with open(UI_DIR / "assets" / "dictionary_data.json", "w", encoding="utf8") as f:
         json.dump(output.model_dump(mode="json"), f, indent=4)
-    logger.warning(
-        "WARNING: This is a Development server and is not secure for production"
+    serve(UI_DIR, port)
+
+
+@app.command(hidden=True)
+def dev(
+    language_config_path: Path = typer.Argument(
+        exists=True,
+        file_okay=True,
+        dir_okay=False,
+        readable=True,
+        help="The path to your dictionary's language configuration file.",
+    ),  # type: ignore
+    port: int = 3636,
+    ui_repo: Path = typer.Option(
+        default=UI_REPO_DIR,
+        file_okay=False,
+        dir_okay=True,
+        help="The path to your checkout of the mothertongues-UI repository.",
+    ),
+):
+    """
+    ## Develop the Mother Tongues UI against your dictionary\
+
+    Runs the UI from the mothertongues-UI source with live reloading, and rebuilds your dictionary
+    whenever its configuration, its data or the mothertongues Python code changes.
+    The dictionary data is served on the port after `--port` and proxied by the UI dev server.
+    """
+    if not (ui_repo / "node_modules").is_dir():
+        logger.error(
+            f"Could not find an installed mothertongues-UI repository at {ui_repo}. "
+            "Run `git submodule update --init` and `npm install` in mothertongues-UI, "
+            "or pass its location with --ui-repo."
+        )
+        exit(1)
+    if shutil.which("npx") is None:
+        logger.error("Could not find `npx`. Please install Node.js first.")
+        exit(1)
+    data_port = port + 1
+    nx = subprocess.Popen(
+        [
+            "npx",
+            "nx",
+            "serve",
+            "mtd-mobile-ui",
+            "--configuration=pydev",
+            f"--port={port}",
+        ],
+        cwd=ui_repo,
+        env={**os.environ, "MTD_DATA_PORT": str(data_port)},
+        # Own process group so the whole nx tree can be stopped together
+        start_new_session=True,
     )
-    httpd = socketserver.TCPServer(("", port), Handler)
     logger.info(
-        "Open http://localhost:{port} in your browser to see your dictionary", port=port
+        "Open http://localhost:{port} in your browser once the UI has compiled",
+        port=port,
     )
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        httpd.server_close()
+        watch_and_serve(
+            language_config_path, data_port, None, ignore=[ui_repo], announce=False
+        )
+    finally:
+        try:
+            os.killpg(nx.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        nx.wait()
 
 
 @app.command(hidden=True)

@@ -6,6 +6,7 @@ from loguru import logger
 
 from mothertongues.tests.test_cli import CommandLineTest
 from mothertongues.tests.test_configuration import ConfigurationTest
+from mothertongues.tests.test_devserver import DevServerTest
 from mothertongues.tests.test_dictionary_data import DictionaryDataTest
 from mothertongues.tests.test_exporter import DictionaryExporterTest
 from mothertongues.tests.test_index import DictionaryIndexBuilderTest
@@ -14,7 +15,9 @@ from mothertongues.tests.test_sorter import SorterTest
 
 LOADER = TestLoader()
 
-INTEGRATION_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [CommandLineTest]]
+INTEGRATION_TESTS = [
+    LOADER.loadTestsFromTestCase(test) for test in [CommandLineTest, DevServerTest]
+]
 
 CONFIG_TESTS = [
     LOADER.loadTestsFromTestCase(test)

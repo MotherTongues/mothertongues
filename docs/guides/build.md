@@ -24,6 +24,8 @@ Then run:
 
 And your dictionary will be served at [http://localhost:3636](http://localhost:3636)
 
+If you add `--watch` (`mothertongues build-and-run <path_to_config.mtd.json> --watch`), your dictionary is rebuilt and the page in your browser refreshes automatically whenever you save a change to your configuration or data files.
+
 ## Exporting your data
 
 First, you need to export the dictionary data required by any MTD UI.
