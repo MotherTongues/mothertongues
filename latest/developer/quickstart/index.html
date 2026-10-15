@@ -654,12 +654,18 @@
 <ul>
 <li>Your dictionary will be available on your computer at http://localhost:3636</li>
 <li>Press ctrl+c to exit the server from your terminal.</li>
+<li>Add <code>--watch</code> to rebuild your dictionary and refresh the page automatically whenever you change your configuration or data.</li>
 </ul>
 <div class="admonition local-development-note">
 <p class="admonition-title">Local-development-note</p>
 <p>If you are customizing MTD code, and you want to see your changes deployed locally, you need to run the above commands within the <code>uv</code> environment that was automatically setup for you upon local installation.</p>
 <p>This can be done by prefixing all <code>mothertongues</code> commands with <code>uv run</code> (e.g. <code>uv run mothertongues new-project</code>) or by activating the environment directly (<code>source .venv/bin/activate</code>).</p>
 <p>Check out the <a href="https://docs.astral.sh/uv/getting-started/features/#running-commands">uv documentation</a> for more details</p>
+</div>
+<div class="admonition developing-the-ui-note">
+<p class="admonition-title">Developing-the-ui-note</p>
+<p>If you are working on the Mother Tongues UI itself, run <code>npm install</code> once in the <code>mothertongues-UI</code> submodule and then use <code>uv run mothertongues dev "&lt;FileLocationYouProvided&gt;/config.mtd.json"</code>.
+This serves the UI from its source with live reloading at http://localhost:3636, and rebuilds your dictionary whenever its configuration, its data or the mothertongues Python code changes, so there is no need to run <code>nx build</code> or clear your browser cache between changes.</p>
 </div>
 </li>
 </ol>
