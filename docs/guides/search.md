@@ -177,6 +177,35 @@ Sometimes it's convenient to just remove all accents/diacritics. For example, in
 ...
 ```
 
+## Replace Rules
+
+Sometimes the same word can be spelled in more than one way, and you want a search for one spelling to find the other. For example, Danish used to write "å" as "aa", so a user might search for "Aalborg" when your dictionary has "Ålborg". You can handle this with `replace_rules`, which replaces every match of a pattern with some other text:
+
+```json hl_lines='7-9'
+...
+"l1_normalization_transducer": {
+            "lower": true,
+            "unicode_normalization": "NFC",
+            "remove_punctuation": "[.,/#!$%^&?*';:{}=\\-_`~()]",
+            "remove_combining_characters": true,
+            "replace_rules": {
+                "aa": "a"
+            }
+        },
+...
+```
+
+Like all of the other settings in the normalization transducer, replace rules are applied both to the terms in your dictionary when it is built *and* to what the user types when they search. So, with the configuration above, "Ålborg", "Aalborg" and "alborg" are all normalized to `alborg`, and a search for any one of them will find the others.
+
+There are a few things to keep in mind when writing replace rules:
+
+- **Replace rules are applied last**, after lowercasing, Unicode normalization, removing punctuation and removing combining characters. Your rules need to match text that has *already* been through those steps. In the example above, `remove_combining_characters` has already turned "å" into "a", which is why the rule replaces "aa" with "a", not with "å". A rule of `"aa": "å"` would not work: "Aalborg" would become `ålborg`, but "Ålborg" would become `alborg`, so they would no longer match.
+- **Rules are applied in the order they are listed**, and each rule is applied to the result of the one before it.
+- **Each pattern is a [regular expression](https://en.wikipedia.org/wiki/Regular_expression).** Characters like `.`, `*`, `+`, `?`, `(`, `)`, `[` and `]` have special meanings, so put a backslash before them if you want to match them literally (and since the configuration is JSON, the backslash itself must be written as `\\`, for example `"\\."`). Rules are run in Python when your dictionary is built and in JavaScript in the browser, so stick to simple patterns, and don't refer to matched groups (like `\1` or `$1`) in the replacement text, since the two languages write these differently.
+
+!!! note
+    This example is for L1 normalization - you can configure this for your L2 language as well.
+
 ## Adding weights
 
 What about if I type 'kat' though? We might not expect a user to type 'kat' unless they are a learner of English - but, if we expect a lot of learners to be using our dictionary, that might be appropriate!
