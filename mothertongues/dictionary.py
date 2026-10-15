@@ -370,7 +370,8 @@ class MTDictionary:
         result = create_inverted_index(self.data, self.config, lang)
         if self.data:
             result.build()
-            result.calculate_scores()
+            bm25_config = getattr(self.config.config, f"{lang}_bm25_config")
+            result.calculate_scores(**bm25_config.model_dump())
         else:
             logger.debug(
                 "Sorry your dictionary does not have any entries so we cannot build the index for it."

@@ -146,6 +146,19 @@ class StemmerEnum(str, Enum):
     none = "none"
 
 
+class BM25Config(BaseConfig):
+    """Parameters for the BM25 algorithm used to rank search results"""
+
+    k1: float = Field(default=1.5, ge=0.0)
+    """Term frequency saturation: how much repeated occurrences of a term in a field increase its score"""
+
+    b: float = Field(default=1.0, ge=0.0, le=1.0)
+    """Length normalization: how much matches in longer fields are penalized (0 is none, 1 is full)"""
+
+    epsilon: float = Field(default=0.25, ge=0.0)
+    """Floor for very common terms: their IDF is replaced by epsilon times the average IDF"""
+
+
 class RestrictedTransducer(BaseConfig):
     lower: bool = True
     unicode_normalization: NormalizationEnum = NormalizationEnum.nfc
@@ -600,6 +613,12 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
     l1_stemmer: StemmerEnum = StemmerEnum.none
 
     l2_stemmer: StemmerEnum = StemmerEnum.snowball_english
+
+    l1_bm25_config: BM25Config = Field(default_factory=BM25Config)
+    """The BM25 parameters for ranking l1 search results"""
+
+    l2_bm25_config: BM25Config = Field(default_factory=BM25Config)
+    """The BM25 parameters for ranking l2 search results"""
 
     l1_normalization_transducer: RestrictedTransducer = Field(
         default_factory=RestrictedTransducer

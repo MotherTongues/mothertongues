@@ -2,7 +2,10 @@ import time
 
 import nltk
 
+from pydantic import ValidationError
+
 from mothertongues.config.models import (
+    BM25Config,
     CheckableParserTargetFieldNames,
     MTDConfiguration,
 )
@@ -61,6 +64,23 @@ class DictionaryIndexBuilderTest(BasicTestCase):
                     index.data[term][posting]["score"]["total"], 0.0
                 )
 
+    def test_bm25_config(self):
+        # Defaults
+        l1_index = self.dictionary.return_single_index("l1")
+        self.assertEqual((l1_index.k1, l1_index.b, l1_index.epsilon), (1.5, 1.0, 0.25))
+        # Configured values are passed to the scorer for the matching language only
+        self.dictionary.config.config.l2_bm25_config = BM25Config(
+            k1=1.2, b=0.5, epsilon=0.1
+        )
+        l1_index = self.dictionary.return_single_index("l1")
+        l2_index = self.dictionary.return_single_index("l2")
+        self.assertEqual((l1_index.k1, l1_index.b, l1_index.epsilon), (1.5, 1.0, 0.25))
+        self.assertEqual((l2_index.k1, l2_index.b, l2_index.epsilon), (1.2, 0.5, 0.1))
+        # Out of range values are rejected
+        for bad_value in [{"b": 1.5}, {"b": -0.1}, {"k1": -1}, {"epsilon": -1}]:
+            with self.assertRaises(ValidationError):
+                BM25Config(**bad_value)
+
     def test_score_brown_corpus(self):
         nltk.download("brown")
         corpus = [
@@ -72,7 +92,8 @@ class DictionaryIndexBuilderTest(BasicTestCase):
         second_index = create_inverted_index(corpus, self.dictionary.config, "l2")
         second_index.keys_to_index = ["test"]
         second_index.build()
-        second_index.calculate_scores()
+        # rank_bm25 uses b=0.75
+        second_index.calculate_scores(b=0.75)
         index.build()
         index._legacy_calculate_scores()
         self.assertEqual(second_index.k1, index._scorers["test"].k1)
