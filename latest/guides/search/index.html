@@ -620,6 +620,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ranking-results-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ranking results (Advanced)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -919,6 +930,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ranking-results-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ranking results (Advanced)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1126,6 +1148,41 @@ c,t,0.9
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>This will <strong>only</strong> work when our search strategy is set to "weighted_levenstein". The other search strategy is faster, but does not allow for weighted edit distance calculations.</p>
+</div>
+<h2 id="ranking-results-advanced">Ranking results (Advanced)<a class="headerlink" href="#ranking-results-advanced" title="Permanent link">&para;</a></h2>
+<p>When more than one entry matches a search, Mother Tongues has to decide which ones to show first. It does this in two steps:</p>
+<ol>
+<li><strong>Edit distance first.</strong> Results are sorted by how close they are to what the user typed (see <a href="#adding-weights">Adding weights</a>). An entry containing <code>cat</code> will always rank above an entry that only contains <code>kat</code> when the user searches for <code>cat</code>.</li>
+<li><strong>Then a relevance score.</strong> Results that are <em>equally</em> close to the query (for example, every entry containing the word <code>cat</code>) are then sorted by a relevance score calculated with <a href="https://en.wikipedia.org/wiki/Okapi_BM25">BM25</a>.</li>
+</ol>
+<p>The one exception is when the search only looks for exact matches; in that case, results are sorted by the relevance score alone.</p>
+<p>This means that the settings below only change the order of results that are equally close to the query. They will not help if your search is returning too many or too few results - for that, see the other sections of this guide.</p>
+<p>You can configure the relevance score separately for L1 and L2 searches. The default configuration looks like this:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;L1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;YourLanguage&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;L2&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;English&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="err">...</span>
+<span class="hll"><span class="w">        </span><span class="nt">&quot;l1_bm25_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;k1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;b&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;epsilon&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span>
+</span><span class="hll"><span class="w">        </span><span class="p">},</span>
+</span><span class="hll"><span class="w">        </span><span class="nt">&quot;l2_bm25_config&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;k1&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;b&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span>
+</span><span class="hll"><span class="w">            </span><span class="nt">&quot;epsilon&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span>
+</span><span class="hll"><span class="w">        </span><span class="p">},</span>
+</span><span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>The defaults should work well for most dictionaries. If you do want to change them, here is what each setting does:</p>
+<p><strong><code>b</code> - field length (between 0 and 1, default 1).</strong> Controls whether a match in a short field counts for more than the same match in a long field. When searching for <code>cat</code>, you probably want an entry whose definition is just "cat" to rank above one whose definition is "a small domesticated mammal, often kept as a pet, related to the wild cat". At <code>1</code>, short fields are strongly favoured; at <code>0</code>, length is ignored.</p>
+<p><strong><code>k1</code> - repetition (0 or more, default 1.5).</strong> Controls how much a word appearing several times in the same field adds to its score. Each repeat adds less than the one before, and <code>k1</code> controls how quickly that levels off. At <code>0</code>, only whether the word appears matters, not how often; higher values let repeats keep counting. Words, and most definitions, are too short for words to repeat, so this mainly matters if you've <a href="#index-changing-which-fields-get-searched">indexed</a> longer fields like <code>example_sentence</code>.</p>
+<p><strong><code>epsilon</code> - very common words (0 or more, default 0.25).</strong> Words that appear in many entries are given less weight than rare ones. For a word that appears in more than half of the entries, such as "to" in a dictionary where verbs are defined "to run", "to eat", and so on, the formula would give it a negative weight. Instead, its weight is set to <code>epsilon</code> × the average weight of all words, so it still counts for a little. At <code>0</code>, these words add nothing to the score.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These settings are used when your dictionary data is built, so you will need to rebuild your dictionary (for example with <code>mothertongues build-and-run</code> or <code>mothertongues export</code>) to see their effect.</p>
 </div>
 
 
