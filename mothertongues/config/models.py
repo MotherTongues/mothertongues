@@ -677,7 +677,7 @@ class LanguageConfiguration(LanguageConfigurationExportFormat):
                     return json.load(f)
             if alphabet.suffix.endswith("txt"):
                 with open(alphabet, encoding="utf8") as f:
-                    return [x.strip() for x in f]
+                    return [x.strip() for x in f if x.strip()]
             raise ValueError(
                 f"If providing a file ({alphabet}) with your alphabet, it must be either 'json' or 'txt'."
             )
