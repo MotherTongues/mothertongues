@@ -79,6 +79,33 @@
             "title": "Audio",
             "type": "object"
         },
+        "BM25Config": {
+            "additionalProperties": false,
+            "description": "Parameters for the BM25 algorithm used to rank search results",
+            "properties": {
+                "k1": {
+                    "default": 1.5,
+                    "minimum": 0.0,
+                    "title": "K1",
+                    "type": "number"
+                },
+                "b": {
+                    "default": 1.0,
+                    "maximum": 1.0,
+                    "minimum": 0.0,
+                    "title": "B",
+                    "type": "number"
+                },
+                "epsilon": {
+                    "default": 0.25,
+                    "minimum": 0.0,
+                    "title": "Epsilon",
+                    "type": "number"
+                }
+            },
+            "title": "BM25Config",
+            "type": "object"
+        },
         "CheckableParserTargetFieldNames": {
             "enum": [
                 "word",
@@ -542,6 +569,12 @@
                     "default": "mothertongues.utils.get_current_time",
                     "title": "Build",
                     "type": "string"
+                },
+                "l1_bm25_config": {
+                    "$ref": "#/$defs/BM25Config"
+                },
+                "l2_bm25_config": {
+                    "$ref": "#/$defs/BM25Config"
                 },
                 "no_sort_characters": {
                     "anyOf": [

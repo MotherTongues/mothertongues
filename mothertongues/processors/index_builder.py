@@ -191,8 +191,9 @@ class InvertedIndex:
                     if self.IDFS[key][term] < 0:
                         self.IDFS[key][term] = self.epsilon * avg_idf
                     IDF = self.IDFS[key][term]
-                    # calculate score
-                    score = IDF * (
+                    # calculate score (a term absent from this field scores 0; computing
+                    # it would divide by zero for an empty field when b=1)
+                    score = 0.0 if term_frequency == 0 else IDF * (
                         term_frequency
                         * (self.k1 + 1)
                         / (
@@ -217,7 +218,7 @@ class InvertedIndex:
                     else:
                         self.data[term][posting]["score"]["total"] += score
 
-    def calculate_scores(self, b=0.75, k1=1.5, epsilon=0.25):
+    def calculate_scores(self, b=1.0, k1=1.5, epsilon=0.25):
         self.k1 = k1
         self.b = b
         self.epsilon = epsilon

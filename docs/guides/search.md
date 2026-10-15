@@ -246,3 +246,47 @@ The *weights* file can be one of several formats
 
 !!! important
     This will **only** work when our search strategy is set to "weighted_levenstein". The other search strategy is faster, but does not allow for weighted edit distance calculations.
+
+## Ranking results (Advanced)
+
+When more than one entry matches a search, Mother Tongues has to decide which ones to show first. It does this in two steps:
+
+1. **Edit distance first.** Results are sorted by how close they are to what the user typed (see [Adding weights](#adding-weights)). An entry containing `cat` will always rank above an entry that only contains `kat` when the user searches for `cat`.
+2. **Then a relevance score.** Results that are *equally* close to the query (for example, every entry containing the word `cat`) are then sorted by a relevance score calculated with [BM25](https://en.wikipedia.org/wiki/Okapi_BM25).
+
+The one exception is when the search only looks for exact matches; in that case, results are sorted by the relevance score alone.
+
+This means that the settings below only change the order of results that are equally close to the query. They will not help if your search is returning too many or too few results - for that, see the other sections of this guide.
+
+You can configure the relevance score separately for L1 and L2 searches. The default configuration looks like this:
+
+```json hl_lines="6-15"
+{
+    "config": {
+        "L1": "YourLanguage",
+        "L2": "English",
+        ...
+        "l1_bm25_config": {
+            "k1": 1.5,
+            "b": 1.0,
+            "epsilon": 0.25
+        },
+        "l2_bm25_config": {
+            "k1": 1.5,
+            "b": 1.0,
+            "epsilon": 0.25
+        },
+    }
+}
+```
+
+The defaults should work well for most dictionaries. If you do want to change them, here is what each setting does:
+
+**`b` - field length (between 0 and 1, default 1).** Controls whether a match in a short field counts for more than the same match in a long field. When searching for `cat`, you probably want an entry whose definition is just "cat" to rank above one whose definition is "a small domesticated mammal, often kept as a pet, related to the wild cat". At `1`, short fields are strongly favoured; at `0`, length is ignored.
+
+**`k1` - repetition (0 or more, default 1.5).** Controls how much a word appearing several times in the same field adds to its score. Each repeat adds less than the one before, and `k1` controls how quickly that levels off. At `0`, only whether the word appears matters, not how often; higher values let repeats keep counting. Words, and most definitions, are too short for words to repeat, so this mainly matters if you've [indexed](#index-changing-which-fields-get-searched) longer fields like `example_sentence`.
+
+**`epsilon` - very common words (0 or more, default 0.25).** Words that appear in many entries are given less weight than rare ones. For a word that appears in more than half of the entries, such as "to" in a dictionary where verbs are defined "to run", "to eat", and so on, the formula would give it a negative weight. Instead, its weight is set to `epsilon` × the average weight of all words, so it still counts for a little. At `0`, these words add nothing to the score.
+
+!!! note
+    These settings are used when your dictionary data is built, so you will need to rebuild your dictionary (for example with `mothertongues build-and-run` or `mothertongues export`) to see their effect.
