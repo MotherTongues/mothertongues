@@ -759,8 +759,8 @@
 </div>
 <p>Once you have properly configured your dictionary data, you can let <code>mothertongues</code> put it all together!</p>
 <p>This will parse all of the data according to your specifications, combine all of your sources of data, sort your data according to your alphabet, create an <a href="https://en.wikipedia.org/wiki/Inverted_index">inverted index</a> for improved performance, <a href="https://en.wikipedia.org/wiki/Okapi_BM25">calculate BM25 scores for ranking search results</a>, and generate the code necessary for your approximate search to work.</p>
-<p>This guide assumes that you have worked through the steps to create a valid <a href="#mtd-language-configuration-file">Language Configuration file</a> and <a href="#mtd-data-resource-configuration-file">Data Resource Configuration files</a> for each unique source of data. It also assumes you have a directory
-structure similar to the one <a href="#file-structure">described in this guide</a>.</p>
+<p>This guide assumes that you have worked through the steps to create a valid <a href="../prepare/#mtd-configuration-file">MTD Configuration file</a> for your dictionary, with each of your sources of data listed under its <code>data</code> key. It also assumes you have a directory
+structure similar to the one <a href="../prepare/#project-folder-structure">described in this guide</a>.</p>
 <p>Then run:</p>
 <p><code>mothertongues build-and-run &lt;path_to_config.mtd.json&gt;</code></p>
 <p>And your dictionary will be served at <a href="http://localhost:3636">http://localhost:3636</a></p>
@@ -777,7 +777,7 @@ structure similar to the one <a href="#file-structure">described in this guide</
 <p>Here are the steps for creating a mobile dictionary on your machine.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for <a href="#seeing-your-dictionary-in-action-ie-local-development">running on your machine</a> or <a href="#exporting-your-data">exporting your data</a> and <a href="">publishing to GitHub</a></p>
+<p>You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for <a href="#seeing-your-dictionary-in-action-ie-local-development">running on your machine</a>, <a href="#exporting-your-data">exporting your data</a> or <a href="../../nocode/install/">publishing to GitHub</a></p>
 </div>
 <ol>
 <li>
