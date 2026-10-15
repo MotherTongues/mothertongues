@@ -10,7 +10,7 @@ The most time-intensive part of building your dictionary, depending on how you w
 
 ## Project folder structure
 
-To generate a sample project that you can edit to suit your needs, use the `mothertongues new-project` command. For example `mothertongues new-project --outdir . --name 'DanishDictionary'` will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a [MTD configuration file](#mtd-language-configuration-file) ('config.mtd.json').
+To generate a sample project that you can edit to suit your needs, use the `mothertongues new-project` command. For example `mothertongues new-project --outdir . --name 'DanishDictionary'` will build a folder called 'DanishDictionary in the current directory'. It will include some sample data ('data.xlsx') and a [MTD configuration file](#mtd-configuration-file) ('config.mtd.json').
 
 ```raw
 📦DanishDictionary
@@ -21,7 +21,7 @@ To generate a sample project that you can edit to suit your needs, use the `moth
 ## MTD Configuration file
 
 !!! tip
-    In the [starter](https://github.com/MotherTongues/mtd-starter), the language configuration file is found here: `mtd-starter/config.mtd.json`
+    In the [starter](https://github.com/MotherTongues/mtd-starter), the MTD configuration file is found here: `mtd-starter/config.mtd.json`
 
 
 Every dictionary must have a configuration file, which helps define which data belongs to your dictionary and meta data like your dictionary's [alphabet](#customized-alphabet)
@@ -49,7 +49,7 @@ Your data will get sorted based on your defined [alphabet](#customized-alphabet)
 
 Adding your custom alphabet allows your entries to be sorted based on that alphabet. If you don't use a custom alphabet, the English alphabet will be used instead.
 
-In your Language Configuration file, set the `alphabet`
+In your MTD Configuration file, set the `alphabet`
 key equal to an array containing the letters in your language's alphabet in alphabetical order:
 
 ```json hl_lines="6"
@@ -64,7 +64,7 @@ key equal to an array containing the letters in your language's alphabet in alph
 }
 ```
 
-You can also reference a file that contains a txt or json file containing your alphabet:
+You can also set `alphabet` to the path of a `.txt` or `.json` file containing your alphabet. A `.txt` file should list one letter per line, in alphabetical order (blank lines are ignored). A `.json` file should contain an array of letters, like the example above. The path is relative to your MTD Configuration file:
 
 ```json hl_lines="6"
 {
@@ -72,7 +72,7 @@ You can also reference a file that contains a txt or json file containing your a
         "L1": "Danish",
         "L2": "English",
         ...
-        "alphabet": "../alphabet.txt"
+        "alphabet": "alphabet.txt"
     },
     ...
 }
