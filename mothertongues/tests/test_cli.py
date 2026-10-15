@@ -1,7 +1,7 @@
 import json
 import os
 from unittest import main
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 from typer.testing import CliRunner
 
@@ -139,6 +139,106 @@ class CommandLineTest(BasicTestCase):
             )
         self.assertEqual(result.exit_code, 1)
         self.assertIn("npm install", logs[0])
+
+    def make_ui_dir(self):
+        ui_dir = self.tempdir / "ui"
+        (ui_dir / "assets").mkdir(parents=True)
+        return ui_dir
+
+    def test_run(self):
+        ui_dir = self.make_ui_dir()
+        data = self.tempdir / "dictionary_data.json"
+        data.write_text('{"data": []}', encoding="utf8")
+        with (
+            patch("mothertongues.cli.UI_DIR", ui_dir),
+            patch("mothertongues.cli.serve") as mock_serve,
+        ):
+            result = self.runner.invoke(app, ["run", str(data), "--port", "4321"])
+        self.assertEqual(result.exit_code, 0)
+        mock_serve.assert_called_once_with(ui_dir, 4321)
+        self.assertEqual(
+            (ui_dir / "assets" / "dictionary_data.json").read_text(encoding="utf8"),
+            '{"data": []}',
+        )
+
+    def test_build_and_run(self):
+        ui_dir = self.make_ui_dir()
+        config = self.data_dir / "config_data_check.json"
+        with (
+            patch("mothertongues.cli.UI_DIR", ui_dir),
+            patch("mothertongues.cli.serve") as mock_serve,
+        ):
+            result = self.runner.invoke(app, ["build-and-run", str(config)])
+        self.assertEqual(result.exit_code, 0)
+        mock_serve.assert_called_once_with(ui_dir, 3636)
+        with open(ui_dir / "assets" / "dictionary_data.json", encoding="utf8") as f:
+            self.assertIn("data", json.load(f))
+
+    def test_build_and_run_watch(self):
+        ui_dir = self.make_ui_dir()
+        config = self.data_dir / "config_data_check.json"
+        with (
+            patch("mothertongues.cli.UI_DIR", ui_dir),
+            patch("mothertongues.cli.watch_and_serve") as mock_watch,
+            patch("mothertongues.cli.serve") as mock_serve,
+        ):
+            result = self.runner.invoke(app, ["build-and-run", str(config), "--watch"])
+        self.assertEqual(result.exit_code, 0)
+        mock_watch.assert_called_once_with(config, 3636, ui_dir)
+        mock_serve.assert_not_called()
+        # Watch mode serves the data from memory instead of writing it into the UI
+        self.assertFalse((ui_dir / "assets" / "dictionary_data.json").exists())
+
+    def invoke_dev(self, ui_repo):
+        return self.runner.invoke(
+            app,
+            [
+                "dev",
+                str(self.data_dir / "config_data_check.json"),
+                "--ui-repo",
+                str(ui_repo),
+                "--port",
+                "4321",
+            ],
+        )
+
+    def test_dev_missingNpx(self):
+        ui_repo = self.tempdir / "mothertongues-UI"
+        (ui_repo / "node_modules").mkdir(parents=True)
+        with patch("mothertongues.cli.shutil.which", return_value=None):
+            with capture_logs() as logs:
+                result = self.invoke_dev(ui_repo)
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn("Could not find `npx`", logs[0])
+
+    def test_dev(self):
+        ui_repo = self.tempdir / "mothertongues-UI"
+        (ui_repo / "node_modules").mkdir(parents=True)
+        with (
+            patch("mothertongues.cli.shutil.which", return_value="/bin/npx"),
+            patch("mothertongues.cli.subprocess.Popen") as mock_popen,
+            patch("mothertongues.cli.watch_and_serve") as mock_watch,
+            patch("mothertongues.cli.os.killpg") as mock_killpg,
+        ):
+            result = self.invoke_dev(ui_repo)
+            self.assertEqual(result.exit_code, 0)
+            command = mock_popen.call_args.args[0]
+            self.assertEqual(command[:4], ["npx", "nx", "serve", "mtd-mobile-ui"])
+            self.assertIn("--port=4321", command)
+            kwargs = mock_popen.call_args.kwargs
+            self.assertEqual(kwargs["cwd"], ui_repo)
+            self.assertEqual(kwargs["env"]["MTD_DATA_PORT"], "4322")
+            (_, data_port, ui_dir), watch_kwargs = mock_watch.call_args
+            self.assertEqual((data_port, ui_dir), (4322, None))
+            self.assertEqual(watch_kwargs["ignore"], [ui_repo])
+            # nx is stopped when the watcher exits
+            mock_killpg.assert_called_once_with(mock_popen.return_value.pid, ANY)
+            mock_popen.return_value.wait.assert_called_once()
+
+            # ...even if nx has already exited
+            mock_killpg.side_effect = ProcessLookupError
+            result = self.invoke_dev(ui_repo)
+            self.assertEqual(result.exit_code, 0)
 
     def test_export_validate_happyPath(self):
         result = self.runner.invoke(
