@@ -234,6 +234,12 @@ class ConfigurationTest(BasicTestCase):
 
         self.assertEqual(txt_lc.alphabet, [])
 
+    def test_alphabet_txt_ignores_blank_lines(self):
+        alphabet_text_path = self.data_dir / "alphabet_blank_lines.txt"
+        txt_lc = LanguageConfiguration(alphabet=alphabet_text_path)
+
+        self.assertEqual(txt_lc.alphabet, ["a", "b", "c"])
+
     def test_alphabet_is_empty_json(self):
         alphabet_json_path = self.data_dir / "alphabet_empty.json"
         json_lc = LanguageConfiguration(alphabet=alphabet_json_path)

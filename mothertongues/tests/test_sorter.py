@@ -111,7 +111,7 @@ class SorterTest(BasicTestCase):
             ],
             key=lambda x: x["sorting_form"],
         )
-        self.assertEquals(lexicon_sorted, sorter(lexicon, "word"))
+        self.assertEqual(lexicon_sorted, sorter(lexicon, "word"))
 
     def test_digraph_sorting(self):
         """Sort digraphs"""
