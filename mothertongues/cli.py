@@ -31,6 +31,7 @@ from mothertongues.utils import load_mtd_configuration
 app = typer.Typer(rich_markup_mode="markdown")
 UI_DIR = Path(__file__).parent / "ui"
 UI_REPO_DIR = Path(__file__).parent.parent / "mothertongues-UI"
+IS_WINDOWS = os.name == "nt"
 
 
 def ensure_ui_built():
@@ -140,13 +141,15 @@ def dev(
             "or pass its location with --ui-repo."
         )
         exit(1)
-    if shutil.which("npx") is None:
+    # Use the full path, since on Windows npx is npx.cmd, which Popen won't find by name
+    npx = shutil.which("npx")
+    if npx is None:
         logger.error("Could not find `npx`. Please install Node.js first.")
         exit(1)
     data_port = port + 1
     nx = subprocess.Popen(
         [
-            "npx",
+            npx,
             "nx",
             "serve",
             "mtd-mobile-ui",
@@ -155,8 +158,8 @@ def dev(
         ],
         cwd=ui_repo,
         env={**os.environ, "MTD_DATA_PORT": str(data_port)},
-        # Own process group so the whole nx tree can be stopped together
-        start_new_session=True,
+        # Own process group so the whole nx tree can be stopped together (POSIX only)
+        start_new_session=not IS_WINDOWS,
     )
     logger.info(
         "Open http://localhost:{port} in your browser once the UI has compiled",
@@ -167,11 +170,21 @@ def dev(
             language_config_path, data_port, None, ignore=[ui_repo], announce=False
         )
     finally:
+        stop_process_tree(nx)
+
+
+def stop_process_tree(process: subprocess.Popen):
+    """Stop a process and everything it started (npx starts nx, which starts node)."""
+    if IS_WINDOWS:
+        subprocess.run(
+            ["taskkill", "/T", "/F", "/PID", str(process.pid)], capture_output=True
+        )
+    else:
         try:
-            os.killpg(nx.pid, signal.SIGTERM)
+            os.killpg(process.pid, signal.SIGTERM)
         except ProcessLookupError:
             pass
-        nx.wait()
+    process.wait()
 
 
 @app.command(hidden=True)

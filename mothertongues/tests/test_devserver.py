@@ -36,11 +36,12 @@ class DevServerTest(BasicTestCase):
         if handler is None:
             handler_class = type("Handler", (NoCacheHandler,), handler_attrs)
             handler = partial(handler_class, directory=str(self.tempdir))
-        httpd = _Server(("localhost", 0), handler)
+        # 127.0.0.1 rather than localhost, which tries IPv6 first and is slow on Windows
+        httpd = _Server(("127.0.0.1", 0), handler)
         threading.Thread(target=httpd.serve_forever, daemon=True).start()
         self.addCleanup(httpd.server_close)
         self.addCleanup(httpd.shutdown)
-        return f"http://localhost:{httpd.server_address[1]}"
+        return f"http://127.0.0.1:{httpd.server_address[1]}"
 
     def get(self, url, method="GET"):
         request = urllib.request.Request(url, method=method)

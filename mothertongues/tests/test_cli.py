@@ -1,11 +1,11 @@
 import json
 import os
 from unittest import main
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from mothertongues.cli import app
+from mothertongues.cli import app, stop_process_tree
 from mothertongues.config.models import (
     DictionaryEntryExportFormat,
     MTDConfiguration,
@@ -218,12 +218,12 @@ class CommandLineTest(BasicTestCase):
             patch("mothertongues.cli.shutil.which", return_value="/bin/npx"),
             patch("mothertongues.cli.subprocess.Popen") as mock_popen,
             patch("mothertongues.cli.watch_and_serve") as mock_watch,
-            patch("mothertongues.cli.os.killpg") as mock_killpg,
+            patch("mothertongues.cli.stop_process_tree") as mock_stop,
         ):
             result = self.invoke_dev(ui_repo)
             self.assertEqual(result.exit_code, 0)
             command = mock_popen.call_args.args[0]
-            self.assertEqual(command[:4], ["npx", "nx", "serve", "mtd-mobile-ui"])
+            self.assertEqual(command[:4], ["/bin/npx", "nx", "serve", "mtd-mobile-ui"])
             self.assertIn("--port=4321", command)
             kwargs = mock_popen.call_args.kwargs
             self.assertEqual(kwargs["cwd"], ui_repo)
@@ -232,13 +232,32 @@ class CommandLineTest(BasicTestCase):
             self.assertEqual((data_port, ui_dir), (4322, None))
             self.assertEqual(watch_kwargs["ignore"], [ui_repo])
             # nx is stopped when the watcher exits
-            mock_killpg.assert_called_once_with(mock_popen.return_value.pid, ANY)
-            mock_popen.return_value.wait.assert_called_once()
+            mock_stop.assert_called_once_with(mock_popen.return_value)
 
+    def test_stop_process_tree_posix(self):
+        process = MagicMock(pid=1234)
+        with (
+            patch("mothertongues.cli.IS_WINDOWS", False),
+            patch("mothertongues.cli.os.killpg", create=True) as mock_killpg,
+        ):
+            stop_process_tree(process)
+            mock_killpg.assert_called_once_with(1234, ANY)
+            process.wait.assert_called_once()
             # ...even if nx has already exited
             mock_killpg.side_effect = ProcessLookupError
-            result = self.invoke_dev(ui_repo)
-            self.assertEqual(result.exit_code, 0)
+            stop_process_tree(process)
+
+    def test_stop_process_tree_windows(self):
+        process = MagicMock(pid=1234)
+        with (
+            patch("mothertongues.cli.IS_WINDOWS", True),
+            patch("mothertongues.cli.subprocess.run") as mock_run,
+        ):
+            stop_process_tree(process)
+        self.assertEqual(
+            mock_run.call_args.args[0], ["taskkill", "/T", "/F", "/PID", "1234"]
+        )
+        process.wait.assert_called_once()
 
     def test_export_validate_happyPath(self):
         result = self.runner.invoke(
