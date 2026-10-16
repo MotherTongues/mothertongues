@@ -85,7 +85,7 @@ jobs:
           path: dist/
 
   publish:
-    needs: [check-version, build]
+    needs: [build]
     runs-on: ubuntu-latest
     environment:
       name: pypi
