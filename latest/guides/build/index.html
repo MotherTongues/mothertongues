@@ -456,13 +456,63 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mobileui-development" class="md-nav__link">
+  <a href="#customizing-the-ui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mobile/UI Development
+        Customizing the UI
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Customizing the UI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-ui-in-development-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the UI in development mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-your-customized-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing your customized UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -723,13 +773,63 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mobileui-development" class="md-nav__link">
+  <a href="#customizing-the-ui" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Mobile/UI Development
+        Customizing the UI
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Customizing the UI">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-ui-in-development-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running the UI in development mode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-your-customized-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Publishing your customized UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -774,29 +874,108 @@ structure similar to the one <a href="../prepare/#project-folder-structure">desc
 </ol>
 <p><code>mothertongues export &lt;path_to_config.mtd.json&gt; &lt;output_folder&gt;</code></p>
 <p>This will create a file called <code>dictionary_data.json</code> which is the file you will need to transfer to your MTD UI in the next section.</p>
-<h2 id="mobileui-development">Mobile/UI Development<a class="headerlink" href="#mobileui-development" title="Permanent link">&para;</a></h2>
-<p>Here are the steps for creating a mobile dictionary on your machine.</p>
+<h2 id="customizing-the-ui">Customizing the UI<a class="headerlink" href="#customizing-the-ui" title="Permanent link">&para;</a></h2>
+<p><em>This advanced guide assumes some experience with web development. The UI is an <a href="https://angular.dev">Angular</a> and <a href="https://ionicframework.com">Ionic</a> app found in the <code>mothertongues-UI</code> folder.</em></p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You only need to do this if you intend to customize the code for the UI, otherwise you can just follow the steps for <a href="#seeing-your-dictionary-in-action-ie-local-development">running on your machine</a>, <a href="#exporting-your-data">exporting your data</a> or <a href="../../nocode/install/">publishing to GitHub</a></p>
+<p>You only need this guide if you want to change the code of the UI itself. To see changes to your dictionary's data or configuration as you make them, <code>mothertongues build-and-run &lt;path_to_config.mtd.json&gt; --watch</code> is all you need (see <a href="#seeing-your-dictionary-in-action-ie-local-development">above</a>). To put your dictionary online, see <a href="#exporting-your-data">exporting your data</a> or <a href="../../nocode/install/">publishing to GitHub</a>.</p>
 </div>
+<h3 id="setting-up">Setting up<a class="headerlink" href="#setting-up" title="Permanent link">&para;</a></h3>
+<p>You need a copy of the <code>mothertongues</code> source code, including the <code>mothertongues-UI</code> submodule, and Node 22 or newer. If you don't have these yet, follow the steps for <a href="../../developer/prerequisites/#installing-mother-tongues">installing Mother Tongues locally</a>.</p>
+<p>Then install the UI's dependencies. You only need to do this once, and again whenever the UI's <code>package.json</code> changes:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>mothertongues-UI
+npm<span class="w"> </span>install
+<span class="nb">cd</span><span class="w"> </span>..
+</code></pre></div>
+<h3 id="running-the-ui-in-development-mode">Running the UI in development mode<a class="headerlink" href="#running-the-ui-in-development-mode" title="Permanent link">&para;</a></h3>
+<p>From the <code>mothertongues</code> folder, run:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>mothertongues<span class="w"> </span>dev<span class="w"> </span>&lt;path_to_config.mtd.json&gt;
+</code></pre></div>
+<p>Wait until you see <code>Compiled successfully</code>, then open <a href="http://localhost:3636">http://localhost:3636</a>. From then on, any changes you save are picked up automatically:</p>
+<table>
+<thead>
+<tr>
+<th>When you change...</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UI code in <code>mothertongues-UI</code></td>
+<td>Only the changed code is recompiled, and the page reloads</td>
+</tr>
+<tr>
+<td>Your configuration or data files</td>
+<td>Your dictionary is rebuilt, and the page reloads</td>
+</tr>
+<tr>
+<td>The <code>mothertongues</code> Python code</td>
+<td>The Python server restarts, rebuilds your dictionary, and the page reloads</td>
+</tr>
+</tbody>
+</table>
+<p>There's no need to run <code>nx build</code> or clear your browser's cache between changes. Press ctrl+c to stop.</p>
+<p>Options:</p>
+<ul>
+<li><code>--port &lt;number&gt;</code>: serve the UI on a different port (the default is 3636). Your dictionary data is served on the port after it (3637 by default), so both ports need to be free.</li>
+<li><code>--ui-repo &lt;path&gt;</code>: use a copy of <code>mothertongues-UI</code> somewhere other than the <code>mothertongues-UI</code> folder.</li>
+</ul>
+<details class="info">
+<summary>How it works</summary>
+<p><code>mothertongues dev</code> starts the Angular development server (<code>npx nx serve mtd-mobile-ui --configuration=pydev</code>), which compiles the UI in memory. It also starts a small Python server that builds your dictionary and serves <code>dictionary_data.json</code>. The Angular server forwards requests for the data to the Python server, which restarts whenever your configuration, data or the Python code changes.</p>
+</details>
+<h3 id="publishing-your-customized-ui">Publishing your customized UI<a class="headerlink" href="#publishing-your-customized-ui" title="Permanent link">&para;</a></h3>
+<p>Development mode only runs on your computer. To put your customized dictionary online, build a production version of the site and upload it to any static web host, such as <a href="https://pages.github.com">GitHub Pages</a>, Netlify or your own server.</p>
 <ol>
 <li>
-<p>Change into the UI directory:</p>
-<p><code>cd mothertongues-UI</code></p>
+<p><strong>Build the site.</strong> From the <code>mothertongues-UI</code> folder, run:</p>
+<div class="highlight"><pre><span></span><code>npx<span class="w"> </span>nx<span class="w"> </span>build<span class="w"> </span>mtd-mobile-ui<span class="w"> </span>--configuration<span class="o">=</span>production<span class="w"> </span>--base-href<span class="o">=</span>/&lt;path&gt;/
+</code></pre></div>
+<p>The <code>--base-href</code> is the path your site will live at. For GitHub Pages, that's usually your repository's name, e.g. <code>--base-href=/my-dictionary/</code> for a site at <code>https://&lt;YourGitHubUserName&gt;.github.io/my-dictionary/</code>. For a site at the root of its own domain, use <code>--base-href=/</code>.</p>
+<p>The site is written to <code>dist/packages/mtd-mobile-ui</code>.</p>
 </li>
 <li>
-<p>Install dependencies:</p>
-<p><code>npm install</code></p>
+<p><strong>Add your dictionary data.</strong> The build contains sample data, so replace it with your own:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>mothertongues<span class="w"> </span><span class="nb">export</span><span class="w"> </span>&lt;path_to_config.mtd.json&gt;<span class="w"> </span>dist/packages/mtd-mobile-ui/assets/
+</code></pre></div>
+<p>If your dictionary has audio or images, copy them into <code>dist/packages/mtd-mobile-ui</code> too, at the paths your data refers to. For example, an audio path of <code>assets/audio/word.mp3</code> means the file goes in <code>dist/packages/mtd-mobile-ui/assets/audio/word.mp3</code>.</p>
 </li>
 <li>
-<p>Move your <a href="#exporting-your-data">exported data</a> to <code>mothertongues-UI/packages/mtd-mobile-ui/src/assets/dictionary_data.json</code></p>
+<p><strong>Let pages reload correctly.</strong> The site uses paths like <code>/my-dictionary/browse</code>, which only exist inside the app. Static hosts return a "not found" page if someone refreshes or follows a link straight to one of them. On GitHub Pages, fix this by copying <code>index.html</code> to <code>404.html</code>:</p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>dist/packages/mtd-mobile-ui/index.html<span class="w"> </span>dist/packages/mtd-mobile-ui/404.html
+</code></pre></div>
+<p>Other hosts have their own setting for this, usually called a "rewrite" or "single-page app" fallback to <code>index.html</code>.</p>
 </li>
 <li>
-<p>Serve your dictionary:</p>
-<p><code>npx nx serve mtd-mobile-ui</code></p>
+<p><strong>Upload</strong> everything in <code>dist/packages/mtd-mobile-ui</code> to your host.</p>
 </li>
 </ol>
+<div class="admonition tip">
+<p class="admonition-title">Publishing automatically with GitHub Actions</p>
+<p>The <a href="https://github.com/MotherTongues/mtd-starter">mtd-starter</a> template already builds and publishes a dictionary to GitHub Pages every time you push (see <a href="../../nocode/install/">publishing to GitHub</a>). To publish your customized UI instead of the default one:</p>
+<ol>
+<li>Push your changes to your own fork of <a href="https://github.com/MotherTongues/mothertongues-UI">mothertongues-UI</a>.</li>
+<li>
+<p>In your copy of <code>.github/workflows/build.yaml</code>, change the "Check out mothertongues" step to <code>submodules: false</code>. Then add a step after it that checks out your fork into the UI folder:</p>
+<div class="highlight"><pre><span></span><code><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Check out my UI</span>
+<span class="w">  </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v7</span>
+<span class="w">  </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;YourGitHubUserName&gt;/mothertongues-UI</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mothertongues/mothertongues-UI</span>
+</code></pre></div>
+</li>
+<li>
+<p>Change <code>--base-href=/mtd-starter/</code> in the "Build" step to your repository's name.</p>
+</li>
+</ol>
+</div>
+<h3 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>"Could not find an installed mothertongues-UI repository"</strong>: the UI's dependencies aren't installed. Run <code>npm install</code> in <code>mothertongues-UI</code>. If that folder is empty, run <code>git submodule update --init</code> from the <code>mothertongues</code> folder first.</li>
+<li><strong>"Could not find <code>npx</code>"</strong>: Node isn't installed, or isn't on your <code>PATH</code>. Install <a href="https://nodejs.org/en/download">Node 22 or newer</a>.</li>
+<li><strong>The port is already in use</strong>: another server (perhaps another <code>mothertongues</code> command) is still running. Stop it, or choose other ports with <code>--port</code>.</li>
+<li><strong>"Could not build your dictionary"</strong>: there's an error in your configuration or data. The UI keeps running, and your dictionary is rebuilt as soon as you save a fix.</li>
+</ul>
 
 
 
