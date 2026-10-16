@@ -85,8 +85,6 @@ jobs:
           path: dist/
 
   publish:
-    # Only publish once the release PR has been merged
-    if: github.event_name == 'push'
     needs: [check-version, build]
     runs-on: ubuntu-latest
     environment:
