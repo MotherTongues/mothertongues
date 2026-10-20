@@ -6,7 +6,7 @@ authors = [{ name = "roedoejet", email = "hello@aidanpine.ca" }]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=1.26.4",
+    "numpy>=2.4.6",
     "fastapi>=0.116.1",
     "loguru>=0.7.3",
     # Pinned below 0.10: 0.10+ changes error-output rendering (routed through
